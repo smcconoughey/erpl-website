@@ -113,12 +113,15 @@ function updateCountdowns() {
     });
 }
 
+// Store projects globally for modal access
+let projectsData = [];
+
 async function loadProjects() {
-    const projects = await loadJSON('data/projects.json');
-    if (!projects) return;
+    projectsData = await loadJSON('data/projects.json');
+    if (!projectsData) return;
 
     const grid = document.getElementById('projectsGrid');
-    grid.innerHTML = projects.map(project => `
+    grid.innerHTML = projectsData.map(project => `
         <div class="project-card">
             <div class="project-image">
                 <img src="${project.image}" alt="${project.name}" 
@@ -127,11 +130,97 @@ async function loadProjects() {
             <div class="project-content">
                 <h3>${project.name}</h3>
                 <p>${project.description}</p>
-                <a href="${project.link}" class="btn btn-secondary" target="_blank" rel="noopener">Read more</a>
+                <button type="button" class="btn btn-secondary project-read-more" data-project-id="${project.id}">Read more</button>
             </div>
         </div>
     `).join('');
+
+    // Attach click handlers using event delegation
+    grid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.project-read-more');
+        if (btn) {
+            e.preventDefault();
+            const projectId = btn.dataset.projectId;
+            openProjectModal(projectId);
+        }
+    });
 }
+
+function openProjectModal(projectId) {
+    const project = projectsData.find(p => p.id === projectId);
+    if (!project) return;
+
+    const modal = document.getElementById('projectModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalStatus = document.getElementById('modalStatus');
+    const modalImage = document.getElementById('modalImage');
+    const modalAbout = document.getElementById('modalAbout');
+    const modalSpecs = document.getElementById('modalSpecs');
+
+    // Populate modal
+    modalTitle.textContent = project.name;
+    modalImage.src = project.image;
+    modalImage.alt = project.name;
+
+    if (project.details) {
+        modalAbout.textContent = project.details.about || project.description;
+        modalStatus.textContent = project.details.status || '';
+        modalStatus.style.display = project.details.status ? 'inline-block' : 'none';
+
+        // Build specs if available
+        if (project.details.specs) {
+            const specs = project.details.specs;
+            const specLabels = {
+                thrust: 'Thrust',
+                chamberPressure: 'Chamber Pressure',
+                massFlowRate: 'Mass Flow Rate',
+                mixtureRatio: 'Mixture Ratio',
+                injectionType: 'Injection Type',
+                oxidizerFlowRate: 'Oxidizer Flow Rate'
+            };
+
+            let specsHtml = '<h4>Engine Specifications</h4><ul>';
+            for (const [key, value] of Object.entries(specs)) {
+                const label = specLabels[key] || key;
+                specsHtml += `<li><strong>${label}:</strong> ${value}</li>`;
+            }
+            specsHtml += '</ul>';
+            modalSpecs.innerHTML = specsHtml;
+            modalSpecs.style.display = 'block';
+        } else {
+            modalSpecs.style.display = 'none';
+        }
+    } else {
+        modalAbout.textContent = project.description;
+        modalStatus.style.display = 'none';
+        modalSpecs.style.display = 'none';
+    }
+
+    // Show modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeProjectModal() {
+    const modal = document.getElementById('projectModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Initialize modal event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('projectModal');
+    if (modal) {
+        // Close on backdrop click
+        modal.querySelector('.modal-backdrop').addEventListener('click', closeProjectModal);
+        // Close on X button click
+        modal.querySelector('.modal-close').addEventListener('click', closeProjectModal);
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeProjectModal();
+        });
+    }
+});
 
 async function loadLeadership() {
     const leaders = await loadJSON('data/leadership.json');
@@ -286,26 +375,26 @@ async function initHeroSlideshow() {
 
     // Build slides from config
     const slidesData = heroConfig.slides || [];
-    const slideDuration = heroConfig.slideDuration || 6000;
-    const timedVideos = [];
+    const imageDuration = heroConfig.imageDuration || 6000; // 6 seconds for images
 
     slidesData.forEach((slide, index) => {
         const slideDiv = document.createElement('div');
         slideDiv.className = 'hero-slide' + (index === 0 ? ' active' : '');
+        slideDiv.dataset.type = slide.type;
 
         if (slide.type === 'video') {
             const video = document.createElement('video');
             video.className = 'hero-media';
             video.muted = true;
-            video.loop = true;
             video.playsInline = true;
             if (index === 0) video.autoplay = true;
 
-            // Store timing data if present
-            if (slide.startTime !== undefined || slide.endTime !== undefined) {
-                video.dataset.start = slide.startTime || 0;
-                video.dataset.end = slide.endTime || '';
-                timedVideos.push(video);
+            // Store timing data if present (for trimmed videos)
+            if (slide.startTime !== undefined) {
+                video.dataset.start = slide.startTime;
+            }
+            if (slide.endTime !== undefined) {
+                video.dataset.end = slide.endTime;
             }
 
             const source = document.createElement('source');
@@ -324,56 +413,86 @@ async function initHeroSlideshow() {
         slidesContainer.appendChild(slideDiv);
     });
 
-    // Setup timed video handlers
-    timedVideos.forEach(video => {
-        const startTime = parseFloat(video.dataset.start) || 0;
-        const endTime = video.dataset.end ? parseFloat(video.dataset.end) : null;
-
-        video.addEventListener('loadedmetadata', () => {
-            video.currentTime = startTime;
-        });
-
-        if (endTime !== null) {
-            video.addEventListener('timeupdate', () => {
-                if (video.currentTime >= endTime) {
-                    video.currentTime = startTime;
-                }
-            });
-        }
-    });
-
-    // Get all slides and start slideshow
+    // Get all slides
     const slides = slidesContainer.querySelectorAll('.hero-slide');
     if (slides.length === 0) return;
 
     let currentSlide = 0;
+    let imageTimer = null;
 
-    function nextSlide() {
-        // Remove active class from current slide
+    function goToNextSlide() {
+        // Clear any pending timer
+        if (imageTimer) {
+            clearTimeout(imageTimer);
+            imageTimer = null;
+        }
+
+        // Remove active class and pause current video
         slides[currentSlide].classList.remove('active');
-
-        // Pause video if present
         const currentVideo = slides[currentSlide].querySelector('video');
-        if (currentVideo) currentVideo.pause();
+        if (currentVideo) {
+            currentVideo.pause();
+            currentVideo.removeEventListener('ended', goToNextSlide);
+        }
 
         // Move to next slide
         currentSlide = (currentSlide + 1) % slides.length;
-
-        // Add active class to new slide
         slides[currentSlide].classList.add('active');
 
-        // Play video if present and reset if timed
+        // Handle the new slide
+        const slideType = slides[currentSlide].dataset.type;
         const newVideo = slides[currentSlide].querySelector('video');
-        if (newVideo) {
-            if (newVideo.dataset.start) {
-                newVideo.currentTime = parseFloat(newVideo.dataset.start);
+
+        if (slideType === 'video' && newVideo) {
+            // Reset to start position if defined
+            const startTime = parseFloat(newVideo.dataset.start) || 0;
+            newVideo.currentTime = startTime;
+
+            // If end time is defined, use timeupdate to transition
+            const endTime = newVideo.dataset.end ? parseFloat(newVideo.dataset.end) : null;
+            if (endTime !== null) {
+                const onTimeUpdate = () => {
+                    if (newVideo.currentTime >= endTime) {
+                        newVideo.removeEventListener('timeupdate', onTimeUpdate);
+                        goToNextSlide();
+                    }
+                };
+                newVideo.addEventListener('timeupdate', onTimeUpdate);
+            } else {
+                // No end time, use ended event for full video
+                newVideo.addEventListener('ended', goToNextSlide, { once: true });
             }
             newVideo.play();
+        } else {
+            // Image slide - use timer
+            imageTimer = setTimeout(goToNextSlide, imageDuration);
         }
     }
 
-    // Start the slideshow
-    setInterval(nextSlide, slideDuration);
+    // Start the first slide
+    const firstSlide = slides[0];
+    const firstVideo = firstSlide.querySelector('video');
+
+    if (firstSlide.dataset.type === 'video' && firstVideo) {
+        const startTime = parseFloat(firstVideo.dataset.start) || 0;
+        firstVideo.currentTime = startTime;
+
+        const endTime = firstVideo.dataset.end ? parseFloat(firstVideo.dataset.end) : null;
+        if (endTime !== null) {
+            const onTimeUpdate = () => {
+                if (firstVideo.currentTime >= endTime) {
+                    firstVideo.removeEventListener('timeupdate', onTimeUpdate);
+                    goToNextSlide();
+                }
+            };
+            firstVideo.addEventListener('timeupdate', onTimeUpdate);
+        } else {
+            firstVideo.addEventListener('ended', goToNextSlide, { once: true });
+        }
+    } else {
+        // First slide is image
+        imageTimer = setTimeout(goToNextSlide, imageDuration);
+    }
 }
 
 // ===== Header scroll effect =====

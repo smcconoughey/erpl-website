@@ -1,58 +1,110 @@
 [
     {
         "id": "moe",
-        "name": "MOE Rocket",
+        "name": "Project Moe",
         "description": "MOE is ERPL's premier bi-propellant rocket engine. Designed to carry our flight vehicle to 60,000 feet, this beast of an engine and vehicle will set a new world record for collegiate rocket engines.",
-        "image": "assets/projects/moe.jpg",
-        "link": "https://erpl.space/moe/"
+        "image": "assets/projects/IMG_5980-2.png",
+        "details": {
+            "about": "MOE is a bi-propellant liquid rocket designed to reach an altitude of 60,000 feet during flight. Using the experience and knowledge gained from Odyssey and Juno, MOE aims to be one of the most powerful liquid rockets ever developed by a university. The engine is currently being designed and manufactured.",
+            "status": "In Testing",
+            "specs": {
+                "thrust": "2,250 lbf",
+                "chamberPressure": "500 psia",
+                "massFlowRate": "4.23 kg/s",
+                "mixtureRatio": "1.1",
+                "injectionType": "Coaxial Swirl"
+            },
+            "contact": "Rex Gavsie and Sean McConoughey"
+        }
     },
     {
         "id": "fluids",
         "name": "Fluids",
-        "description": "Fluids is our division that focus on fluid systems. Fluids handles design, maintaince, and upgrades for our Draco ground test stand. They now also build and test the fluid systems for MOE.",
+        "description": "Fluids is our division that focuses on fluid systems. Fluids handles design, maintenance, and upgrades for our Draco ground test stand. They also build and test the fluid systems for MOE.",
         "image": "assets/projects/flight.jpg",
-        "link": "https://erpl.space/fluids/"
+        "details": {
+            "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has developed expertise in cryogenic handling, high-pressure systems, and flow control.",
+            "status": "Active Division"
+        }
     },
     {
         "id": "electronics",
         "name": "Electronics",
         "description": "Our electronics division specializes in controlling our rocket engines and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
         "image": "assets/projects/electronics.jpg",
-        "link": "https://erpl.space/electronics/"
+        "details": {
+            "about": "The Electronics division designs and builds all control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. All PCBs are designed and assembled in-house.",
+            "status": "Active Division"
+        }
     },
     {
         "id": "flight",
         "name": "Flight",
-        "description": "Flight is our division that focus on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body for MOE.",
+        "description": "Flight is our division that focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body for MOE.",
         "image": "assets/projects/flight.jpg",
-        "link": "https://erpl.space/flight/"
+        "details": {
+            "about": "The Flight division handles all aspects of vehicle design including aerodynamics, structures, recovery systems, and active stabilization. The team developed Spectre, an actively stabilized rocket, and is now applying that expertise to the MOE flight vehicle.",
+            "status": "Active Division"
+        }
     },
     {
         "id": "engines",
         "name": "Engines",
-        "description": "Engines designs, produces, and characterizes ERPLs propulsion systems. Starting with Odyssey, a hybrid, in 2023, we have since tested three liquid bi-propellent engines, each increasing in complexity and power.",
+        "description": "Engines designs, produces, and characterizes ERPL's propulsion systems. Starting with Odyssey in 2023, we have since tested three liquid bi-propellent engines, each increasing in complexity and power.",
         "image": "assets/projects/flight.jpg",
-        "link": "https://erpl.space/engines/"
+        "details": {
+            "about": "The Engines division is responsible for the design, manufacturing, and testing of all propulsion systems. The team has progressed from Odyssey (hybrid) to Juno and Triton (liquid bi-propellant), with MOE being the culmination of this experience.",
+            "status": "Active Division"
+        }
     },
     {
         "id": "triton",
         "name": "Triton",
         "description": "Triton is a rocket engine designed to produce 1,000 lbf of thrust, intended to demonstrate a large step up in engine size from Juno. It is also a test bed for many different component designs.",
-        "image": "assets/projects/triton.jpg",
-        "link": "https://erpl.space/triton/"
+        "image": "assets/projects/triton.png",
+        "details": {
+            "about": "Triton represents a significant step up in engine capability from Juno. Designed for 1,000 lbf of thrust, Triton serves as both a high-power demonstrator and a testbed for new component designs that will be used in future projects.",
+            "specs": {
+                "thrust": "950 lbf",
+                "chamberPressure": "400 psia",
+                "massFlowRate": "2.2 kg/s",
+                "mixtureRatio": "1.4",
+                "injectionType": "Unlike Doublet Impinging"
+            },
+            "status": "Temporarily Retired"
+        }
     },
     {
         "id": "juno",
         "name": "Juno Engine",
         "description": "Juno was our first endeavor into cryogenic bi-propellant rocket engines. With the ability to target a range of operating conditions, Juno gave us experience with dealing with cryogenic fluids and liquid rocketry.",
-        "image": "assets/projects/juno.jpg",
-        "link": "https://erpl.space/juno/"
+        "image": "assets/projects/juno.png",
+        "details": {
+            "about": "Project Juno is ERPL's first endeavor into liquid bi-propellant rocket engines in over a decade. This engine was built to be rapidly tested for short duration test fires. Juno was designed to use liquid oxygen and ethanol for propellants. Juno is currently awaiting testing following a redesign of the igniter assembly.",
+            "specs": {
+                "thrust": "350 lbf",
+                "chamberPressure": "450 psia",
+                "massFlowRate": "0.66 kg/s",
+                "mixtureRatio": "1.3",
+                "injectionType": "Unlike Impinging"
+            },
+            "status": "Retired"
+        }
     },
     {
         "id": "odyssey",
         "name": "Odyssey",
         "description": "Odyssey was a hybrid rocket engine that utilized HTPB and nitrous oxide and produced a maximum of 600 lbf of thrust. This engine gave the team experience in fluid systems, infrastructure development, and operations planning.",
         "image": "assets/projects/odyssey.jpg",
-        "link": "https://erpl.space/odyssey/"
+        "details": {
+            "about": "Project Odyssey was a 500 lbf hybrid rocket engine utilizing HTPB and nitrous oxide as propellants. The engine was fired twice with the second test resulting in the loss of the engine due to thermal failures. Odyssey was ERPL's first engine test in over a decade and acted as a knowledge gathering project that resulted in the development of a propellant feed system, custom data collection, and a multitude of operations planning documents. The engine is retired and on display in the College of Engineering.",
+            "specs": {
+                "thrust": "500 lbf",
+                "chamberPressure": "500 psia",
+                "oxidizerFlowRate": "1 kg/s",
+                "injectionType": "Swirl"
+            },
+            "status": "Retired"
+        }
     }
 ]

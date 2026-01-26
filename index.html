@@ -20,7 +20,7 @@
         <div class="header-container">
             <div class="header-left">
                 <a href="#" class="logo">
-                    <img src="assets/logo/120349515_padded_logo.png" alt="ERPL" class="logo-img">
+                    <img src="assets/logo/ERPL Logo Vectorized_flame (1).png" alt="ERPL" class="logo-img">
                 </a>
                 <nav class="nav-links" id="navLinks">
                     <!-- Populated by JS -->
@@ -57,15 +57,18 @@
     </section>
 
     <!-- About Section -->
-    <section class="section" id="about">
+    <section class="section section-about" id="about">
         <div class="container">
-            <div class="section-header">
-                <h2>Who we are</h2>
-                <p class="section-subtitle">The Experimental Rocket Propulsion Lab<br><span>at Embry-Riddle Aeronautical
-                        University</span></p>
-            </div>
-            <div class="about-content">
-                <p id="aboutDescription"></p>
+            <div class="about-grid">
+                <div class="about-text">
+                    <h2>Who we are</h2>
+                    <div class="accent-line"></div>
+                    <h3>The Experimental Rocket Propulsion Lab<br>at Embry-Riddle Aeronautical University</h3>
+                    <p id="aboutDescription"></p>
+                </div>
+                <div class="about-image">
+                    <img src="assets/team/moe.png" alt="ERPL Team">
+                </div>
             </div>
         </div>
     </section>
@@ -144,6 +147,22 @@
             <p>&copy; 2026 ERPL. Made with ❤ at Embry-Riddle Aeronautical University</p>
         </div>
     </footer>
+    <!-- Project Modal -->
+    <div id="projectModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Project Title</h2>
+                <span id="modalStatus" class="modal-status"></span>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="" class="modal-image">
+                <p id="modalAbout"></p>
+                <div id="modalSpecs" class="modal-specs"></div>
+            </div>
+        </div>
+    </div>
 
     <script src="main.js"></script>
 </body>

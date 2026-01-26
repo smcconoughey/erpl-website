@@ -1,5 +1,5 @@
 {
-    "slideDuration": 6000,
+    "imageDuration": 6000,
     "slides": [
         {
             "type": "video",

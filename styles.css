@@ -92,8 +92,7 @@ header {
 .logo-img {
     height: 40px;
     width: auto;
-    filter: brightness(0) invert(1);
-    /* Make logo white */
+    /* Logo should be visible on dark bg, no filter needed */
 }
 
 .nav-links {
@@ -323,7 +322,7 @@ header {
 
 /* ===== Sections ===== */
 .section {
-    padding: var(--spacing-xl) 0;
+    padding: var(--spacing-lg) 0;
 }
 
 .section-dark {
@@ -358,16 +357,63 @@ header {
 }
 
 /* ===== About Section ===== */
-.about-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
+.section-about {
+    padding: var(--spacing-xl) 0;
 }
 
-.about-content p {
-    font-size: 1.125rem;
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: var(--spacing-xl);
+    align-items: center;
+}
+
+.about-text h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 300;
+    font-style: italic;
+    margin-bottom: var(--spacing-md);
+}
+
+.accent-line {
+    width: 60px;
+    height: 3px;
+    background: #3b82f6;
+    margin-bottom: var(--spacing-md);
+}
+
+.about-text h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    line-height: 1.5;
+}
+
+.about-text p {
+    font-size: 1rem;
     line-height: 1.8;
     color: var(--text-secondary);
+}
+
+.about-image img {
+    width: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+@media (max-width: 900px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .about-text {
+        text-align: center;
+    }
+
+    .accent-line {
+        margin: 0 auto var(--spacing-md);
+    }
 }
 
 /* ===== Projects Section ===== */
@@ -680,27 +726,104 @@ footer p {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
     .countdowns {
         gap: var(--spacing-md);
     }
 
+    .countdown-title {
+        font-size: 0.65rem;
+    }
+
     .countdown-value {
-        font-size: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .countdown-timer {
+        gap: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 1024px) {
+    .countdowns {
+        gap: var(--spacing-sm);
+    }
+
+    .countdown-title {
+        font-size: 0.6rem;
+    }
+
+    .countdown-value {
+        font-size: 0.95rem;
+    }
+
+    .countdown-label {
+        font-size: 0.55rem;
+    }
+}
+
+@media (max-width: 900px) {
+
+    /* Hide one countdown to save space */
+    .countdown-item:last-child {
+        display: none;
     }
 }
 
 @media (max-width: 768px) {
     :root {
-        --header-height: 70px;
+        --header-height: 60px;
     }
 
+    /* Hide nav by default, show when active */
     .nav-links {
         display: none;
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        background: var(--bg-primary);
+        flex-direction: column;
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--border);
+        z-index: 999;
     }
 
+    .nav-links.mobile-active {
+        display: flex;
+    }
+
+    .nav-links a {
+        padding: var(--spacing-sm);
+        font-size: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    /* Show countdowns on mobile but more compact */
     .countdowns {
-        display: none;
+        display: flex;
+        gap: var(--spacing-sm);
+    }
+
+    .countdown-item {
+        text-align: center;
+    }
+
+    .countdown-title {
+        font-size: 0.6rem;
+        margin-bottom: 2px;
+    }
+
+    .countdown-timer {
+        gap: var(--spacing-xs);
+    }
+
+    .countdown-value {
+        font-size: 0.875rem;
+    }
+
+    .countdown-label {
+        font-size: 0.5rem;
     }
 
     .menu-toggle {
@@ -763,4 +886,156 @@ footer p {
     justify-content: center;
     color: var(--text-muted);
     font-size: 0.875rem;
+}
+
+/* ===== Modal Styles ===== */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+}
+
+.modal-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-status {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.modal-body {
+    padding: var(--spacing-md);
+}
+
+.modal-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: var(--spacing-md);
+    background: var(--bg-tertiary);
+}
+
+.modal-body p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--spacing-md);
+}
+
+.modal-specs {
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    padding: var(--spacing-md);
+}
+
+.modal-specs h4 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-sm);
+}
+
+.modal-specs ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-xs);
+}
+
+.modal-specs li {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.modal-specs li strong {
+    color: var(--text-primary);
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        max-height: 90vh;
+    }
+
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .modal-specs ul {
+        grid-template-columns: 1fr;
+    }
 }

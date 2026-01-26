@@ -17,7 +17,7 @@
     {
         "name": "Samuel Muller",
         "role": "Secretary",
-        "photo": "assets/team/samuel.png"
+        "photo": "assets/team/samuel.jpg"
     },
     {
         "name": "Jay Parikh",
@@ -37,31 +37,21 @@
     {
         "name": "Andrew Levesque",
         "role": "Secretary",
-        "photo": "assets/team/andrew.png"
+        "photo": "assets/team/andrew.jpg"
     },
     {
         "name": "Zane Reed",
         "role": "Fluids Lead",
-        "photo": "assets/team/zane.png"
+        "photo": "assets/team/zane.jpg"
     },
     {
         "name": "Jack Jung",
         "role": "Electronics Lead",
-        "photo": "assets/team/jack.png"
+        "photo": "assets/team/jack.jpg"
     },
     {
         "name": "Jackson Floyd",
         "role": "Engines Lead",
         "photo": "assets/team/jackson.png"
-    },
-    {
-        "name": "Brady Benedetti",
-        "role": "Saguaro Lead",
-        "photo": "assets/team/brady.png"
-    },
-    {
-        "name": "Joe Traverso",
-        "role": "RED Lead",
-        "photo": "assets/team/joe.jpg"
     }
 ]
