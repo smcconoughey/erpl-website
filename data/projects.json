@@ -1,0 +1,58 @@
+[
+    {
+        "id": "moe",
+        "name": "MOE Rocket",
+        "description": "MOE is ERPL's premier bi-propellant rocket engine. Designed to carry our flight vehicle to 60,000 feet, this beast of an engine and vehicle will set a new world record for collegiate rocket engines.",
+        "image": "assets/projects/moe.jpg",
+        "link": "https://erpl.space/moe/"
+    },
+    {
+        "id": "fluids",
+        "name": "Fluids",
+        "description": "Fluids is our division that focus on fluid systems. Fluids handles design, maintaince, and upgrades for our Draco ground test stand. They now also build and test the fluid systems for MOE.",
+        "image": "assets/projects/flight.jpg",
+        "link": "https://erpl.space/fluids/"
+    },
+    {
+        "id": "electronics",
+        "name": "Electronics",
+        "description": "Our electronics division specializes in controlling our rocket engines and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
+        "image": "assets/projects/electronics.jpg",
+        "link": "https://erpl.space/electronics/"
+    },
+    {
+        "id": "flight",
+        "name": "Flight",
+        "description": "Flight is our division that focus on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body for MOE.",
+        "image": "assets/projects/flight.jpg",
+        "link": "https://erpl.space/flight/"
+    },
+    {
+        "id": "engines",
+        "name": "Engines",
+        "description": "Engines designs, produces, and characterizes ERPLs propulsion systems. Starting with Odyssey, a hybrid, in 2023, we have since tested three liquid bi-propellent engines, each increasing in complexity and power.",
+        "image": "assets/projects/flight.jpg",
+        "link": "https://erpl.space/engines/"
+    },
+    {
+        "id": "triton",
+        "name": "Triton",
+        "description": "Triton is a rocket engine designed to produce 1,000 lbf of thrust, intended to demonstrate a large step up in engine size from Juno. It is also a test bed for many different component designs.",
+        "image": "assets/projects/triton.jpg",
+        "link": "https://erpl.space/triton/"
+    },
+    {
+        "id": "juno",
+        "name": "Juno Engine",
+        "description": "Juno was our first endeavor into cryogenic bi-propellant rocket engines. With the ability to target a range of operating conditions, Juno gave us experience with dealing with cryogenic fluids and liquid rocketry.",
+        "image": "assets/projects/juno.jpg",
+        "link": "https://erpl.space/juno/"
+    },
+    {
+        "id": "odyssey",
+        "name": "Odyssey",
+        "description": "Odyssey was a hybrid rocket engine that utilized HTPB and nitrous oxide and produced a maximum of 600 lbf of thrust. This engine gave the team experience in fluid systems, infrastructure development, and operations planning.",
+        "image": "assets/projects/odyssey.jpg",
+        "link": "https://erpl.space/odyssey/"
+    }
+]

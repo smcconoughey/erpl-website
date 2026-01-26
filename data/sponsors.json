@@ -1,0 +1,74 @@
+[
+    {
+        "name": "Blue Origin",
+        "logo": "assets/sponsors/Blue Origin Logo - Feather.svg",
+        "url": "https://www.blueorigin.com",
+        "tier": "platinum"
+    },
+    {
+        "name": "Musk Foundation",
+        "logo": "assets/sponsors/MuskFoundation_logo.png",
+        "url": "https://www.muskfoundation.org",
+        "tier": "platinum"
+    },
+    {
+        "name": "Kitty Hawk",
+        "logo": "assets/sponsors/KittyHawk Logo.svg",
+        "url": "https://kittyhawk.aero",
+        "tier": "gold"
+    },
+    {
+        "name": "SendCutSend",
+        "logo": "assets/sponsors/sendcutsend-logo-white.svg",
+        "url": "https://sendcutsend.com",
+        "tier": "gold"
+    },
+    {
+        "name": "Valworx",
+        "logo": "assets/sponsors/Valworx-logo.webp",
+        "url": "https://valworx.com",
+        "tier": "gold"
+    },
+    {
+        "name": "Mastercam",
+        "logo": "assets/sponsors/Mastercam.png",
+        "url": "https://mastercam.com",
+        "tier": "silver"
+    },
+    {
+        "name": "Metrologic Group",
+        "logo": "assets/sponsors/Logo-Metrologic-Group Black.png",
+        "url": "https://metrologic.fr",
+        "tier": "silver"
+    },
+    {
+        "name": "3Dconnexion",
+        "logo": "assets/sponsors/3dconnexion_logo.png",
+        "url": "https://3dconnexion.com",
+        "tier": "silver"
+    },
+    {
+        "name": "DCS",
+        "logo": "assets/sponsors/DCS Logo Blk NB.png",
+        "url": "https://dframeware.com",
+        "tier": "silver"
+    },
+    {
+        "name": "Evology",
+        "logo": "assets/sponsors/evology-logo-300x234.png",
+        "url": "https://evology.com",
+        "tier": "bronze"
+    },
+    {
+        "name": "Engineering Center",
+        "logo": "assets/sponsors/ec-logo_220x@2x.png",
+        "url": "#",
+        "tier": "bronze"
+    },
+    {
+        "name": "Metalcraft",
+        "logo": "assets/sponsors/metalcraft.png",
+        "url": "#",
+        "tier": "bronze"
+    }
+]

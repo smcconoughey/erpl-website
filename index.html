@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERPL – Experimental Rocket Propulsion Laboratory</title>
+    <meta name="description"
+        content="The Experimental Rocket Propulsion Lab (ERPL) at Embry-Riddle Aeronautical University is a student-run organization dedicated to designing, building, and testing experimental rocket engines.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Header with Logo, Nav, and Countdowns -->
+    <header id="header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="#" class="logo">
+                    <img src="assets/logo/120349515_padded_logo.png" alt="ERPL" class="logo-img">
+                </a>
+                <nav class="nav-links" id="navLinks">
+                    <!-- Populated by JS -->
+                </nav>
+            </div>
+
+            <div class="header-right">
+                <div class="countdowns" id="countdowns">
+                    <!-- Populated by JS -->
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-background">
+            <!-- Crossfading slides container - populated by JS from hero.json -->
+            <div class="hero-slides" id="heroSlides"></div>
+            <!-- Gradient overlay -->
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <img src="" alt="ERPL Logo" class="hero-logo" id="heroLogo">
+            <h1 id="heroTagline">Propelling our future</h1>
+            <p id="heroSubtitle">through the rapid design and test of rocket engines</p>
+            <a href="#" class="btn btn-primary" id="joinBtn">Join the Club</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>Who we are</h2>
+                <p class="section-subtitle">The Experimental Rocket Propulsion Lab<br><span>at Embry-Riddle Aeronautical
+                        University</span></p>
+            </div>
+            <div class="about-content">
+                <p id="aboutDescription"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="section section-dark" id="projects">
+        <div class="container">
+            <div class="section-header">
+                <h2>Project Highlights</h2>
+                <p class="section-subtitle">ERPL is working on a lot – but here's a couple of our biggest projects and
+                    objectives</p>
+            </div>
+            <p class="projects-intro">ERPL primarily focuses on the design and testing of liquid and hybrid rocket
+                engines. After the successful hotfire test of our hybrid rocket engine, Odyssey, we pivoted to go all in
+                on our new objective of building a high-altitude liquid rocket. We have many projects that help
+                contribute towards this goal.</p>
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Leadership Section -->
+    <section class="section" id="leadership">
+        <div class="container">
+            <div class="section-header">
+                <h2>Leadership Board</h2>
+                <p class="section-subtitle">Meet our officers and leads</p>
+            </div>
+            <div class="leadership-grid" id="leadershipGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- What's Next Section -->
+    <section class="section section-accent" id="whats-next">
+        <div class="container">
+            <div class="whats-next-content">
+                <h2>What's next?</h2>
+                <p id="whatsNextText"></p>
+                <a href="#contact" class="btn btn-outline">Contact us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sponsors Section -->
+    <section class="section" id="sponsors">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Sponsors</h2>
+                <p class="section-subtitle">Thank you to our amazing sponsors for their support</p>
+            </div>
+            <div class="sponsors-container" id="sponsorsContainer">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section section-dark" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Contact Us</h2>
+                <p class="section-subtitle">Prospective students, sponsors, media</p>
+            </div>
+            <div class="social-links" id="socialLinks">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ERPL. Made with ❤ at Embry-Riddle Aeronautical University</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+{
+    "slideDuration": 6000,
+    "slides": [
+        {
+            "type": "video",
+            "src": "assets/projects/moehotfire.mp4"
+        },
+        {
+            "type": "image",
+            "src": "assets/team/moe.png"
+        },
+        {
+            "type": "video",
+            "src": "assets/projects/hotfirevideo.mp4",
+            "startTime": 6,
+            "endTime": 14
+        },
+        {
+            "type": "image",
+            "src": "assets/projects/IMG_5980-2.png"
+        }
+    ],
+    "logo": "assets/logo/ERPL Logo Vectorized_flame (1).png"
+}

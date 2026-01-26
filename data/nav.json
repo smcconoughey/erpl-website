@@ -1,0 +1,22 @@
+[
+    {
+        "name": "About",
+        "link": "#about"
+    },
+    {
+        "name": "Projects",
+        "link": "#projects"
+    },
+    {
+        "name": "Leadership",
+        "link": "#leadership"
+    },
+    {
+        "name": "Sponsors",
+        "link": "#sponsors"
+    },
+    {
+        "name": "Contact",
+        "link": "#contact"
+    }
+]

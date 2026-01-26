@@ -1,0 +1,67 @@
+[
+    {
+        "name": "Sean McConoughey",
+        "role": "President",
+        "photo": "assets/team/sean.png"
+    },
+    {
+        "name": "Justin Robinson",
+        "role": "Vice President",
+        "photo": "assets/team/justin.png"
+    },
+    {
+        "name": "Kendall Pielin",
+        "role": "Treasurer",
+        "photo": "assets/team/kendall.png"
+    },
+    {
+        "name": "Samuel Muller",
+        "role": "Secretary",
+        "photo": "assets/team/samuel.png"
+    },
+    {
+        "name": "Jay Parikh",
+        "role": "Public Relations Officer",
+        "photo": "assets/team/jay.jpg"
+    },
+    {
+        "name": "Josafath Villegas",
+        "role": "Safety",
+        "photo": "assets/team/josafath.jpg"
+    },
+    {
+        "name": "Rex Gavsie",
+        "role": "MOE Lead",
+        "photo": "assets/team/rex.png"
+    },
+    {
+        "name": "Andrew Levesque",
+        "role": "Secretary",
+        "photo": "assets/team/andrew.png"
+    },
+    {
+        "name": "Zane Reed",
+        "role": "Fluids Lead",
+        "photo": "assets/team/zane.png"
+    },
+    {
+        "name": "Jack Jung",
+        "role": "Electronics Lead",
+        "photo": "assets/team/jack.png"
+    },
+    {
+        "name": "Jackson Floyd",
+        "role": "Engines Lead",
+        "photo": "assets/team/jackson.png"
+    },
+    {
+        "name": "Brady Benedetti",
+        "role": "Saguaro Lead",
+        "photo": "assets/team/brady.png"
+    },
+    {
+        "name": "Joe Traverso",
+        "role": "RED Lead",
+        "photo": "assets/team/joe.jpg"
+    }
+]
