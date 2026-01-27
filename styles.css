@@ -744,14 +744,30 @@ footer p {
 }
 
 /* ===== Responsive ===== */
-/* Hide nav links earlier to make room for countdowns */
-@media (max-width: 1100px) {
+/* Progressively compress nav before hamburger */
+@media (max-width: 1350px) {
     .nav-links {
-        display: none;
+        gap: var(--spacing-sm);
     }
 
-    .menu-toggle {
-        display: flex;
+    .nav-links a {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+}
+
+@media (max-width: 1250px) {
+    .nav-links {
+        gap: 8px;
+    }
+
+    .nav-links a {
+        font-size: 0.7rem;
+        letter-spacing: 0;
+    }
+
+    .header-left {
+        gap: var(--spacing-md);
     }
 }
 
@@ -770,6 +786,17 @@ footer p {
 
     .countdown-timer {
         gap: var(--spacing-xs);
+    }
+}
+
+/* Hide nav links and show hamburger after compression stages */
+@media (max-width: 1100px) {
+    .nav-links {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: flex;
     }
 }
 
