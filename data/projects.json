@@ -37,7 +37,7 @@
     {
         "id": "electronics",
         "name": "Electronics",
-        "description": "Our electronics division specializes in controlling our rocket engines and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
+        "description": "Our electronics division specializes in commanding, controlling, and instrumenting our propulsion systems and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
         "image": "assets/projects/electronics.jpg",
         "details": {
             "about": "The Electronics division designs and builds all control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. All PCBs are designed and assembled in-house.",
@@ -57,7 +57,7 @@
     {
         "id": "engines",
         "name": "Engines",
-        "description": "Engines designs, produces, and characterizes ERPL's propulsion systems. Starting with Odyssey in 2023, we have since tested three liquid bi-propellent engines, each increasing in complexity and power.",
+        "description": "Engines designs, produces, and characterizes ERPL's propulsion systems. Following Odyssey in 2023, ERPL transitioned into liquid bipropellant propulsion and has since tested three increasingly complex engines.",
         "image": "assets/projects/flight.jpg",
         "details": {
             "about": "The Engines division is responsible for the design, manufacturing, and testing of all propulsion systems. The team has progressed from Odyssey (hybrid) to Juno and Triton (liquid bi-propellant), with MOE being the culmination of this experience.",

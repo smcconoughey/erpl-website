@@ -16,8 +16,8 @@
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
     --spacing-md: 2rem;
-    --spacing-lg: 4rem;
-    --spacing-xl: 6rem;
+    --spacing-lg: 3rem;
+    --spacing-xl: 4rem;
     --container-max: 1200px;
     --header-height: 80px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -339,7 +339,7 @@ header {
 
 .section-header {
     text-align: center;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
 }
 
 .section-header h2 {
@@ -397,12 +397,41 @@ header {
     font-size: 1rem;
     line-height: 1.8;
     color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.about-text h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
 }
 
 .about-image img {
     width: 100%;
     border-radius: 8px;
     object-fit: cover;
+}
+
+.about-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.about-column h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: var(--spacing-sm);
+}
+
+.about-column p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
 }
 
 @media (max-width: 900px) {
@@ -430,12 +459,15 @@ header {
 }
 
 .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--spacing-md);
 }
 
 .project-card {
+    flex: 0 1 340px;
+    max-width: 400px;
     background: var(--bg-card);
     border: 1px solid var(--border);
     overflow: hidden;
@@ -498,12 +530,15 @@ header {
 
 /* ===== Leadership Section ===== */
 .leadership-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--spacing-md);
 }
 
 .leader-card {
+    flex: 0 1 180px;
+    max-width: 220px;
     text-align: center;
     padding: var(--spacing-md);
     background: var(--bg-secondary);

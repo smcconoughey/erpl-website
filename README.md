@@ -1,10 +1,10 @@
 # ERPL Website
 
-Experimental Rocket Propulsion Laboratory website.
+Experimental Rocket Propulsion Lab website.
 
 ## Deployment
 
-This site is automatically deployed to Netlify when changes are pushed to the `main` branch.
+This site is automatically deployed to Render when changes are pushed to the `main` branch.
 
 ## Local Development
 
@@ -17,4 +17,4 @@ Then open http://localhost:8000
 
 ## Domain Setup
 
-The site is configured to use `erpl.space` as a custom domain through Netlify.
+The site is configured to use `erpl.space` as a custom domain through Render.

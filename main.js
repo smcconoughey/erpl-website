@@ -37,6 +37,8 @@ async function loadSiteData() {
     document.getElementById('heroTagline').textContent = data.tagline;
     document.getElementById('heroSubtitle').textContent = data.subtitle;
     document.getElementById('aboutDescription').textContent = data.description;
+    document.getElementById('aboutMission').textContent = data.mission || '';
+    document.getElementById('aboutPhilosophy').textContent = data.philosophy || '';
     document.getElementById('whatsNextText').textContent = data.whatsNext;
     document.getElementById('joinBtn').href = data.joinLink;
 }
