@@ -10,7 +10,7 @@
             "specs": {
                 "thrust": "2,250 lbf",
                 "chamberPressure": "500 psia",
-                "massFlowRate": "4.23 kg/s",
+                "massFlowRate": "4.4 kg/s",
                 "mixtureRatio": "1.1",
                 "injectionType": "Coaxial Swirl"
             },
@@ -24,7 +24,7 @@
         "images": [
             "assets/projects/fluids_6678.jpg",
             "assets/projects/fluids_6690.jpg",
-            "assets/projects/fluids_6690 (1).jpg"
+            "assets/projects/fluids_stew.jpg"
         ],
         "details": {
             "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has developed expertise in cryogenic handling, high-pressure systems, and flow control.",
