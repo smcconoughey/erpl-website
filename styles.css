@@ -73,12 +73,14 @@ header {
     justify-content: space-between;
     align-items: center;
     height: var(--header-height);
+    overflow: hidden;
 }
 
 .header-left {
     display: flex;
     align-items: center;
     gap: var(--spacing-lg);
+    flex-shrink: 0;
 }
 
 .logo {
@@ -123,7 +125,9 @@ header {
 
 .countdowns {
     display: flex;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .countdown-item {
@@ -726,6 +730,17 @@ footer p {
 }
 
 /* ===== Responsive ===== */
+/* Hide nav links earlier to make room for countdowns */
+@media (max-width: 1100px) {
+    .nav-links {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+}
+
 @media (max-width: 1200px) {
     .countdowns {
         gap: var(--spacing-md);

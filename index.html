@@ -4,13 +4,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERPL – Experimental Rocket Propulsion Laboratory</title>
+    <title>ERPL – Experimental Rocket Propulsion Laboratory | Embry-Riddle Aeronautical University</title>
     <meta name="description"
-        content="The Experimental Rocket Propulsion Lab (ERPL) at Embry-Riddle Aeronautical University is a student-run organization dedicated to designing, building, and testing experimental rocket engines.">
+        content="The Experimental Rocket Propulsion Lab (ERPL) at Embry-Riddle Aeronautical University is a student-run organization dedicated to designing, building, and testing experimental rocket engines including liquid bi-propellant and hybrid systems.">
+    <meta name="keywords"
+        content="ERPL, Experimental Rocket Propulsion Laboratory, Embry-Riddle Aeronautical University, ERAU, rocket engine, liquid rocket, hybrid rocket, student rocketry, aerospace engineering, MOE rocket, Juno engine, Triton engine, Odyssey engine, collegiate rocketry, rocket propulsion, bi-propellant, cryogenic propulsion">
+    <meta name="author" content="ERPL - Experimental Rocket Propulsion Laboratory">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://erpl.space/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://erpl.space/">
+    <meta property="og:title" content="ERPL – Experimental Rocket Propulsion Laboratory">
+    <meta property="og:description"
+        content="Student-run rocket propulsion lab at Embry-Riddle Aeronautical University. Designing and testing liquid bi-propellant and hybrid rocket engines.">
+    <meta property="og:image" content="https://erpl.space/assets/logo/ERPL Logo Vectorized_flame (1).png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://erpl.space/">
+    <meta name="twitter:title" content="ERPL – Experimental Rocket Propulsion Laboratory">
+    <meta name="twitter:description"
+        content="Student-run rocket propulsion lab at Embry-Riddle Aeronautical University. Designing and testing liquid bi-propellant and hybrid rocket engines.">
+    <meta name="twitter:image" content="https://erpl.space/assets/logo/ERPL Logo Vectorized_flame (1).png">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Experimental Rocket Propulsion Laboratory",
+        "alternateName": "ERPL",
+        "url": "https://erpl.space",
+        "logo": "https://erpl.space/assets/logo/ERPL Logo Vectorized_flame (1).png",
+        "description": "Student-run organization at Embry-Riddle Aeronautical University dedicated to designing, building, and testing experimental rocket engines.",
+        "parentOrganization": {
+            "@type": "CollegeOrUniversity",
+            "name": "Embry-Riddle Aeronautical University",
+            "alternateName": "ERAU"
+        },
+        "member": [
+            {"@type": "Person", "name": "Rex Gavsie", "jobTitle": "President"},
+            {"@type": "Person", "name": "Kendall Anderson", "jobTitle": "Vice President"},
+            {"@type": "Person", "name": "Sean McConoughey", "jobTitle": "Chief Engineer"},
+            {"@type": "Person", "name": "Samuel Muller", "jobTitle": "Secretary"},
+            {"@type": "Person", "name": "Jay Parikh", "jobTitle": "Treasurer"},
+            {"@type": "Person", "name": "Justin Fay", "jobTitle": "Safety Officer"},
+            {"@type": "Person", "name": "Josafath Lorenzo", "jobTitle": "Outreach Coordinator"},
+            {"@type": "Person", "name": "Andrew Levesque", "jobTitle": "Secretary"},
+            {"@type": "Person", "name": "Zane Reed", "jobTitle": "Engines Lead"},
+            {"@type": "Person", "name": "Jack Jung", "jobTitle": "Fluids Lead"},
+            {"@type": "Person", "name": "Jackson Floyd", "jobTitle": "Electronics Lead"}
+        ],
+        "knowsAbout": ["rocket propulsion", "liquid rocket engines", "hybrid rocket engines", "aerospace engineering", "cryogenic systems", "rocket testing"]
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/logo/favicon.png">
+    <link rel="apple-touch-icon" href="assets/logo/favicon.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -57,7 +113,7 @@
     </section>
 
     <!-- About Section -->
-    <section class="section section-about" id="about">
+    <section class="section section-about" id="about" aria-label="About ERPL">
         <div class="container">
             <div class="about-grid">
                 <div class="about-text">
@@ -67,14 +123,15 @@
                     <p id="aboutDescription"></p>
                 </div>
                 <div class="about-image">
-                    <img src="assets/team/moe.png" alt="ERPL Team">
+                    <img src="assets/team/moe.png"
+                        alt="ERPL student rocket propulsion team at Embry-Riddle Aeronautical University with MOE engine">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Projects Section -->
-    <section class="section section-dark" id="projects">
+    <section class="section section-dark" id="projects" aria-label="ERPL Rocket Engine Projects">
         <div class="container">
             <div class="section-header">
                 <h2>Project Highlights</h2>
@@ -92,7 +149,7 @@
     </section>
 
     <!-- Leadership Section -->
-    <section class="section" id="leadership">
+    <section class="section" id="leadership" aria-label="ERPL Leadership Team">
         <div class="container">
             <div class="section-header">
                 <h2>Leadership Board</h2>

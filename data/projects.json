@@ -40,7 +40,7 @@
     {
         "id": "flight",
         "name": "Flight",
-        "description": "Flight is our division that focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body for MOE.",
+        "description": "Flight is our division that focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body, recovery, and simulation for MOE.",
         "image": "assets/projects/flight.jpg",
         "details": {
             "about": "The Flight division handles all aspects of vehicle design including aerodynamics, structures, recovery systems, and active stabilization. The team developed Spectre, an actively stabilized rocket, and is now applying that expertise to the MOE flight vehicle.",

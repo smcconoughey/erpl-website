@@ -3,13 +3,13 @@
         "name": "Blue Origin",
         "logo": "assets/sponsors/Blue Origin Logo - Feather.svg",
         "url": "https://www.blueorigin.com",
-        "tier": "platinum"
+        "tier": "gold"
     },
     {
         "name": "Musk Foundation",
         "logo": "assets/sponsors/MuskFoundation_logo.png",
         "url": "https://www.muskfoundation.org",
-        "tier": "platinum"
+        "tier": "gold"
     },
     {
         "name": "Kitty Hawk",
@@ -33,42 +33,42 @@
         "name": "Mastercam",
         "logo": "assets/sponsors/Mastercam.png",
         "url": "https://mastercam.com",
-        "tier": "silver"
+        "tier": "gold"
     },
     {
         "name": "Metrologic Group",
         "logo": "assets/sponsors/Logo-Metrologic-Group Black.png",
         "url": "https://metrologic.fr",
-        "tier": "silver"
+        "tier": "gold"
     },
     {
         "name": "3Dconnexion",
         "logo": "assets/sponsors/3dconnexion_logo.png",
         "url": "https://3dconnexion.com",
-        "tier": "silver"
+        "tier": "gold"
     },
     {
         "name": "DCS",
         "logo": "assets/sponsors/DCS Logo Blk NB.png",
         "url": "https://dframeware.com",
-        "tier": "silver"
+        "tier": "gold"
     },
     {
         "name": "Evology",
         "logo": "assets/sponsors/evology-logo-300x234.png",
         "url": "https://evology.com",
-        "tier": "bronze"
+        "tier": "gold"
     },
     {
         "name": "Engineering Center",
         "logo": "assets/sponsors/ec-logo_220x@2x.png",
         "url": "#",
-        "tier": "bronze"
+        "tier": "gold"
     },
     {
         "name": "Metalcraft",
         "logo": "assets/sponsors/metalcraft.png",
         "url": "#",
-        "tier": "bronze"
+        "tier": "gold"
     }
 ]
