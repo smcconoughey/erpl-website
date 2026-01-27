@@ -123,7 +123,7 @@
                     <p id="aboutDescription"></p>
                 </div>
                 <div class="about-image">
-                    <img src="assets/team/moe.jpg"
+                    <img src="assets/team/IMG_6035.png"
                         alt="ERPL student rocket propulsion team at Embry-Riddle Aeronautical University with MOE engine">
                 </div>
             </div>
@@ -214,7 +214,14 @@
                 <span id="modalStatus" class="modal-status"></span>
             </div>
             <div class="modal-body">
-                <img id="modalImage" src="" alt="" class="modal-image">
+                <div class="modal-gallery">
+                    <button class="gallery-nav gallery-prev" aria-label="Previous image">&#10094;</button>
+                    <div class="gallery-images" id="modalGallery">
+                        <!-- Images populated by JS -->
+                    </div>
+                    <button class="gallery-nav gallery-next" aria-label="Next image">&#10095;</button>
+                    <div class="gallery-dots" id="galleryDots"></div>
+                </div>
                 <p id="modalAbout"></p>
                 <div id="modalSpecs" class="modal-specs"></div>
             </div>

@@ -174,6 +174,9 @@ function initProjectCarousels() {
     });
 }
 
+let currentGalleryIndex = 0;
+let currentGalleryImages = [];
+
 function openProjectModal(projectId) {
     const project = projectsData.find(p => p.id === projectId);
     if (!project) return;
@@ -181,14 +184,39 @@ function openProjectModal(projectId) {
     const modal = document.getElementById('projectModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalStatus = document.getElementById('modalStatus');
-    const modalImage = document.getElementById('modalImage');
+    const modalGallery = document.getElementById('modalGallery');
+    const galleryDots = document.getElementById('galleryDots');
     const modalAbout = document.getElementById('modalAbout');
     const modalSpecs = document.getElementById('modalSpecs');
 
     // Populate modal
     modalTitle.textContent = project.name;
-    modalImage.src = project.image;
-    modalImage.alt = project.name;
+
+    // Handle both single image and images array
+    currentGalleryImages = project.images || [project.image];
+    currentGalleryIndex = 0;
+
+    // Build gallery images
+    modalGallery.innerHTML = currentGalleryImages.map((src, i) => `
+        <img src="${src}" alt="${project.name}" class="gallery-image ${i === 0 ? 'active' : ''}">
+    `).join('');
+
+    // Build dots
+    if (currentGalleryImages.length > 1) {
+        galleryDots.innerHTML = currentGalleryImages.map((_, i) => `
+            <span class="gallery-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>
+        `).join('');
+        galleryDots.style.display = 'flex';
+
+        // Show/hide nav buttons
+        modal.querySelector('.gallery-prev').style.display = 'flex';
+        modal.querySelector('.gallery-next').style.display = 'flex';
+    } else {
+        galleryDots.innerHTML = '';
+        galleryDots.style.display = 'none';
+        modal.querySelector('.gallery-prev').style.display = 'none';
+        modal.querySelector('.gallery-next').style.display = 'none';
+    }
 
     if (project.details) {
         modalAbout.textContent = project.details.about || project.description;
@@ -229,10 +257,40 @@ function openProjectModal(projectId) {
     document.body.style.overflow = 'hidden';
 }
 
+function navigateGallery(direction) {
+    const images = document.querySelectorAll('#modalGallery .gallery-image');
+    const dots = document.querySelectorAll('#galleryDots .gallery-dot');
+
+    if (images.length <= 1) return;
+
+    images[currentGalleryIndex].classList.remove('active');
+    dots[currentGalleryIndex]?.classList.remove('active');
+
+    currentGalleryIndex = (currentGalleryIndex + direction + images.length) % images.length;
+
+    images[currentGalleryIndex].classList.add('active');
+    dots[currentGalleryIndex]?.classList.add('active');
+}
+
+function goToGallerySlide(index) {
+    const images = document.querySelectorAll('#modalGallery .gallery-image');
+    const dots = document.querySelectorAll('#galleryDots .gallery-dot');
+
+    images[currentGalleryIndex].classList.remove('active');
+    dots[currentGalleryIndex]?.classList.remove('active');
+
+    currentGalleryIndex = index;
+
+    images[currentGalleryIndex].classList.add('active');
+    dots[currentGalleryIndex]?.classList.add('active');
+}
+
 function closeProjectModal() {
     const modal = document.getElementById('projectModal');
     modal.classList.remove('active');
     document.body.style.overflow = '';
+    currentGalleryImages = [];
+    currentGalleryIndex = 0;
 }
 
 // Initialize modal event listeners
@@ -243,9 +301,24 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.querySelector('.modal-backdrop').addEventListener('click', closeProjectModal);
         // Close on X button click
         modal.querySelector('.modal-close').addEventListener('click', closeProjectModal);
-        // Close on Escape key
+
+        // Gallery navigation
+        modal.querySelector('.gallery-prev').addEventListener('click', () => navigateGallery(-1));
+        modal.querySelector('.gallery-next').addEventListener('click', () => navigateGallery(1));
+
+        // Dot navigation
+        modal.querySelector('#galleryDots').addEventListener('click', (e) => {
+            if (e.target.classList.contains('gallery-dot')) {
+                goToGallerySlide(parseInt(e.target.dataset.index));
+            }
+        });
+
+        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
+            if (!modal.classList.contains('active')) return;
             if (e.key === 'Escape') closeProjectModal();
+            if (e.key === 'ArrowLeft') navigateGallery(-1);
+            if (e.key === 'ArrowRight') navigateGallery(1);
         });
     }
 });
