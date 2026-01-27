@@ -27,10 +27,11 @@
         "images": [
             "assets/projects/fluids_6678.jpg",
             "assets/projects/fluids_6690.jpg",
+            "assets/projects/redteam.png",
             "assets/projects/fluids_stew.jpg"
         ],
         "details": {
-            "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has developed expertise in cryogenic handling, high-pressure systems, and flow control.",
+            "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has developed expertise in cryogenic handling, high-pressure systems, and flow control. Fluids is also home to our Red Team and Test Conductor, who operate our test stand alongside the Ground Controller.",
             "status": "Active Division"
         }
     },
@@ -38,9 +39,9 @@
         "id": "electronics",
         "name": "Electronics",
         "description": "Our electronics division specializes in commanding, controlling, and instrumenting our propulsion systems and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
-        "image": "assets/projects/electronics.jpg",
+        "image": "assets/projects/electronics.png",
         "details": {
-            "about": "The Electronics division designs and builds all control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. All PCBs are designed and assembled in-house.",
+            "about": "The Electronics division designs and builds all control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. All PCBs are designed and assembled in-house. The electronics divison is home to our Ground Controller, who handles take collection and remote operation during tests.",
             "status": "Active Division"
         }
     },
@@ -48,7 +49,10 @@
         "id": "flight",
         "name": "Flight",
         "description": "Flight is our division that focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body, recovery, and simulation for MOE.",
-        "image": "assets/projects/flight.jpg",
+        "images": [
+            "assets/projects/flight.png",
+            "assets/projects/ATran_04222023_ERPL_SpectreFlight3-15.jpg"
+        ],
         "details": {
             "about": "The Flight division handles all aspects of vehicle design including aerodynamics, structures, recovery systems, and active stabilization. The team developed Spectre, an actively stabilized rocket, and is now applying that expertise to the MOE flight vehicle.",
             "status": "Active Division"
@@ -58,7 +62,11 @@
         "id": "engines",
         "name": "Engines",
         "description": "Engines designs, produces, and characterizes ERPL's propulsion systems. Following Odyssey in 2023, ERPL transitioned into liquid bipropellant propulsion and has since tested three increasingly complex engines.",
-        "image": "assets/projects/flight.jpg",
+        "images": [
+            "assets/projects/engines_aiden.jpg",
+            "assets/projects/moeengine.jpg",
+            "assets/projects/tritonhotfire.jpg"
+        ],
         "details": {
             "about": "The Engines division is responsible for the design, manufacturing, and testing of all propulsion systems. The team has progressed from Odyssey (hybrid) to Juno and Triton (liquid bi-propellant), with MOE being the culmination of this experience.",
             "status": "Active Division"
