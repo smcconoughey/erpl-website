@@ -21,7 +21,11 @@
         "id": "fluids",
         "name": "Fluids",
         "description": "Fluids is our division that focuses on fluid systems. Fluids handles design, maintenance, and upgrades for our Draco ground test stand. They also build and test the fluid systems for MOE.",
-        "image": "assets/projects/flight.jpg",
+        "images": [
+            "assets/projects/fluids_6678.jpg",
+            "assets/projects/fluids_6690.jpg",
+            "assets/projects/fluids_6690 (1).jpg"
+        ],
         "details": {
             "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has developed expertise in cryogenic handling, high-pressure systems, and flow control.",
             "status": "Active Division"

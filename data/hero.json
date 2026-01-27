@@ -13,11 +13,19 @@
             "type": "video",
             "src": "assets/projects/hotfirevideo.mp4",
             "startTime": 6,
-            "endTime": 14
+            "endTime": 12
         },
         {
             "type": "image",
             "src": "assets/projects/IMG_5980-2.jpg"
+        },
+        {
+            "type": "video",
+            "src": "assets/projects/highspeedmoeclipped.mov"
+        },
+        {
+            "type": "image",
+            "src": "assets/projects/odyssey.jpg"
         }
     ],
     "logo": "assets/logo/ERPL Logo Vectorized_flame (1).png"

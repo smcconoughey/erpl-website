@@ -452,6 +452,7 @@ header {
     height: 200px;
     background: var(--bg-tertiary);
     overflow: hidden;
+    position: relative;
 }
 
 .project-image img {
@@ -459,6 +460,19 @@ header {
     height: 100%;
     object-fit: cover;
     transition: var(--transition);
+}
+
+/* Carousel styles */
+.project-carousel img.carousel-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.project-carousel img.carousel-img.active {
+    opacity: 1;
 }
 
 .project-card:hover .project-image img {

@@ -121,11 +121,19 @@ async function loadProjects() {
     if (!projectsData) return;
 
     const grid = document.getElementById('projectsGrid');
-    grid.innerHTML = projectsData.map(project => `
+    grid.innerHTML = projectsData.map(project => {
+        // Support both single image and images array
+        const images = project.images || [project.image];
+        const hasCarousel = images.length > 1;
+
+        return `
         <div class="project-card">
-            <div class="project-image">
-                <img src="${project.image}" alt="${project.name}" 
-                     onerror="this.parentElement.classList.add('placeholder-bg'); this.style.display='none'; this.parentElement.innerHTML='<span>${project.name}</span>'">
+            <div class="project-image ${hasCarousel ? 'project-carousel' : ''}" data-images='${JSON.stringify(images)}'>
+                ${images.map((img, i) => `
+                    <img src="${img}" alt="${project.name}" 
+                         class="carousel-img ${i === 0 ? 'active' : ''}"
+                         onerror="this.style.display='none'">
+                `).join('')}
             </div>
             <div class="project-content">
                 <h3>${project.name}</h3>
@@ -133,7 +141,7 @@ async function loadProjects() {
                 <button type="button" class="btn btn-secondary project-read-more" data-project-id="${project.id}">Read more</button>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 
     // Attach click handlers using event delegation
     grid.addEventListener('click', (e) => {
@@ -143,6 +151,26 @@ async function loadProjects() {
             const projectId = btn.dataset.projectId;
             openProjectModal(projectId);
         }
+    });
+
+    // Initialize carousels
+    initProjectCarousels();
+}
+
+function initProjectCarousels() {
+    const carousels = document.querySelectorAll('.project-carousel');
+
+    carousels.forEach(carousel => {
+        const images = carousel.querySelectorAll('.carousel-img');
+        if (images.length <= 1) return;
+
+        let currentIndex = 0;
+
+        setInterval(() => {
+            images[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % images.length;
+            images[currentIndex].classList.add('active');
+        }, 5000); // 5 second rotation
     });
 }
 
