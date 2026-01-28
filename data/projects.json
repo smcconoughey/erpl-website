@@ -39,7 +39,11 @@
         "id": "electronics",
         "name": "Electronics",
         "description": "Our electronics division specializes in commanding, controlling, and instrumenting our propulsion systems and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
-        "image": "assets/projects/electronics.png",
+        "images": [
+            "assets/projects/henry.jpg",
+            "assets/projects/electronics.png",
+            "assets/projects/groundcontroller.jpg"
+        ],
         "details": {
             "about": "The Electronics division designs and builds all control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. All PCBs are designed and assembled in-house. The electronics divison is home to our Ground Controller, who handles take collection and remote operation during tests.",
             "status": "Active Division"
