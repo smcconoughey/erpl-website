@@ -27,7 +27,7 @@
         "images": [
             "assets/projects/fluids_6678.jpg",
             "assets/projects/fluids_6690.jpg",
-            "assets/projects/redteam.png",
+            "assets/projects/redteam.jpg",
             "assets/projects/fluids_stew.jpg"
         ],
         "details": {
@@ -41,7 +41,7 @@
         "description": "Our electronics division specializes in commanding, controlling, and instrumenting our propulsion systems and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
         "images": [
             "assets/projects/henry.jpg",
-            "assets/projects/electronics.png",
+            "assets/projects/electronics.jpg",
             "assets/projects/groundcontroller.jpg"
         ],
         "details": {
@@ -54,7 +54,7 @@
         "name": "Flight",
         "description": "Flight is our division that focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body, recovery, and simulation for MOE.",
         "images": [
-            "assets/projects/flight.png",
+            "assets/projects/flight.jpg",
             "assets/projects/ATran_04222023_ERPL_SpectreFlight3-15.jpg"
         ],
         "details": {
