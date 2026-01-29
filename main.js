@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadProjects(),
         loadLeadership(),
         loadSocialLinks(),
-        loadSponsors()
+        loadSponsors(),
+        loadAlumniOutcomes()
     ]);
 
     initMobileMenu();
@@ -426,6 +427,81 @@ async function loadSponsors() {
     }
 
     container.innerHTML = html;
+}
+
+async function loadAlumniOutcomes() {
+    const data = await loadJSON('data/alumni.json');
+    if (!data) return;
+
+    // Set header text
+    const headlineEl = document.getElementById('outcomesHeadline');
+    const subtitleEl = document.getElementById('outcomesSubtitle');
+    const descriptionEl = document.getElementById('outcomesDescription');
+    
+    if (headlineEl) headlineEl.textContent = data.headline;
+    if (subtitleEl) subtitleEl.textContent = data.subtitle;
+    if (descriptionEl) descriptionEl.textContent = data.description;
+
+    // Render company logos carousel
+    const companiesContainer = document.getElementById('outcomesCompanies');
+    if (companiesContainer && data.companies) {
+        // Create logo items HTML
+        const logosHtml = data.companies.map(company => `
+            <div class="company-logo-item">
+                <div class="company-logo-wrapper">
+                    <img src="${company.logo}" alt="${company.name}"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\\'color:var(--text-primary);font-weight:600;\\'>${company.name}</span>'">
+                </div>
+            </div>
+        `).join('');
+        
+        // Duplicate logos for seamless infinite scroll
+        companiesContainer.innerHTML = `
+            <div class="companies-track">
+                ${logosHtml}
+                ${logosHtml}
+            </div>
+        `;
+    }
+
+    // Render values
+    const valuesContainer = document.getElementById('outcomesValues');
+    if (valuesContainer && data.values) {
+        valuesContainer.innerHTML = data.values.map(value => `
+            <div class="value-card">
+                <h4>${value.title}</h4>
+                <p>${value.description}</p>
+            </div>
+        `).join('');
+    }
+
+    // Render testimonials
+    const testimonialsContainer = document.getElementById('outcomesTestimonials');
+    if (testimonialsContainer && data.testimonials) {
+        testimonialsContainer.innerHTML = data.testimonials.map(testimonial => `
+            <div class="testimonial-card">
+                <p class="testimonial-quote">${testimonial.quote}</p>
+                <div class="testimonial-author">
+                    <span class="name">${testimonial.author}</span>
+                    <span class="role">${testimonial.role}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Set CTA content
+    if (data.callToAction) {
+        const ctaTitleEl = document.getElementById('outcomesCtaTitle');
+        const ctaTextEl = document.getElementById('outcomesCtaText');
+        const ctaBtnEl = document.getElementById('outcomesCtaBtn');
+        
+        if (ctaTitleEl) ctaTitleEl.textContent = data.callToAction.title;
+        if (ctaTextEl) ctaTextEl.textContent = data.callToAction.text;
+        if (ctaBtnEl) {
+            ctaBtnEl.textContent = data.callToAction.buttonText;
+            ctaBtnEl.href = data.callToAction.buttonLink;
+        }
+    }
 }
 
 // ===== UI Interactions =====

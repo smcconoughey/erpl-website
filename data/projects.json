@@ -95,7 +95,7 @@
     },
     {
         "id": "juno",
-        "name": "Juno Engine",
+        "name": "Juno",
         "description": "Juno was our first endeavor into cryogenic bi-propellant rocket engines. With the ability to target a range of operating conditions, Juno gave us experience with dealing with cryogenic fluids and liquid rocketry.",
         "image": "assets/projects/juno.png",
         "details": {

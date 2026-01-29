@@ -706,6 +706,213 @@ header {
     padding: 8px 16px;
 }
 
+/* ===== Alumni Outcomes Section ===== */
+.section-outcomes {
+    background: var(--bg-secondary);
+    padding: var(--spacing-xl) 0;
+}
+
+.outcomes-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.outcomes-header h2 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.outcomes-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Company Logos Carousel */
+.outcomes-companies {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: var(--spacing-lg) 0;
+    margin-bottom: var(--spacing-lg);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.companies-track {
+    display: flex;
+    gap: var(--spacing-lg);
+    animation: scroll-logos 25s linear infinite;
+    width: max-content;
+}
+
+@keyframes scroll-logos {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.company-logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.company-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 70px;
+    width: 200px;
+}
+
+.company-logo-wrapper img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+/* Outcomes Content */
+.outcomes-content {
+    max-width: 900px;
+    margin: 0 auto var(--spacing-lg);
+    text-align: center;
+}
+
+.outcomes-description {
+    font-size: 1.125rem;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Values Grid */
+.outcomes-values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.value-card {
+    padding: var(--spacing-md);
+    text-align: left;
+}
+
+.value-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.value-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* Testimonials */
+.outcomes-testimonials {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.testimonial-card {
+    padding: var(--spacing-md) 0;
+    border-top: 1px solid var(--border);
+}
+
+.testimonial-quote {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: var(--spacing-sm);
+}
+
+.testimonial-author {
+    display: flex;
+    flex-direction: column;
+}
+
+.testimonial-author .name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.testimonial-author .role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* CTA Section */
+.outcomes-cta {
+    text-align: center;
+    padding: var(--spacing-lg) 0;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.outcomes-cta h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.outcomes-cta p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .outcomes-values {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .outcomes-testimonials {
+        grid-template-columns: 1fr;
+    }
+    
+    .value-card {
+        padding: var(--spacing-sm) 0;
+        border-top: 1px solid var(--border);
+    }
+}
+
+@media (max-width: 768px) {
+    .companies-track {
+        gap: var(--spacing-md);
+    }
+    
+    .company-logo-wrapper {
+        height: 50px;
+        width: 150px;
+    }
+}
+
 /* ===== Contact Section ===== */
 .social-links {
     display: flex;

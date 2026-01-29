@@ -1,0 +1,67 @@
+{
+  "headline": "Where Our Engineers Land",
+  "subtitle": "ERPL alumni go on to work at the world's leading aerospace companies",
+  "description": "We don't just build rockets. We build the people who build rockets. Our members graduate with real experience in cryogenic fluid systems, avionics architecture, composite manufacturing, and hazardous testing operations. When you walk in our door, you don't need to know everything. You just need to be curious, committed, and ready to get your hands dirty.",
+  "callToAction": {
+    "title": "Ready to become an aerospace engineer?",
+    "text": "In the classroom, you learn the equations. At ERPL, you learn why they matter. We bridge the gap between academic theory and aerospace reality by tackling projects that are technically difficult and operationally complex.",
+    "buttonText": "Join ERPL",
+    "buttonLink": "https://campusgroups.erau.edu/erpl/club_signup"
+  },
+  "values": [
+    {
+      "title": "Ownership",
+      "description": "Students own their subsystems from PDR to test."
+    },
+    {
+      "title": "Transparency",
+      "description": "We analyze our failures as rigorously as our successes."
+    },
+    {
+      "title": "Teamwork",
+      "description": "A rocket needs many things to work at once. No one launches alone."
+    }
+  ],
+  "companies": [
+    {
+      "name": "SpaceX",
+      "logo": "assets/alumni/spacex-logo.svg"
+    },
+    {
+      "name": "Blue Origin",
+      "logo": "assets/alumni/blueorigin-logo.svg"
+    },
+    {
+      "name": "Northrop Grumman",
+      "logo": "assets/alumni/northrop-grumman-logo.png"
+    },
+    {
+      "name": "Johns Hopkins APL",
+      "logo": "assets/alumni/JHU_APL_Logo.svg.png"
+    },
+    {
+      "name": "Firefly Aerospace",
+      "logo": "assets/alumni/firefly-logo.png"
+    },
+    {
+      "name": "Relativity Space",
+      "logo": "assets/alumni/thumbnail_Relativity_white_RGB.png"
+    },
+    {
+      "name": "Vast",
+      "logo": "assets/alumni/Vast_Wordmark_White_CMYK.png"
+    }
+  ],
+  "testimonials": [
+    {
+      "quote": "The work I performed with and adjacent to ERPL was directly responsible for me landing both of my internships and my dream job in the aerospace industry. The opportunities for real engineering experience available at ERPL and clubs like it cannot be matched by classroom work.",
+      "author": "ERPL Alumni",
+      "role": "Aerospace Engineer"
+    },
+    {
+      "quote": "The work I did at ERPL (writing testing ops, test set up, engine assembly instructions and executing pressurized testing) is 70% of what I do in my current role just with a bigger rocket.",
+      "author": "ERPL Alumni",
+      "role": "Propulsion Engineer"
+    }
+  ]
+}
