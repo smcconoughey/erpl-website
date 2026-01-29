@@ -1,7 +1,7 @@
 {
   "headline": "Where Our Engineers Land",
   "subtitle": "ERPL alumni go on to work at the world's leading aerospace companies",
-  "description": "We don't just build rockets. We build the people who build rockets. Our members graduate with real experience in cryogenic fluid systems, avionics architecture, composite manufacturing, and hazardous testing operations. When you walk in our door, you don't need to know everything. You just need to be curious, committed, and ready to get your hands dirty.",
+  "description": "We don't just build rockets. We build the people who build rockets. Our members graduate with real experience in cryogenic fluid systems, avionics architecture, composite manufacturing, hazardous testing operations, and more. When you walk in our door, you don't need to know everything. You just need to be curious, committed, and ready to get your hands dirty.",
   "callToAction": {
     "title": "Ready to become an aerospace engineer?",
     "text": "In the classroom, you learn the equations. At ERPL, you learn why they matter. We bridge the gap between academic theory and aerospace reality by tackling projects that are technically difficult and operationally complex.",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Northrop Grumman",
-      "logo": "assets/alumni/northrop-grumman-logo.png"
+      "logo": "assets/alumni/Northrop-Grumman-Logo.png"
     },
     {
       "name": "Johns Hopkins APL",
