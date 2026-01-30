@@ -108,7 +108,10 @@
             <img src="" alt="ERPL Logo" class="hero-logo" id="heroLogo">
             <h1 id="heroTagline">Propelling our future</h1>
             <p id="heroSubtitle">through the rapid design and test of rocket engines</p>
-            <a href="#" class="btn btn-primary" id="joinBtn">Join the Club</a>
+            <div class="hero-ctas">
+                <a href="#" class="btn btn-primary" id="joinBtn">Join ERPL</a>
+                <a href="#contact" class="btn btn-outline" id="sponsorBtn">Sponsor ERPL</a>
+            </div>
         </div>
     </section>
 
@@ -120,6 +123,7 @@
                     <h2>Who we are</h2>
                     <div class="accent-line"></div>
                     <h3>The Experimental Rocket Propulsion Lab<br>at Embry-Riddle Aeronautical University</h3>
+                    <p class="differentiator">ERPL is one of the few undergraduate teams in the U.S. designing and hot-firing liquid bi-propellant rocket engines.</p>
                     <p id="aboutDescription"></p>
                 </div>
                 <div class="about-image">
@@ -140,22 +144,46 @@
         </div>
     </section>
 
-    <!-- Projects Section -->
-    <section class="section section-dark" id="projects" aria-label="ERPL Rocket Engine Projects">
+    <!-- Project Highlights (Teaser) Section -->
+    <section class="section section-dark" id="projects" aria-label="ERPL Projects Overview">
         <div class="container">
             <div class="section-header">
-                <h2>Project Highlights</h2>
-                <p class="section-subtitle">ERPL is working on a lot – but here's a couple of our biggest projects and
-                    objectives</p>
+                <h2>What We're Building</h2>
+                <p class="section-subtitle">Liquid bi-propellant rocketry from the ground up</p>
             </div>
-            <p class="projects-intro">ERPL primarily focuses on the design and testing of liquid bi-propellant rocket
-                engines. After the successful hotfire test of our hybrid rocket engine Odyssey in 2023, we transitioned
-                fully to
-                liquid propulsion with the objective of building a high-altitude liquid rocket. We have many projects
-                that help
-                contribute towards this goal.</p>
-            <div class="projects-grid" id="projectsGrid">
-                <!-- Populated by JS -->
+            
+            <div class="project-flagship">
+                <div class="flagship-image">
+                    <img src="assets/projects/moe.png" alt="Project MOE - ERPL's flagship rocket">
+                </div>
+                <div class="flagship-content">
+                    <h3>Project MOE</h3>
+                    <p class="flagship-tagline">Our Flagship Vehicle</p>
+                    <p>A scratch-built liquid bi-propellant rocket targeting 60,000 feet and the collegiate altitude record. Custom composite airframe, 2,250 lbf engine, active recovery systems.</p>
+                </div>
+            </div>
+
+            <div class="divisions-grid">
+                <div class="division-item">
+                    <h4>Fluids</h4>
+                    <p>High-pressure cryogenic feed systems and ground test stand operations.</p>
+                </div>
+                <div class="division-item">
+                    <h4>Electronics</h4>
+                    <p>Custom avionics, data acquisition, and flight control systems.</p>
+                </div>
+                <div class="division-item">
+                    <h4>Flight</h4>
+                    <p>Aerodynamics, composite structures, and recovery systems.</p>
+                </div>
+                <div class="division-item">
+                    <h4>Engines</h4>
+                    <p>Thrust chambers, injectors, and cooling system design.</p>
+                </div>
+            </div>
+
+            <div class="projects-cta">
+                <a href="#projects-full" class="btn btn-outline">Explore Our Projects</a>
             </div>
         </div>
     </section>
@@ -164,10 +192,23 @@
     <section class="section" id="leadership" aria-label="ERPL Leadership Team">
         <div class="container">
             <div class="section-header">
-                <h2>Leadership Board</h2>
-                <p class="section-subtitle">Meet our officers and leads</p>
+                <h2>Leadership</h2>
+                <p class="section-subtitle">Meet the team making it happen</p>
             </div>
             <div class="leadership-grid" id="leadershipGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Full Projects Section (Deep Dive) -->
+    <section class="section section-dark" id="projects-full" aria-label="ERPL Project Details">
+        <div class="container">
+            <div class="section-header">
+                <h2>Project Deep Dive</h2>
+                <p class="section-subtitle">Our divisions, engines, and evolution</p>
+            </div>
+            <div class="projects-grid" id="projectsGrid">
                 <!-- Populated by JS -->
             </div>
         </div>
@@ -224,7 +265,10 @@
             <div class="outcomes-cta">
                 <h3 id="outcomesCtaTitle">Ready to become an aerospace engineer?</h3>
                 <p id="outcomesCtaText"></p>
-                <a href="#" class="btn btn-primary" id="outcomesCtaBtn">Join ERPL</a>
+                <div class="outcomes-cta-buttons">
+                    <a href="#" class="btn btn-primary" id="outcomesCtaBtn">Join ERPL</a>
+                    <a href="#contact" class="btn btn-outline">Contact / Sponsor</a>
+                </div>
             </div>
         </div>
     </section>

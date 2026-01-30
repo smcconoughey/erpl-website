@@ -52,7 +52,8 @@ async function loadNavigation() {
     navLinks.innerHTML = navData.map(item => {
         const isExternal = !item.link.startsWith('#');
         const attrs = isExternal ? 'target="_blank" rel="noopener"' : '';
-        return `<a href="${item.link}" ${attrs}>${item.name}</a>`;
+        const highlightClass = item.highlight ? 'nav-highlight' : '';
+        return `<a href="${item.link}" ${attrs} class="${highlightClass}">${item.name}</a>`;
     }).join('');
 }
 
