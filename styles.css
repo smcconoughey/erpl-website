@@ -476,12 +476,28 @@ header {
 .flagship-image {
     border-radius: 8px;
     overflow: hidden;
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: var(--bg-tertiary);
 }
 
 .flagship-image img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     display: block;
+}
+
+.flagship-carousel img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.flagship-carousel img.active {
+    opacity: 1;
 }
 
 .flagship-content h3 {
@@ -498,9 +514,16 @@ header {
     margin-bottom: var(--spacing-sm);
 }
 
-.flagship-content p:last-child {
+.flagship-content p {
     color: var(--text-secondary);
     line-height: 1.8;
+}
+
+.flagship-content .flagship-next {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border);
+    font-size: 0.95rem;
 }
 
 .divisions-grid {

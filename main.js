@@ -124,6 +124,9 @@ async function loadProjects() {
     projectsData = await loadJSON('data/projects.json');
     if (!projectsData) return;
 
+    // Load flagship project (MOE)
+    loadFlagshipProject();
+
     const grid = document.getElementById('projectsGrid');
     grid.innerHTML = projectsData.map(project => {
         // Support both single image and images array
@@ -161,7 +164,46 @@ async function loadProjects() {
     initProjectCarousels();
 }
 
+async function loadFlagshipProject() {
+    const flagship = document.getElementById('projectFlagship');
+    if (!flagship || !projectsData) return;
+
+    // Find MOE project
+    const moe = projectsData.find(p => p.id === 'moe');
+    if (!moe) return;
+
+    // Get site data for What's Next content
+    const siteData = await loadJSON('data/site.json');
+    const whatsNext = siteData?.whatsNext || '';
+
+    const images = moe.images || [moe.image];
+    
+    flagship.innerHTML = `
+        <div class="flagship-image flagship-carousel">
+            ${images.map((img, i) => `
+                <img src="${img}" alt="${moe.name}" class="carousel-img ${i === 0 ? 'active' : ''}">
+            `).join('')}
+        </div>
+        <div class="flagship-content">
+            <h3>${moe.name}</h3>
+            <p class="flagship-tagline">Our Flagship Vehicle</p>
+            <p>${moe.description}</p>
+            <p class="flagship-next">${whatsNext}</p>
+            <button type="button" class="btn btn-secondary project-read-more" data-project-id="${moe.id}">Learn More</button>
+        </div>
+    `;
+
+    // Initialize flagship carousel after content is loaded
+    initFlagshipCarousel();
+
+    // Add click handler for Learn More button
+    flagship.querySelector('.project-read-more')?.addEventListener('click', (e) => {
+        openProjectModal(e.target.dataset.projectId);
+    });
+}
+
 function initProjectCarousels() {
+    // Initialize project card carousels
     const carousels = document.querySelectorAll('.project-carousel');
 
     carousels.forEach(carousel => {
@@ -176,6 +218,21 @@ function initProjectCarousels() {
             images[currentIndex].classList.add('active');
         }, 5000); // 5 second rotation
     });
+}
+
+function initFlagshipCarousel() {
+    const flagshipCarousel = document.querySelector('.flagship-carousel');
+    if (flagshipCarousel) {
+        const images = flagshipCarousel.querySelectorAll('.carousel-img');
+        if (images.length > 1) {
+            let currentIndex = 0;
+            setInterval(() => {
+                images[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % images.length;
+                images[currentIndex].classList.add('active');
+            }, 4000); // 4 second rotation for flagship
+        }
+    }
 }
 
 let currentGalleryIndex = 0;
