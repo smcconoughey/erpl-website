@@ -1,7 +1,7 @@
 [
     {
         "id": "moe",
-        "name": "Project Moe",
+        "name": "Project MOE",
         "description": "MOE is ERPL's premier bi-propellant rocket engine. Designed to carry our flight vehicle to 60,000 feet, this beast of an engine and vehicle will set a new world record for collegiate rocket engines.",
         "images": [
             "assets/projects/IMG_5980-2.jpg",
@@ -32,7 +32,7 @@
             "assets/projects/fluids_stew.jpg"
         ],
         "details": {
-            "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has developed expertise in cryogenic handling, high-pressure systems, and flow control. Fluids is also home to our Red Team and Test Conductor, who operate our test stand alongside the Ground Controller.",
+            "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has gained expertise in cryogenic handling, high-pressure systems, and flow control. Fluids is also home to our Red Team and Test Conductor, who operate our test stand alongside the Ground Controller.",
             "status": "Active Division"
         }
     },
@@ -52,14 +52,14 @@
     },
     {
         "id": "flight",
-        "name": "Flight",
-        "description": "Flight is our division that focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, flight has shifted to develop the flight body, recovery, and simulation for MOE.",
+        "name": "Structures & Dynamics",
+        "description": "The Structures & Dynamics division focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, the division has shifted to develop the flight body, recovery systems, and simulation for MOE.",
         "images": [
             "assets/projects/flight.jpg",
             "assets/projects/ATran_04222023_ERPL_SpectreFlight3-15.jpg"
         ],
         "details": {
-            "about": "The Flight division handles all aspects of vehicle design including aerodynamics, structures, recovery systems, and active stabilization. The team developed Spectre, an actively stabilized rocket, and is now applying that expertise to the MOE flight vehicle.",
+            "about": "The Structures & Dynamics division handles all aspects of vehicle design including aerodynamics, structures, recovery systems, and active stabilization. The team developed Spectre, an actively stabilized rocket, and is now applying that expertise to the MOE flight vehicle.",
             "status": "Active Division"
         }
     },
