@@ -523,7 +523,7 @@ header {
     margin-top: var(--spacing-sm);
     padding-top: var(--spacing-sm);
     border-top: 1px solid var(--border);
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .divisions-grid {
