@@ -719,7 +719,7 @@ header {
     color: var(--text-secondary);
     font-size: 1.125rem;
     line-height: 1.8;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
 }
 
 /* ===== Sponsors Section ===== */
