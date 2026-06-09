@@ -24,7 +24,7 @@
     {
         "id": "fluids",
         "name": "Fluids",
-        "description": "Fluids is our division that focuses on fluid systems. Fluids handles design, maintenance, and upgrades for our Draco ground test stand. The division also builds and tests the fluid systems for MOE.",
+        "description": "Fluids is our division that focuses on fluid systems. Fluids handles design, maintenance, and upgrades for our Draco ground test stand. The division also builds and tests the fluid systems for the MOE flight vehicle.",
         "images": [
             "assets/projects/fluids_6678.jpg",
             "assets/projects/fluids_6690.jpg",
