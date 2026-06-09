@@ -39,7 +39,7 @@
     {
         "id": "electronics",
         "name": "Electronics",
-        "description": "Our Electronics division specializes in commanding, controlling, and instrumenting our propulsion systems and collecting the required data for analysis. The team designs and assembles all our circuitry in house.",
+        "description": "Our Electronics division specializes in commanding, controlling, and instrumenting our propulsion systems and collecting the required data for analysis. The division designs and assembles all our circuitry in house.",
         "images": [
             "assets/projects/henry.jpg",
             "assets/projects/electronics.jpg",
