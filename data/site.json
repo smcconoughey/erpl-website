@@ -8,5 +8,5 @@
   "philosophy": "ERPL emphasizes iterative development, extensive testing, and post-test data analysis. Every new test is preceded by design reviews, fault analysis, and procedural rehearsals. Test data directly drives iteration decisions across propulsion, fluids, electronics, and structures.",
   "mission": "ERPL exists to bridge the gap between classroom theory and real propulsion systems. Students graduate having designed hardware, executed test campaigns, and analyzed real engine data; experience rarely available at the undergraduate level.",
   "joinLink": "https://campusgroups.erau.edu/erpl/club_signup",
-  "whatsNext": "The Experimental Rocket Propulsion Lab is working towards its first flight-capable liquid bi-propellant launch vehicle with the objective of fielding a flight-ready liquid bipropellant vehicle and competing in the Friends of Amateur Rocketry Dollar-Per-Foot Challenge this December."
+  "whatsNext": "The Experimental Rocket Propulsion Lab is working towards its first flight-capable liquid bi-propellant launch vehicle with the objective of competing in the Friends of Amateur Rocketry Dollar-Per-Foot Challenge this December."
 }
