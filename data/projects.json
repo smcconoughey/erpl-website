@@ -2,19 +2,19 @@
     {
         "id": "moe",
         "name": "Project MOE",
-        "description": "MOE is ERPL's premier bi-propellant rocket engine. Designed to carry our flight vehicle to 60,000 feet, this beast of an engine and vehicle will set a new world record for collegiate rocket engines.",
+        "description": "MOE is ERPL's flagship liquid bipropellant launch vehicle. Designed for a 60,000-foot flight at approximately Mach 2.5, it is one of the most ambitious student-built liquid rocket programs in the United States.",
         "images": [
             "assets/projects/IMG_5980-2.jpg",
             "assets/projects/moe_tanks.jpg",
             "assets/projects/moeengine.jpg"
         ],
         "details": {
-            "about": "MOE is a bi-propellant liquid rocket designed to reach an altitude of 60,000 feet during flight. Using the experience and knowledge gained from Odyssey and Juno, MOE aims to be one of the most powerful liquid rockets ever developed by a university. The engine is currently being designed and manufactured.",
-            "status": "In Testing",
+            "about": "MOE is a LOX/IPA liquid bipropellant rocket designed to reach approximately 60,000 feet. Building on the experience gained from Odyssey, Juno, and Triton, the team is conducting integrated testing and preparing the vehicle for the Friends of Amateur Rocketry Dollar-Per-Foot Challenge.",
+            "status": "Integrated Testing",
             "specs": {
                 "thrust": "2,250 lbf",
                 "chamberPressure": "500 psia",
-                "massFlowRate": "4.4 kg/s",
+                "massFlowRate": "4.25 kg/s",
                 "mixtureRatio": "1.1",
                 "injectionType": "Coaxial Swirl"
             },
@@ -46,7 +46,7 @@
             "assets/projects/groundcontroller.jpg"
         ],
         "details": {
-            "about": "The Electronics division designs and builds all control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. All PCBs are designed and assembled in-house. The electronics divison is home to our Ground Controller, who handles take collection and remote operation during tests.",
+            "about": "The Electronics division designs and builds the control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. PCBs are designed and assembled in-house. The Electronics division is also home to the Ground Controller, who handles data collection and remote operation during tests.",
             "status": "Active Division"
         }
     },

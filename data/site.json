@@ -2,11 +2,11 @@
   "name": "ERPL",
   "fullName": "Experimental Rocket Propulsion Laboratory",
   "university": "Embry-Riddle Aeronautical University",
-  "tagline": "Propelling our future",
-  "subtitle": "through the rapid design and test of rocket engines",
-  "description": "The Experimental Rocket Propulsion Lab (ERPL) is a student-run organization dedicated to designing, building, and testing experimental rocket engines. Students experience hands-on learning through a wide range of projects spanning liquid propulsion, avionics, and flight systems. Regardless of what area you decide to focus on in the club, we are glad to have you! You don't need any experience to get started and this is a great way to socialize and network.",
+  "tagline": "Built to be tested.",
+  "subtitle": "Student-built liquid propulsion—from first cut to hot fire and flight.",
+  "description": "The Experimental Rocket Propulsion Lab (ERPL) is a student-run engineering organization that designs, builds, and tests experimental rocket propulsion systems. Members gain hands-on experience across liquid propulsion, high-pressure fluid systems, avionics, structures, recovery, and flight systems. No prior experience is required to join.",
   "philosophy": "ERPL emphasizes iterative development, extensive testing, and post-test data analysis. Every new test is preceded by design reviews, fault analysis, and procedural rehearsals. Test data directly drives iteration decisions across propulsion, fluids, electronics, and structures.",
   "mission": "ERPL exists to bridge the gap between classroom theory and real propulsion systems. Students graduate having designed hardware, executed test campaigns, and analyzed real engine data; experience rarely available at the undergraduate level.",
   "joinLink": "https://campusgroups.erau.edu/erpl/club_signup",
-  "whatsNext": "The Experimental Rocket Propulsion Lab is working towards its first flight-capable liquid bi-propellant launch vehicle with the objective of competing in the Friends of Amateur Rocketry Dollar-Per-Foot Challenge this December."
+  "whatsNext": "ERPL is preparing MOE, its first flight-capable liquid bipropellant launch vehicle, for the Friends of Amateur Rocketry Dollar-Per-Foot Challenge on December 12, 2026."
 }

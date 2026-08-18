@@ -3,7 +3,7 @@
   "subtitle": "ERPL alumni go on to work at the world's leading aerospace companies",
   "description": "We don't just build rockets. We build the people who build rockets. Our members graduate with real experience in cryogenic fluid systems, avionics architecture, composite manufacturing, hazardous testing operations, and more. When you walk in our door, you don't need to know everything. You just need to be curious, committed, and ready to get your hands dirty.",
   "callToAction": {
-    "title": "Ready to become an aerospace engineer?",
+    "title": "Ready to build flight hardware?",
     "text": "In the classroom, you learn the equations. At ERPL, you learn why they matter. We bridge the gap between academic theory and aerospace reality by tackling projects that are technically difficult and operationally complex.",
     "buttonText": "Join ERPL",
     "buttonLink": "https://campusgroups.erau.edu/erpl/club_signup"
@@ -45,7 +45,7 @@
     },
     {
       "name": "Relativity Space",
-      "logo": "assets/alumni/thumbnail_Relativity_white_RGB.png"
+      "logo": "assets/alumni/thumbnail_Relativity_White_RGB.png"
     },
     {
       "name": "Vast",

@@ -45,17 +45,17 @@
             "alternateName": "ERAU"
         },
         "member": [
-            {"@type": "Person", "name": "Rex Gavsie", "jobTitle": "President"},
-            {"@type": "Person", "name": "Kendall Anderson", "jobTitle": "Vice President"},
-            {"@type": "Person", "name": "Sean McConoughey", "jobTitle": "Chief Engineer"},
+            {"@type": "Person", "name": "Sean McConoughey", "jobTitle": "President"},
+            {"@type": "Person", "name": "Justin Robinson", "jobTitle": "Vice President"},
+            {"@type": "Person", "name": "Kendall Pielin", "jobTitle": "Treasurer"},
             {"@type": "Person", "name": "Samuel Muller", "jobTitle": "Secretary"},
-            {"@type": "Person", "name": "Jay Parikh", "jobTitle": "Treasurer"},
-            {"@type": "Person", "name": "Justin Fay", "jobTitle": "Safety Officer"},
-            {"@type": "Person", "name": "Josafath Lorenzo", "jobTitle": "Outreach Coordinator"},
-            {"@type": "Person", "name": "Patrick Gawel", "jobTitle": "Secretary"},
-            {"@type": "Person", "name": "Zane Reed", "jobTitle": "Engines Lead"},
-            {"@type": "Person", "name": "Jack Jung", "jobTitle": "Fluids Lead"},
-            {"@type": "Person", "name": "Jackson Floyd", "jobTitle": "Electronics Lead"}
+            {"@type": "Person", "name": "Jay Parikh", "jobTitle": "Public Relations Officer"},
+            {"@type": "Person", "name": "Josafath Villegas", "jobTitle": "Safety"},
+            {"@type": "Person", "name": "Rex Gavsie", "jobTitle": "MOE Lead"},
+            {"@type": "Person", "name": "Patrick Gawel", "jobTitle": "Structures & Dynamics Lead"},
+            {"@type": "Person", "name": "Zane Reed", "jobTitle": "Fluids Lead"},
+            {"@type": "Person", "name": "Jack Jung", "jobTitle": "Electronics Lead"},
+            {"@type": "Person", "name": "Jackson Floyd", "jobTitle": "Engines Lead"}
         ],
         "knowsAbout": ["rocket propulsion", "liquid rocket engines", "hybrid rocket engines", "aerospace engineering", "cryogenic systems", "rocket testing"]
     }
@@ -63,7 +63,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/logo/favicon.png">
     <link rel="apple-touch-icon" href="assets/logo/favicon.png">
@@ -105,12 +105,31 @@
             <div class="hero-overlay"></div>
         </div>
         <div class="hero-content">
+            <p class="hero-eyebrow">EST. 2007 <span>//</span> DAYTONA BEACH, FL</p>
             <img src="" alt="ERPL Logo" class="hero-logo" id="heroLogo">
-            <h1 id="heroTagline">Propelling our future</h1>
-            <p id="heroSubtitle">through the rapid design and test of rocket engines</p>
+            <h1 id="heroTagline">Built to be tested.</h1>
+            <p id="heroSubtitle">Student-built liquid propulsion—from first cut to hot fire and flight.</p>
             <div class="hero-ctas">
                 <a href="#" class="btn btn-primary" id="joinBtn">Join ERPL</a>
                 <a href="#contact" class="btn btn-outline" id="sponsorBtn">Sponsor ERPL</a>
+            </div>
+        </div>
+        <div class="hero-specs" aria-label="ERPL program highlights">
+            <div class="hero-spec">
+                <span class="hero-spec-label">Program</span>
+                <strong>MOE</strong>
+            </div>
+            <div class="hero-spec">
+                <span class="hero-spec-label">Engine Thrust</span>
+                <strong>2,250 LBF</strong>
+            </div>
+            <div class="hero-spec">
+                <span class="hero-spec-label">Target Altitude</span>
+                <strong>60,000 FT</strong>
+            </div>
+            <div class="hero-spec">
+                <span class="hero-spec-label">Propellants</span>
+                <strong>LOX / IPA</strong>
             </div>
         </div>
     </section>
@@ -120,10 +139,11 @@
         <div class="container">
             <div class="about-grid">
                 <div class="about-text">
-                    <h2>Who we are</h2>
+                    <p class="section-kicker">01 / MISSION</p>
+                    <h2>Built by students.<br>Proven in testing.</h2>
                     <div class="accent-line"></div>
                     <h3>The Experimental Rocket Propulsion Lab<br>at Embry-Riddle Aeronautical University</h3>
-                    <p class="differentiator">ERPL is one of the few undergraduate teams in the U.S. designing and hot-firing liquid bi-propellant rocket engines.</p>
+                    <p class="differentiator">The hardware starts here: engines, cryogenic feed systems, avionics, structures, and test operations—all designed and built by students.</p>
                     <p id="aboutDescription"></p>
                 </div>
                 <div class="about-image">
@@ -148,8 +168,9 @@
     <section class="section section-dark" id="projects" aria-label="ERPL Projects Overview">
         <div class="container">
             <div class="section-header">
+                <p class="section-kicker">02 / PROGRAMS</p>
                 <h2>What We're Building</h2>
-                <p class="section-subtitle">Liquid bi-propellant rocketry from the ground up</p>
+                <p class="section-subtitle">One vehicle. Four technical divisions. Every system developed in-house.</p>
             </div>
             
             <div class="project-flagship" id="projectFlagship">
@@ -185,8 +206,9 @@
     <section class="section" id="leadership" aria-label="ERPL Leadership Team">
         <div class="container">
             <div class="section-header">
+                <p class="section-kicker">03 / OPERATORS</p>
                 <h2>Leadership</h2>
-                <p class="section-subtitle">Meet the team making it happen</p>
+                <p class="section-subtitle">Students responsible for the hardware, teams, and test operations.</p>
             </div>
             <div class="leadership-grid" id="leadershipGrid">
                 <!-- Populated by JS -->
@@ -198,7 +220,8 @@
     <section class="section section-dark" id="projects-full" aria-label="ERPL Project Details">
         <div class="container">
             <div class="section-header">
-                <h2>Project Deep Dive</h2>
+                <p class="section-kicker">04 / SYSTEMS</p>
+                <h2>Systems & Programs</h2>
                 <p class="section-subtitle">Our divisions, engines, and evolution</p>
             </div>
             <div class="projects-grid" id="projectsGrid">
@@ -211,8 +234,9 @@
     <section class="section" id="sponsors">
         <div class="container">
             <div class="section-header">
+                <p class="section-kicker">05 / PARTNERS</p>
                 <h2>Our Sponsors</h2>
-                <p class="section-subtitle">Thank you to our amazing sponsors for their support</p>
+                <p class="section-subtitle">Industry partners enabling student-built propulsion.</p>
             </div>
             <div class="sponsors-container" id="sponsorsContainer">
                 <!-- Populated by JS -->
@@ -224,6 +248,7 @@
     <section class="section section-outcomes" id="outcomes">
         <div class="container">
             <div class="outcomes-header">
+                <p class="section-kicker">06 / OUTCOMES</p>
                 <h2 id="outcomesHeadline">Where Our Engineers Land</h2>
                 <p class="outcomes-subtitle" id="outcomesSubtitle">ERPL alumni go on to work at the world's leading aerospace companies</p>
             </div>
@@ -245,7 +270,7 @@
             </div>
 
             <div class="outcomes-cta">
-                <h3 id="outcomesCtaTitle">Ready to become an aerospace engineer?</h3>
+                <h3 id="outcomesCtaTitle">Ready to build flight hardware?</h3>
                 <p id="outcomesCtaText"></p>
                 <div class="outcomes-cta-buttons">
                     <a href="#" class="btn btn-primary" id="outcomesCtaBtn">Join ERPL</a>
@@ -259,8 +284,9 @@
     <section class="section section-dark" id="contact">
         <div class="container">
             <div class="section-header">
+                <p class="section-kicker">07 / CONTACT</p>
                 <h2>Contact Us</h2>
-                <p class="section-subtitle">Prospective students, sponsors, media</p>
+                <p class="section-subtitle">Recruits / sponsors / media</p>
             </div>
             <div class="social-links" id="socialLinks">
                 <!-- Populated by JS -->
@@ -271,7 +297,7 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2026 ERPL. Made with ❤ at Embry-Riddle Aeronautical University</p>
+            <p>&copy; 2026 ERPL <span>//</span> EST. 2007 <span>//</span> EMBRY-RIDDLE AERONAUTICAL UNIVERSITY</p>
         </div>
     </footer>
     <!-- Project Modal -->
