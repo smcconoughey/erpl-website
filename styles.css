@@ -1144,6 +1144,74 @@ footer span {
     line-height: 1.65;
 }
 
+.meeting-schedule {
+    margin-bottom: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(9, 9, 9, 0.3);
+}
+
+.meeting-schedule-intro {
+    display: grid;
+    align-items: end;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.meeting-schedule-intro span,
+.meeting-schedule-grid span,
+.meeting-schedule-grid time {
+    color: #555555;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    line-height: 1.45;
+}
+
+.meeting-schedule-intro h3 {
+    margin-top: 0.6rem;
+    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+}
+
+.meeting-schedule-intro p {
+    color: #414141;
+    font-size: 0.9rem;
+    line-height: 1.75;
+}
+
+.meeting-schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid rgba(9, 9, 9, 0.3);
+    border-left: 1px solid rgba(9, 9, 9, 0.3);
+}
+
+.meeting-schedule-grid > div {
+    display: flex;
+    min-width: 0;
+    min-height: 135px;
+    flex-direction: column;
+    padding: 1.25rem;
+    border-right: 1px solid rgba(9, 9, 9, 0.3);
+    border-bottom: 1px solid rgba(9, 9, 9, 0.3);
+}
+
+.meeting-schedule-grid strong {
+    margin-top: auto;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.meeting-schedule-grid time {
+    margin-top: 0.4rem;
+    letter-spacing: 0.06em;
+}
+
 .new-member-cta {
     display: flex;
     align-items: center;
@@ -1200,6 +1268,16 @@ footer span {
     .new-member-steps {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .meeting-schedule-intro {
+        align-items: start;
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .meeting-schedule-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 600px) {
@@ -1229,6 +1307,29 @@ footer span {
     .new-member-steps p {
         font-size: 0.72rem;
         line-height: 1.55;
+    }
+
+    .meeting-schedule-intro h3 {
+        font-size: 1.35rem;
+    }
+
+    .meeting-schedule-intro p {
+        font-size: 0.8rem;
+        line-height: 1.65;
+    }
+
+    .meeting-schedule-grid > div {
+        min-height: 115px;
+        padding: 0.9rem;
+    }
+
+    .meeting-schedule-grid strong {
+        font-size: 0.78rem;
+    }
+
+    .meeting-schedule-grid span,
+    .meeting-schedule-grid time {
+        font-size: 0.55rem;
     }
 
     .new-member-cta {
