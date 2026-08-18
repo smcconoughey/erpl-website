@@ -6,6 +6,7 @@
     "result": "SUCCESSFUL HOT FIRE",
     "image": "assets/projects/odyssey.jpg",
     "projectId": "odyssey",
+    "archiveProject": true,
     "source": null,
     "sourceLabel": "ERPL TEST RECORD"
   },
@@ -16,6 +17,7 @@
     "result": "2 SUCCESSFUL HOT FIRES",
     "image": "assets/projects/tritonhotfire.jpg",
     "projectId": "triton",
+    "archiveProject": true,
     "source": "https://erau.edu/about/news-and-stories/news/hot-fire-test",
     "sourceLabel": "EMBRY-RIDDLE REPORT"
   },
@@ -56,6 +58,7 @@
     "result": "SUCCESSFUL COMPOSITE FIRE",
     "image": "assets/projects/triton.png",
     "projectId": "triton",
+    "archiveProject": true,
     "source": null,
     "sourceLabel": "ERPL TEST RECORD"
   }

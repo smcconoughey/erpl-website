@@ -41,6 +41,16 @@
                     "CAD tank restraints, brackets, and fluid-system layouts.",
                     "Assemble hardware and support supervised leak, water, and pressure tests."
                 ]
+            },
+            "careerOutcomes": {
+                "summary": "Feed-system design and test operations build experience for vehicle fluids, ground systems, and propulsion test infrastructure.",
+                "roles": [
+                    "Fluid Systems Engineer",
+                    "Test Stand Engineer",
+                    "Ground Systems Engineer",
+                    "Propulsion Test Engineer",
+                    "Mechanical Design Engineer"
+                ]
             }
         }
     },
@@ -63,6 +73,16 @@
                     "Calibrate pressure transducers, load cells, and thermocouples.",
                     "Write embedded or ground software and support supervised test operations."
                 ]
+            },
+            "careerOutcomes": {
+                "summary": "Circuit design, sensor bring-up, controls, and debugging translate directly to flight electronics and hardware test roles.",
+                "roles": [
+                    "Avionics Hardware Engineer",
+                    "Embedded Software Engineer",
+                    "Instrumentation Engineer",
+                    "Controls Engineer",
+                    "Hardware Test Engineer"
+                ]
             }
         }
     },
@@ -83,6 +103,16 @@
                     "CAD airframe, recovery, and test-fixture components.",
                     "Run hand calculations, aerodynamic models, and structural analysis.",
                     "Fabricate, inspect, and ground-test composite and metallic hardware."
+                ]
+            },
+            "careerOutcomes": {
+                "summary": "Vehicle design, analysis, fabrication, and qualification prepare members for airframe and flight-mechanics work.",
+                "roles": [
+                    "Structures Design Engineer",
+                    "Loads & Dynamics Engineer",
+                    "Aerodynamics Engineer",
+                    "Mechanical Test Engineer",
+                    "Flight Systems Engineer"
                 ]
             }
         }
@@ -106,12 +136,24 @@
                     "CAD injector and thrust-chamber components for design review.",
                     "Support engine assembly and instrumentation, then reduce hot-fire data."
                 ]
+            },
+            "careerOutcomes": {
+                "summary": "Engine design, instrumentation, and firing data build the foundation for propulsion development and component testing.",
+                "roles": [
+                    "Propulsion Engineer",
+                    "Combustion Devices Engineer",
+                    "Thermal & Fluids Analyst",
+                    "Propulsion Test Engineer",
+                    "Engine Systems Engineer"
+                ]
             }
         }
     },
     {
         "id": "triton",
         "name": "Triton",
+        "archive": true,
+        "archiveOrder": 4,
         "description": "Triton is a LOX/ethanol engine in the 1,000 lbf class. Designed and built by first-year members, it completed two successful hot-fire tests at Cecil Spaceport in spring 2025.",
         "image": "assets/projects/triton.png",
         "details": {
@@ -129,6 +171,8 @@
     {
         "id": "juno",
         "name": "Juno",
+        "archive": true,
+        "archiveOrder": 3,
         "description": "Juno returned ERPL to cryogenic liquid bipropellant engine development. Its adjustable operating point supported early work in LOX handling, injector design, and ignition systems.",
         "image": "assets/projects/juno.png",
         "details": {
@@ -146,6 +190,8 @@
     {
         "id": "odyssey",
         "name": "Odyssey",
+        "archive": true,
+        "archiveOrder": 1,
         "description": "Odyssey was ERPL's HTPB/nitrous oxide entry into a lander challenge. The 500 lbf nominal hybrid successfully hotfired, reached approximately 600 lbf at peak, and rebuilt the team's experience in feed systems, data acquisition, and test operations.",
         "image": "assets/projects/odyssey.jpg",
         "details": {
@@ -157,6 +203,18 @@
                 "injectionType": "Swirl"
             },
             "status": "Retired"
+        }
+    },
+    {
+        "id": "spectre",
+        "name": "Spectre",
+        "archive": true,
+        "archiveOrder": 2,
+        "description": "Spectre was ERPL's active-stabilization flight program, combining a custom flight computer, firmware, sensors, and actuated control surfaces.",
+        "image": "assets/projects/ATran_04222023_ERPL_SpectreFlight3-15.jpg",
+        "details": {
+            "about": "The Spectre Module was developed to stabilize a rocket in flight and collect control-system data. Spectre Mk1 flew twice while the team developed roll control, with later work aimed at pitch, yaw, and roll stabilization.",
+            "status": "Past Program"
         }
     }
 ]
