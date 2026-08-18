@@ -438,9 +438,6 @@ async function loadSponsors() {
     const container = document.getElementById('sponsorsContainer');
     if (!container) return;
 
-    // SVG logos with white fills need dark background instead of light
-    const whiteFillLogos = ['Blue Origin', 'sendcutsend'];
-
     // Group sponsors by tier
     const tiers = {
         platinum: sponsors.filter(s => s.tier === 'platinum'),
@@ -463,12 +460,9 @@ async function loadSponsors() {
             const linkOpen = url ? `<a href="${url}" target="_blank" rel="noopener" class="sponsor-link">` : '<div class="sponsor-link">';
             const linkClose = url ? '</a>' : '</div>';
 
-            // Check if logo needs dark background (white fill SVGs)
-            const needsDarkBg = whiteFillLogos.some(name =>
-                sponsor.name.toLowerCase().includes(name.toLowerCase()) ||
-                sponsor.logo.toLowerCase().includes(name.toLowerCase())
-            );
-            const wrapperClass = needsDarkBg ? 'sponsor-logo-wrapper dark-bg' : 'sponsor-logo-wrapper';
+            const wrapperClass = sponsor.theme === 'dark'
+                ? 'sponsor-logo-wrapper dark-bg'
+                : 'sponsor-logo-wrapper';
 
             html += `
                 ${linkOpen}
