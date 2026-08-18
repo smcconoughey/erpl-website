@@ -1,42 +1,62 @@
 [
   {
-    "date": "MAY 2023",
-    "title": "Odyssey cold flow reveals an ignition fault",
-    "summary": "A nitrous-oxide cold flow exercised the feed and data systems and exposed an igniter problem before the next hot-fire attempt.",
-    "result": "COLD FLOW / IGNITION FAULT",
+    "date": "ODYSSEY / 2023-2024",
+    "title": "Odyssey successfully hotfires for the lander challenge",
+    "summary": "ERPL's HTPB/nitrous oxide hybrid completed a successful hot fire as part of the team's lander challenge entry. The campaign established the feed, data acquisition, and operating foundation used by later liquid engines.",
+    "result": "SUCCESSFUL HOT FIRE",
     "image": "assets/projects/odyssey.jpg",
     "projectId": "odyssey",
-    "source": "https://campusgroups.erau.edu/erpl/projects/",
-    "sourceLabel": "Legacy project record"
+    "source": null,
+    "sourceLabel": "ERPL TEST RECORD"
   },
   {
-    "date": "SPRING 2025",
-    "title": "Triton completes two hot fires",
+    "date": "TRITON / SPRING 2025",
+    "title": "Triton completes two successful hot fires",
     "summary": "A first-year team moved a LOX/ethanol engine from training to two successful tests at Cecil Spaceport in ten months.",
-    "result": "~1,000 LBF CLASS",
+    "result": "2 SUCCESSFUL HOT FIRES",
     "image": "assets/projects/tritonhotfire.jpg",
     "projectId": "triton",
     "source": "https://erau.edu/about/news-and-stories/news/hot-fire-test",
-    "sourceLabel": "Embry-Riddle report"
+    "sourceLabel": "EMBRY-RIDDLE REPORT"
   },
   {
-    "date": "EARLY 2026",
-    "title": "MOE test data forces a rebuild",
-    "summary": "An engine anomaly damaged Draco while the team operated remotely. The failure was reviewed, salvageable hardware was identified, and rebuild work began immediately.",
-    "result": "DATA TO REDESIGN",
+    "date": "MOE / EARLY 2026",
+    "title": "MOE successfully reaches full-scale hot fire",
+    "summary": "The 2,250 lbf-class MOE engine successfully ignited and ran through roughly half of the planned burn before a nozzle shear ended the test. The campaign exercised the integrated system and identified the next hardware changes.",
+    "result": "HOT FIRE / ~HALF BURN",
     "image": "assets/projects/moeengine.jpg",
     "projectId": "moe",
-    "source": "https://erau.edu/about/news-and-stories/hub-spoke/stories/get-involved-early-at-embry-riddle-and-change-your-trajectory-with-erpl",
-    "sourceLabel": "Embry-Riddle report"
+    "source": null,
+    "sourceLabel": "ERPL TEST RECORD"
   },
   {
-    "date": "APRIL 2026",
-    "title": "Five freshmen return Draco to service",
+    "date": "COMPOSITE / EARLY 2026",
+    "title": "A composite chamber test finds the next limit",
+    "summary": "A full-scale composite chamber attempt destroyed the engine and damaged Draco. The result produced a clear integration lesson and an immediate rebuild plan.",
+    "result": "LIMIT FOUND / REBUILD",
+    "image": "assets/projects/redteam.jpg",
+    "projectId": "moe",
+    "source": "https://erau.edu/about/news-and-stories/hub-spoke/stories/get-involved-early-at-embry-riddle-and-change-your-trajectory-with-erpl",
+    "sourceLabel": "EMBRY-RIDDLE REPORT"
+  },
+  {
+    "date": "DRACO / APRIL 2026",
+    "title": "Five freshmen rebuild Draco in weeks",
     "summary": "First-year members redesigned the LOX and pressurant systems, tank restraints, relief sizing, and thrust structure, returning the stand to operation within weeks.",
     "result": "REBUILT AND OPERATIONAL",
     "image": "assets/projects/fluids_stew.jpg",
     "projectId": "fluids",
     "source": "https://erau.edu/about/news-and-stories/hub-spoke/stories/get-involved-early-at-embry-riddle-and-change-your-trajectory-with-erpl",
-    "sourceLabel": "Embry-Riddle report"
+    "sourceLabel": "EMBRY-RIDDLE REPORT"
+  },
+  {
+    "date": "TRITON / 2026",
+    "title": "The composite chamber returns to hot fire",
+    "summary": "After rebuilding Draco, the team paired a composite chamber with Triton's smaller injector and successfully hotfired it, validating the chamber concept at reduced scale.",
+    "result": "SUCCESSFUL COMPOSITE FIRE",
+    "image": "assets/projects/triton.png",
+    "projectId": "triton",
+    "source": null,
+    "sourceLabel": "ERPL TEST RECORD"
   }
 ]

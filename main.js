@@ -208,7 +208,9 @@ async function loadTestHistory() {
                 <p>${event.summary}</p>
                 <div class="test-record-actions">
                     <a class="project-deep-link" href="#project/${event.projectId}" data-project-id="${event.projectId}">View system</a>
-                    <a href="${event.source}" target="_blank" rel="noopener">${event.sourceLabel}</a>
+                    ${event.source
+                        ? `<a href="${event.source}" target="_blank" rel="noopener">${event.sourceLabel}</a>`
+                        : `<span>${event.sourceLabel}</span>`}
                 </div>
             </div>
         </article>

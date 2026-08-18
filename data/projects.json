@@ -9,7 +9,7 @@
             "assets/projects/moeengine.jpg"
         ],
         "details": {
-            "about": "MOE is a LOX/IPA liquid bipropellant rocket designed to reach approximately 60,000 feet. Building on the experience gained from Odyssey, Juno, and Triton, the team is conducting integrated testing and preparing the vehicle for the Friends of Amateur Rocketry Dollar-Per-Foot Challenge.",
+            "about": "MOE is a LOX/IPA liquid bipropellant rocket designed to reach approximately 60,000 feet. Its engine reached hot fire and ran through roughly half of the planned burn before a nozzle shear ended the test. The team then used that data to continue engine development and prepare the integrated vehicle for the Friends of Amateur Rocketry Dollar-Per-Foot Challenge.",
             "status": "Integrated Testing",
             "specs": {
                 "thrust": "2,250 lbf",
@@ -115,7 +115,7 @@
         "description": "Triton is a LOX/ethanol engine in the 1,000 lbf class. Designed and built by first-year members, it completed two successful hot-fire tests at Cecil Spaceport in spring 2025.",
         "image": "assets/projects/triton.png",
         "details": {
-            "about": "Triton represents a significant step up in engine capability from Juno. The first engine at ERPL designed and built by first-year members, Triton moved from initial training to two successful hot fires in ten months and remains a testbed for future component designs.",
+            "about": "Triton represents a significant step up in engine capability from Juno. The first engine at ERPL designed and built by first-year members, Triton moved from initial training to two successful hot fires in ten months. After Draco was rebuilt, the team paired Triton's smaller injector with a composite chamber and successfully hotfired the combination.",
             "specs": {
                 "thrust": "950 lbf nominal (~1,000 lbf class)",
                 "chamberPressure": "400 psia",
@@ -146,10 +146,10 @@
     {
         "id": "odyssey",
         "name": "Odyssey",
-        "description": "Odyssey was a 500 lbf nominal HTPB/nitrous oxide hybrid engine that reached approximately 600 lbf at peak. Its campaign rebuilt ERPL's experience in feed systems, data acquisition, and test operations.",
+        "description": "Odyssey was ERPL's HTPB/nitrous oxide entry into a lander challenge. The 500 lbf nominal hybrid successfully hotfired, reached approximately 600 lbf at peak, and rebuilt the team's experience in feed systems, data acquisition, and test operations.",
         "image": "assets/projects/odyssey.jpg",
         "details": {
-            "about": "Project Odyssey was a 500 lbf nominal hybrid rocket engine utilizing HTPB and nitrous oxide as propellants. It reached approximately 600 lbf at peak and was fired twice, with the second test ending in thermal failure. The campaign established propellant feed infrastructure, custom data collection, and the operating procedures used by later engines. Odyssey is retired and on display in the College of Engineering.",
+            "about": "Project Odyssey was a 500 lbf nominal HTPB/nitrous oxide hybrid developed as ERPL's entry into a lander challenge. It successfully hotfired and reached approximately 600 lbf at peak. Its campaign established the propellant feed infrastructure, custom data collection, and operating procedures used by later engines. Odyssey is retired and on display in the College of Engineering.",
             "specs": {
                 "thrust": "500 lbf nominal / ~600 lbf peak",
                 "chamberPressure": "500 psia",
