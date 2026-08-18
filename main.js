@@ -603,14 +603,8 @@ async function initHeroSlideshow() {
     if (!heroConfig) return;
 
     const slidesContainer = document.getElementById('heroSlides');
-    const heroLogo = document.getElementById('heroLogo');
 
     if (!slidesContainer) return;
-
-    // Set the logo from config
-    if (heroConfig.logo && heroLogo) {
-        heroLogo.src = heroConfig.logo;
-    }
 
     // Build slides from config
     const slidesData = heroConfig.slides || [];

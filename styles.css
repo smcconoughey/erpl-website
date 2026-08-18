@@ -302,13 +302,6 @@ footer span {
     padding: 0 0.35rem;
 }
 
-.hero-logo {
-    max-width: 132px;
-    height: auto;
-    margin-bottom: 2.25rem;
-    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
-}
-
 .hero h1 {
     max-width: 980px;
     font-size: clamp(3.5rem, 8.5vw, 8rem);
@@ -1533,10 +1526,6 @@ footer p {
 
     .countdowns {
         display: none;
-    }
-
-    .hero-logo {
-        max-width: 104px;
     }
 
     .hero-eyebrow {
