@@ -152,7 +152,7 @@ async function loadProjects() {
                 <p>${project.description}</p>
                 ${careerOutcomes ? `
                     <div class="project-career-outcomes">
-                        <span>Role paths</span>
+                        <span>Career paths</span>
                         <ul>${careerOutcomes.roles.slice(0, 4).map(role => `<li>${role}</li>`).join('')}</ul>
                     </div>
                 ` : ''}
