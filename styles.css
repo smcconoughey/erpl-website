@@ -666,7 +666,8 @@ footer span {
     border-top: 1px solid var(--border);
 }
 
-.test-record-actions a {
+.test-record-actions a,
+.test-record-actions span {
     color: var(--text-secondary);
     font-family: var(--font-mono);
     font-size: 0.62rem;
