@@ -16,7 +16,7 @@
     "logo": "assets/sponsors/Blue Origin Logo - Feather.svg",
     "url": "https://www.blueorigin.com",
     "tier": "gold",
-    "theme": "dark"
+    "logoTreatment": "black"
   },
   {
     "name": "Musk Foundation",

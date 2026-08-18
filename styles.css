@@ -985,6 +985,10 @@ footer span {
     object-fit: contain;
 }
 
+.sponsor-logo-black {
+    filter: brightness(0);
+}
+
 /* SVG-specific sizing to prevent collapse */
 .sponsor-logo[src$=".svg"] {
     width: 100%;

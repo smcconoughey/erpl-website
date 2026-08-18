@@ -463,11 +463,14 @@ async function loadSponsors() {
             const wrapperClass = sponsor.theme === 'dark'
                 ? 'sponsor-logo-wrapper dark-bg'
                 : 'sponsor-logo-wrapper';
+            const logoClass = sponsor.logoTreatment === 'black'
+                ? 'sponsor-logo sponsor-logo-black'
+                : 'sponsor-logo';
 
             html += `
                 ${linkOpen}
                     <div class="${wrapperClass}">
-                        <img src="${sponsor.logo}" alt="${sponsor.name}" class="sponsor-logo"
+                        <img src="${sponsor.logo}" alt="${sponsor.name}" class="${logoClass}"
                              onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'sponsor-name\\'>${sponsor.name}</span>'">
                     </div>
                 ${linkClose}
