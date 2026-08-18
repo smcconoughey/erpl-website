@@ -1338,10 +1338,9 @@ footer p {
         border-bottom: 1px solid var(--border);
     }
 
-    /* Show countdowns on mobile but more compact */
+    /* Preserve room for the logo and menu on mobile/tablet headers */
     .countdowns {
-        display: flex;
-        gap: var(--spacing-sm);
+        display: none;
     }
 
     .countdown-item {
@@ -1394,7 +1393,7 @@ footer p {
     }
 
     .hero h1 {
-        font-size: clamp(3rem, 16vw, 5rem);
+        font-size: clamp(2.75rem, 15vw, 4.25rem);
     }
 
     .hero-content {
