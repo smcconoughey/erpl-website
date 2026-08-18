@@ -645,6 +645,17 @@ footer span {
 .division-item {
     padding: var(--spacing-md) 0;
     border-top: 1px solid var(--border);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.division-index {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
 }
 
 .division-item h4 {
@@ -659,6 +670,10 @@ footer span {
     font-size: 0.9rem;
     color: var(--text-secondary);
     line-height: 1.6;
+}
+
+.division-item:hover {
+    border-color: var(--text-primary);
 }
 
 .projects-cta {
@@ -677,7 +692,47 @@ footer span {
 
 @media (max-width: 480px) {
     .divisions-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0;
+        border-top: 1px solid var(--border);
+        border-left: 1px solid var(--border);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .division-item {
+        position: relative;
+        min-height: 112px;
+        padding: 1rem;
+        border-top: 0;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .division-item::after {
+        content: '\2198';
+        position: absolute;
+        right: 0.8rem;
+        bottom: 0.65rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .division-index {
+        display: block;
+    }
+
+    .division-item h4 {
+        max-width: 85%;
+        margin: 0;
+        font-size: 0.78rem;
+        line-height: 1.3;
+    }
+
+    .division-item p {
+        display: none;
     }
 }
 

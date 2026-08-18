@@ -133,7 +133,7 @@ async function loadProjects() {
         const hasCarousel = images.length > 1;
 
         return `
-        <div class="project-card">
+        <div class="project-card" id="project-${project.id}">
             <div class="project-image ${hasCarousel ? 'project-carousel' : ''}" data-images='${JSON.stringify(images)}'>
                 ${images.map((img, i) => `
                     <img src="${img}" alt="${project.name}" 
