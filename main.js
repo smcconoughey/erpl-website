@@ -500,14 +500,20 @@ async function loadAlumniOutcomes() {
     const companiesContainer = document.getElementById('outcomesCompanies');
     if (companiesContainer && data.companies) {
         // Create logo items HTML
-        const logosHtml = data.companies.map(company => `
-            <div class="company-logo-item">
-                <div class="company-logo-wrapper">
-                    <img src="${company.logo}" alt="${company.name}"
-                         onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\\'color:var(--text-primary);font-weight:600;\\'>${company.name}</span>'">
+        const logosHtml = data.companies.map(company => {
+            const mark = company.textLogo
+                ? `<span class="company-name-mark" aria-label="${company.name}">${company.textLogo}</span>`
+                : `<img src="${company.logo}" alt="${company.name}"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'company-name-mark\\'>${company.name}</span>'">`;
+
+            return `
+                <div class="company-logo-item">
+                    <div class="company-logo-wrapper">
+                        ${mark}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
         // Duplicate logos for seamless infinite scroll
         companiesContainer.innerHTML = `

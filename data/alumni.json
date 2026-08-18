@@ -66,6 +66,42 @@
     {
       "name": "Vast",
       "logo": "assets/alumni/Vast_Wordmark_White_CMYK.png"
+    },
+    {
+      "name": "Lockheed Martin",
+      "logo": "assets/sponsors/lockheed-martin-logo.svg"
+    },
+    {
+      "name": "Collins Aerospace",
+      "logo": "assets/alumni/collins-aerospace-logo.svg"
+    },
+    {
+      "name": "General Dynamics",
+      "logo": "assets/alumni/general-dynamics-logo.svg"
+    },
+    {
+      "name": "Gulfstream Aerospace",
+      "logo": "assets/alumni/gulfstream-logo.svg"
+    },
+    {
+      "name": "NASA",
+      "textLogo": "NASA"
+    },
+    {
+      "name": "Korry",
+      "logo": "assets/alumni/korry-logo.png"
+    },
+    {
+      "name": "Rocket Factory Augsburg",
+      "logo": "assets/alumni/rfa-logo.png"
+    },
+    {
+      "name": "U.S. Space & Rocket Center",
+      "logo": "assets/alumni/space-rocket-center-logo.png"
+    },
+    {
+      "name": "a.i. solutions",
+      "logo": "assets/alumni/ai-solutions-logo.png"
     }
   ],
   "testimonials": [
