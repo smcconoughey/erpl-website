@@ -7,12 +7,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadNavigation(),
         loadCountdowns(),
         loadProjects(),
+        loadTestHistory(),
         loadLeadership(),
         loadSocialLinks(),
         loadSponsors(),
         loadAlumniOutcomes()
     ]);
 
+    initProjectRouting();
     initMobileMenu();
     initSmoothScroll();
     initHeroSlideshow();
@@ -144,20 +146,10 @@ async function loadProjects() {
             <div class="project-content">
                 <h3>${project.name}</h3>
                 <p>${project.description}</p>
-                <button type="button" class="btn btn-secondary project-read-more" data-project-id="${project.id}">Read more</button>
+                <a href="#project/${project.id}" class="btn btn-secondary project-read-more" data-project-id="${project.id}">Read more</a>
             </div>
         </div>
     `}).join('');
-
-    // Attach click handlers using event delegation
-    grid.addEventListener('click', (e) => {
-        const btn = e.target.closest('.project-read-more');
-        if (btn) {
-            e.preventDefault();
-            const projectId = btn.dataset.projectId;
-            openProjectModal(projectId);
-        }
-    });
 
     // Initialize carousels
     initProjectCarousels();
@@ -188,17 +180,39 @@ async function loadFlagshipProject() {
             <p class="flagship-tagline">Our Flagship Vehicle</p>
             <p>${moe.description}</p>
             <p class="flagship-next">${whatsNext}</p>
-            <button type="button" class="btn btn-secondary project-read-more" data-project-id="${moe.id}">Learn More</button>
+            <a href="#project/${moe.id}" class="btn btn-secondary project-read-more" data-project-id="${moe.id}">Learn More</a>
         </div>
     `;
 
     // Initialize flagship carousel after content is loaded
     initFlagshipCarousel();
 
-    // Add click handler for Learn More button
-    flagship.querySelector('.project-read-more')?.addEventListener('click', (e) => {
-        openProjectModal(e.target.dataset.projectId);
-    });
+}
+
+async function loadTestHistory() {
+    const events = await loadJSON('data/test-history.json');
+    const grid = document.getElementById('testRecordGrid');
+    if (!events || !grid) return;
+
+    grid.innerHTML = events.map(event => `
+        <article class="test-record-card">
+            <a class="test-record-media project-deep-link" href="#project/${event.projectId}" data-project-id="${event.projectId}" aria-label="Open ${event.title}">
+                <img src="${event.image}" alt="" loading="lazy">
+            </a>
+            <div class="test-record-content">
+                <div class="test-record-meta">
+                    <span>${event.date}</span>
+                    <strong>${event.result}</strong>
+                </div>
+                <h3><a class="project-deep-link" href="#project/${event.projectId}" data-project-id="${event.projectId}">${event.title}</a></h3>
+                <p>${event.summary}</p>
+                <div class="test-record-actions">
+                    <a class="project-deep-link" href="#project/${event.projectId}" data-project-id="${event.projectId}">View system</a>
+                    <a href="${event.source}" target="_blank" rel="noopener">${event.sourceLabel}</a>
+                </div>
+            </div>
+        </article>
+    `).join('');
 }
 
 function initProjectCarousels() {
@@ -236,10 +250,18 @@ function initFlagshipCarousel() {
 
 let currentGalleryIndex = 0;
 let currentGalleryImages = [];
+let modalReturnHash = '#projects-full';
+let modalTrigger = null;
+let modalHistoryEntryCreated = false;
 
-function openProjectModal(projectId) {
+function getProjectIdFromHash() {
+    const match = window.location.hash.match(/^#project\/([a-z0-9-]+)$/i);
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+function openProjectModal(projectId, { updateHistory = false, trigger = null } = {}) {
     const project = projectsData.find(p => p.id === projectId);
-    if (!project) return;
+    if (!project) return false;
 
     const modal = document.getElementById('projectModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -247,7 +269,24 @@ function openProjectModal(projectId) {
     const modalGallery = document.getElementById('modalGallery');
     const galleryDots = document.getElementById('galleryDots');
     const modalAbout = document.getElementById('modalAbout');
+    const modalNewMembers = document.getElementById('modalNewMembers');
     const modalSpecs = document.getElementById('modalSpecs');
+    const modalShareStatus = document.getElementById('modalShareStatus');
+
+    if (updateHistory) {
+        if (!getProjectIdFromHash()) {
+            modalReturnHash = window.location.hash || '#projects-full';
+        }
+        const projectHash = `#project/${project.id}`;
+        if (window.location.hash !== projectHash) {
+            window.history.pushState({ projectId: project.id }, '', projectHash);
+            modalHistoryEntryCreated = true;
+        }
+    }
+
+    modalTrigger = trigger || modalTrigger;
+    modal.dataset.projectId = project.id;
+    modalShareStatus.textContent = '';
 
     // Populate modal
     modalTitle.textContent = project.name;
@@ -283,6 +322,20 @@ function openProjectModal(projectId) {
         modalStatus.textContent = project.details.status || '';
         modalStatus.style.display = project.details.status ? 'inline-block' : 'none';
 
+        if (project.details.newMembers) {
+            const newMembers = project.details.newMembers;
+            modalNewMembers.innerHTML = `
+                <p class="modal-new-members-kicker">Start here / first semester</p>
+                <h4>Own real work early.</h4>
+                <p>${newMembers.summary}</p>
+                <ul>${newMembers.work.map(item => `<li>${item}</li>`).join('')}</ul>
+            `;
+            modalNewMembers.style.display = 'block';
+        } else {
+            modalNewMembers.innerHTML = '';
+            modalNewMembers.style.display = 'none';
+        }
+
         // Build specs if available
         if (project.details.specs) {
             const specs = project.details.specs;
@@ -309,12 +362,16 @@ function openProjectModal(projectId) {
     } else {
         modalAbout.textContent = project.description;
         modalStatus.style.display = 'none';
+        modalNewMembers.style.display = 'none';
         modalSpecs.style.display = 'none';
     }
 
     // Show modal
     modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    window.requestAnimationFrame(() => modal.querySelector('.modal-close').focus());
+    return true;
 }
 
 function navigateGallery(direction) {
@@ -345,12 +402,81 @@ function goToGallerySlide(index) {
     dots[currentGalleryIndex]?.classList.add('active');
 }
 
-function closeProjectModal() {
+function hideProjectModal() {
     const modal = document.getElementById('projectModal');
+    if (!modal.classList.contains('active')) return;
     modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     currentGalleryImages = [];
     currentGalleryIndex = 0;
+    modalTrigger?.focus();
+    modalTrigger = null;
+}
+
+function closeProjectModal({ updateHistory = true } = {}) {
+    if (updateHistory && getProjectIdFromHash()) {
+        if (modalHistoryEntryCreated) {
+            modalHistoryEntryCreated = false;
+            window.history.back();
+            return;
+        }
+        window.history.replaceState(null, '', modalReturnHash);
+        hideProjectModal();
+        const returnTarget = document.getElementById(modalReturnHash.replace(/^#/, ''));
+        returnTarget?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+    }
+    hideProjectModal();
+}
+
+function syncProjectRoute() {
+    const projectId = getProjectIdFromHash();
+    if (projectId) {
+        openProjectModal(projectId);
+    } else {
+        modalHistoryEntryCreated = false;
+        hideProjectModal();
+    }
+}
+
+function initProjectRouting() {
+    document.addEventListener('click', (event) => {
+        const projectLink = event.target.closest('[data-project-id][href^="#project/"]');
+        if (!projectLink) return;
+        event.preventDefault();
+        openProjectModal(projectLink.dataset.projectId, {
+            updateHistory: true,
+            trigger: projectLink
+        });
+    });
+
+    window.addEventListener('popstate', syncProjectRoute);
+    syncProjectRoute();
+}
+
+async function copyCurrentProjectLink() {
+    const projectId = document.getElementById('projectModal').dataset.projectId;
+    if (!projectId) return;
+
+    const url = `${window.location.origin}${window.location.pathname}#project/${projectId}`;
+    const status = document.getElementById('modalShareStatus');
+
+    try {
+        await navigator.clipboard.writeText(url);
+    } catch (error) {
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.setAttribute('readonly', '');
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+    }
+
+    status.textContent = 'Copied';
 }
 
 // Initialize modal event listeners
@@ -358,9 +484,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('projectModal');
     if (modal) {
         // Close on backdrop click
-        modal.querySelector('.modal-backdrop').addEventListener('click', closeProjectModal);
+        modal.querySelector('.modal-backdrop').addEventListener('click', () => closeProjectModal());
         // Close on X button click
-        modal.querySelector('.modal-close').addEventListener('click', closeProjectModal);
+        modal.querySelector('.modal-close').addEventListener('click', () => closeProjectModal());
+        modal.querySelector('#modalShare').addEventListener('click', copyCurrentProjectLink);
 
         // Gallery navigation
         modal.querySelector('.gallery-prev').addEventListener('click', () => navigateGallery(-1));
@@ -379,6 +506,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Escape') closeProjectModal();
             if (e.key === 'ArrowLeft') navigateGallery(-1);
             if (e.key === 'ArrowRight') navigateGallery(1);
+
+            if (e.key === 'Tab') {
+                const focusable = [...modal.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])')]
+                    .filter(element => !element.disabled && element.offsetParent !== null);
+                if (!focusable.length) return;
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
         });
     }
 });
@@ -576,21 +718,37 @@ function initMobileMenu() {
         menuToggle.classList.toggle('active');
         navLinks.classList.toggle('mobile-active');
         document.body.classList.toggle('menu-open');
+        menuToggle.setAttribute('aria-expanded', String(menuToggle.classList.contains('active')));
+    });
+
+    navLinks.addEventListener('click', (event) => {
+        if (!event.target.closest('a')) return;
+        menuToggle.classList.remove('active');
+        navLinks.classList.remove('mobile-active');
+        document.body.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
     });
 }
 
 function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href === '#' || href.startsWith('#project/')) return;
+
+            const target = document.getElementById(href.slice(1));
+            if (!target) return;
+
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                const headerHeight = document.getElementById('header').offsetHeight;
-                const targetPosition = target.offsetTop - headerHeight;
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
+            const headerHeight = document.getElementById('header').offsetHeight;
+            const targetPosition = target.offsetTop - headerHeight;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+
+            if (window.location.hash !== href) {
+                window.history.pushState(null, '', href);
             }
         });
     });

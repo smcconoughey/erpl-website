@@ -2,7 +2,7 @@
     {
         "id": "moe",
         "name": "Project MOE",
-        "description": "MOE is ERPL's flagship liquid bipropellant launch vehicle. Designed for a 60,000-foot flight at approximately Mach 2.5, it is one of the most ambitious student-built liquid rocket programs in the United States.",
+        "description": "MOE is ERPL's flagship liquid bipropellant launch vehicle, designed for a 60,000-foot flight at approximately Mach 2.5. The program integrates a 2,250 lbf engine, cryogenic feed system, avionics, structures, and recovery hardware.",
         "images": [
             "assets/projects/IMG_5980-2.jpg",
             "assets/projects/moe_tanks.jpg",
@@ -24,7 +24,7 @@
     {
         "id": "fluids",
         "name": "Fluids",
-        "description": "Fluids is our division that focuses on fluid systems. Fluids handles design, maintenance, and upgrades for our Draco ground test stand. The division also builds and tests the fluid systems for the MOE flight vehicle.",
+        "description": "Fluids owns ERPL's high-pressure and cryogenic feed systems, from P&IDs and component sizing through assembly and test. The division operates Draco and develops the MOE flight feed system.",
         "images": [
             "assets/projects/fluids_6678.jpg",
             "assets/projects/fluids_6690.jpg",
@@ -32,60 +32,92 @@
             "assets/projects/fluids_stew.jpg"
         ],
         "details": {
-            "about": "The Fluids division is responsible for all fluid handling systems within ERPL. This includes propellant feed systems, pressurization systems, and ground support equipment. The team has gained expertise in cryogenic handling, high-pressure systems, and flow control. Fluids is also home to our Red Team and Test Conductor, who operate our test stand alongside the Ground Controller.",
-            "status": "Active Division"
+            "about": "Fluids designs, integrates, and operates ERPL's propellant feed systems, pressurization systems, and ground support equipment. Its members size components, produce system layouts, assemble hardware, and run supervised cryogenic and high-pressure operations on Draco and MOE.",
+            "status": "Active Division",
+            "newMembers": {
+                "summary": "New members start on real feed-system hardware with experienced review and supervised testing.",
+                "work": [
+                    "Read P&IDs and work through pressure drop, orifice, and relief sizing.",
+                    "CAD tank restraints, brackets, and fluid-system layouts.",
+                    "Assemble hardware and support supervised leak, water, and pressure tests."
+                ]
+            }
         }
     },
     {
         "id": "electronics",
         "name": "Electronics",
-        "description": "Our Electronics division specializes in commanding, controlling, and instrumenting our propulsion systems and collecting the required data for analysis. The division designs and assembles all our circuitry in-house.",
+        "description": "Electronics commands, controls, and instruments ERPL's propulsion systems. The division builds the circuitry, software, sensor interfaces, and data systems used from bench checkout through remote test operations.",
         "images": [
             "assets/projects/henry.jpg",
             "assets/projects/electronics.jpg",
             "assets/projects/groundcontroller.jpg"
         ],
         "details": {
-            "about": "The Electronics division designs and builds the control systems and data acquisition hardware for ERPL's projects. This includes engine control units, sensor interfaces, data logging systems, and ground station software. PCBs are designed and assembled in-house. The Electronics division is also home to the Ground Controller, who handles data collection and remote operation during tests.",
-            "status": "Active Division"
+            "about": "Electronics develops ERPL's control systems, data acquisition hardware, engine control units, sensor interfaces, data logging, and ground station software. Members carry hardware and software from bench validation to remote operation and data collection during tests.",
+            "status": "Active Division",
+            "newMembers": {
+                "summary": "New members take a channel or subsystem from bench checkout to live test support.",
+                "work": [
+                    "Build and inspect cable harnesses, sensor interfaces, and circuit boards.",
+                    "Calibrate pressure transducers, load cells, and thermocouples.",
+                    "Write embedded or ground software and support supervised test operations."
+                ]
+            }
         }
     },
     {
         "id": "flight",
         "name": "Structures & Dynamics",
-        "description": "The Structures & Dynamics division focuses on vehicle flight bodies. After developing an actively stabilized rocket, Spectre, the division has shifted to develop the flight body, recovery systems, and simulation for MOE.",
+        "description": "Structures & Dynamics develops MOE's airframe, aerodynamics, recovery systems, and flight simulation. The division carries analysis into fabrication, inspection, and ground testing.",
         "images": [
             "assets/projects/flight.jpg",
             "assets/projects/ATran_04222023_ERPL_SpectreFlight3-15.jpg"
         ],
         "details": {
-            "about": "The Structures & Dynamics division handles all aspects of vehicle design including aerodynamics, structures, recovery systems, and active stabilization. The team developed Spectre, an actively stabilized rocket, and is now applying that expertise to the MOE flight vehicle.",
-            "status": "Active Division"
+            "about": "Structures & Dynamics owns vehicle aerodynamics, primary structures, recovery systems, and flight simulation. Lessons from Spectre, ERPL's actively stabilized rocket, now inform the MOE airframe and flight systems.",
+            "status": "Active Division",
+            "newMembers": {
+                "summary": "New members own bounded flight-hardware problems and carry them through analysis and test.",
+                "work": [
+                    "CAD airframe, recovery, and test-fixture components.",
+                    "Run hand calculations, aerodynamic models, and structural analysis.",
+                    "Fabricate, inspect, and ground-test composite and metallic hardware."
+                ]
+            }
         }
     },
     {
         "id": "engines",
         "name": "Engines",
-        "description": "Engines designs, produces, and characterizes ERPL's propulsion systems. Following Odyssey in 2023, ERPL transitioned into liquid bipropellant propulsion and has since tested three increasingly complex engines.",
+        "description": "Engines takes ERPL propulsion systems from cycle calculations and injector design through integration, instrumentation, hot fire, and post-test analysis.",
         "images": [
             "assets/projects/engines_aiden.jpg",
             "assets/projects/moeengine.jpg",
             "assets/projects/tritonhotfire.jpg"
         ],
         "details": {
-            "about": "The Engines division is responsible for the design, manufacturing, and testing of all propulsion systems. The team has progressed from Odyssey (hybrid) to Juno and Triton (liquid bi-propellant), with MOE being the culmination of this experience.",
-            "status": "Active Division"
+            "about": "Engines owns propulsion design, integration, test support, and data reduction. The program has progressed from the Odyssey hybrid to the Juno and Triton liquid engines, with MOE combining those lessons at flight scale.",
+            "status": "Active Division",
+            "newMembers": {
+                "summary": "New members begin with a defined engine problem, not a semester of observation.",
+                "work": [
+                    "Calculate mass flow, injector sizing, nozzle performance, and thermal loads.",
+                    "CAD injector and thrust-chamber components for design review.",
+                    "Support engine assembly and instrumentation, then reduce hot-fire data."
+                ]
+            }
         }
     },
     {
         "id": "triton",
         "name": "Triton",
-        "description": "Triton is a rocket engine designed to produce 1,000 lbf of thrust, intended to demonstrate a large step up in engine size from Juno. It is also a test bed for many different component designs.",
+        "description": "Triton is a LOX/ethanol engine in the 1,000 lbf class. Designed and built by first-year members, it completed two successful hot-fire tests at Cecil Spaceport in spring 2025.",
         "image": "assets/projects/triton.png",
         "details": {
-            "about": "Triton represents a significant step up in engine capability from Juno. Designed for 1,000 lbf of thrust, Triton serves as both a high-power demonstrator and a testbed for new component designs that will be used in future projects.",
+            "about": "Triton represents a significant step up in engine capability from Juno. The first engine at ERPL designed and built by first-year members, Triton moved from initial training to two successful hot fires in ten months and remains a testbed for future component designs.",
             "specs": {
-                "thrust": "950 lbf",
+                "thrust": "950 lbf nominal (~1,000 lbf class)",
                 "chamberPressure": "400 psia",
                 "massFlowRate": "2.2 kg/s",
                 "mixtureRatio": "1.4",
@@ -97,10 +129,10 @@
     {
         "id": "juno",
         "name": "Juno",
-        "description": "Juno was our first endeavor into cryogenic bi-propellant rocket engines. With the ability to target a range of operating conditions, Juno gave us experience with dealing with cryogenic fluids and liquid rocketry.",
+        "description": "Juno returned ERPL to cryogenic liquid bipropellant engine development. Its adjustable operating point supported early work in LOX handling, injector design, and ignition systems.",
         "image": "assets/projects/juno.png",
         "details": {
-            "about": "Project Juno is ERPL's first endeavor into liquid bi-propellant rocket engines in over a decade. This engine was built to be rapidly tested for short duration test fires. Juno was designed to use liquid oxygen and ethanol for propellants. Juno is currently awaiting testing following a redesign of the igniter assembly.",
+            "about": "Juno was ERPL's first liquid bipropellant engine program in more than a decade. Designed for short-duration LOX/ethanol tests across a range of operating conditions, its feed, injector, and igniter work informed Triton and MOE.",
             "specs": {
                 "thrust": "350 lbf",
                 "chamberPressure": "450 psia",
@@ -114,12 +146,12 @@
     {
         "id": "odyssey",
         "name": "Odyssey",
-        "description": "Odyssey was a hybrid rocket engine that utilized HTPB and nitrous oxide and produced a maximum of 600 lbf of thrust. This engine gave the team experience in fluid systems, infrastructure development, and operations planning.",
+        "description": "Odyssey was a 500 lbf nominal HTPB/nitrous oxide hybrid engine that reached approximately 600 lbf at peak. Its campaign rebuilt ERPL's experience in feed systems, data acquisition, and test operations.",
         "image": "assets/projects/odyssey.jpg",
         "details": {
-            "about": "Project Odyssey was a 500 lbf hybrid rocket engine utilizing HTPB and nitrous oxide as propellants. The engine was fired twice with the second test resulting in the loss of the engine due to thermal failures. Odyssey was ERPL's first engine test in over a decade and acted as a knowledge gathering project that resulted in the development of a propellant feed system, custom data collection, and a multitude of operations planning documents. The engine is retired and on display in the College of Engineering.",
+            "about": "Project Odyssey was a 500 lbf nominal hybrid rocket engine utilizing HTPB and nitrous oxide as propellants. It reached approximately 600 lbf at peak and was fired twice, with the second test ending in thermal failure. The campaign established propellant feed infrastructure, custom data collection, and the operating procedures used by later engines. Odyssey is retired and on display in the College of Engineering.",
             "specs": {
-                "thrust": "500 lbf",
+                "thrust": "500 lbf nominal / ~600 lbf peak",
                 "chamberPressure": "500 psia",
                 "oxidizerFlowRate": "1 kg/s",
                 "injectionType": "Swirl"

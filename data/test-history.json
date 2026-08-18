@@ -1,0 +1,42 @@
+[
+  {
+    "date": "MAY 2023",
+    "title": "Odyssey cold flow reveals an ignition fault",
+    "summary": "A nitrous-oxide cold flow exercised the feed and data systems and exposed an igniter problem before the next hot-fire attempt.",
+    "result": "COLD FLOW / IGNITION FAULT",
+    "image": "assets/projects/odyssey.jpg",
+    "projectId": "odyssey",
+    "source": "https://campusgroups.erau.edu/erpl/projects/",
+    "sourceLabel": "Legacy project record"
+  },
+  {
+    "date": "SPRING 2025",
+    "title": "Triton completes two hot fires",
+    "summary": "A first-year team moved a LOX/ethanol engine from training to two successful tests at Cecil Spaceport in ten months.",
+    "result": "~1,000 LBF CLASS",
+    "image": "assets/projects/tritonhotfire.jpg",
+    "projectId": "triton",
+    "source": "https://erau.edu/about/news-and-stories/news/hot-fire-test",
+    "sourceLabel": "Embry-Riddle report"
+  },
+  {
+    "date": "EARLY 2026",
+    "title": "MOE test data forces a rebuild",
+    "summary": "An engine anomaly damaged Draco while the team operated remotely. The failure was reviewed, salvageable hardware was identified, and rebuild work began immediately.",
+    "result": "DATA TO REDESIGN",
+    "image": "assets/projects/moeengine.jpg",
+    "projectId": "moe",
+    "source": "https://erau.edu/about/news-and-stories/hub-spoke/stories/get-involved-early-at-embry-riddle-and-change-your-trajectory-with-erpl",
+    "sourceLabel": "Embry-Riddle report"
+  },
+  {
+    "date": "APRIL 2026",
+    "title": "Five freshmen return Draco to service",
+    "summary": "First-year members redesigned the LOX and pressurant systems, tank restraints, relief sizing, and thrust structure, returning the stand to operation within weeks.",
+    "result": "REBUILT AND OPERATIONAL",
+    "image": "assets/projects/fluids_stew.jpg",
+    "projectId": "fluids",
+    "source": "https://erau.edu/about/news-and-stories/hub-spoke/stories/get-involved-early-at-embry-riddle-and-change-your-trajectory-with-erpl",
+    "sourceLabel": "Embry-Riddle report"
+  }
+]
