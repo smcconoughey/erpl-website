@@ -129,13 +129,17 @@ async function loadProjects() {
     loadFlagshipProject();
 
     const grid = document.getElementById('projectsGrid');
-    grid.innerHTML = projectsData.map(project => {
+    const divisionIds = ['fluids', 'electronics', 'flight', 'engines'];
+    const divisions = projectsData.filter(project => divisionIds.includes(project.id));
+
+    grid.innerHTML = divisions.map(project => {
         // Support both single image and images array
         const images = project.images || [project.image];
         const hasCarousel = images.length > 1;
+        const careerOutcomes = project.details?.careerOutcomes;
 
         return `
-        <div class="project-card" id="project-${project.id}">
+        <article class="project-card division-card" id="project-${project.id}">
             <div class="project-image ${hasCarousel ? 'project-carousel' : ''}" data-images='${JSON.stringify(images)}'>
                 ${images.map((img, i) => `
                     <img src="${img}" alt="${project.name}" 
@@ -146,9 +150,15 @@ async function loadProjects() {
             <div class="project-content">
                 <h3>${project.name}</h3>
                 <p>${project.description}</p>
-                <a href="#project/${project.id}" class="btn btn-secondary project-read-more" data-project-id="${project.id}">Read more</a>
+                ${careerOutcomes ? `
+                    <div class="project-career-outcomes">
+                        <span>Role paths</span>
+                        <ul>${careerOutcomes.roles.slice(0, 4).map(role => `<li>${role}</li>`).join('')}</ul>
+                    </div>
+                ` : ''}
+                <a href="#project/${project.id}" class="btn btn-secondary project-read-more" data-project-id="${project.id}">Division details</a>
             </div>
-        </div>
+        </article>
     `}).join('');
 
     // Initialize carousels
@@ -194,9 +204,19 @@ async function loadTestHistory() {
     const grid = document.getElementById('testRecordGrid');
     if (!events || !grid) return;
 
-    grid.innerHTML = events.map(event => `
+    grid.innerHTML = events.map(event => {
+        const projectHref = event.archiveProject
+            ? `past-projects.html#${event.projectId}`
+            : `#project/${event.projectId}`;
+        const projectClass = event.archiveProject ? '' : ' project-deep-link';
+        const projectAttributes = event.archiveProject
+            ? ''
+            : `data-project-id="${event.projectId}"`;
+        const actionLabel = event.archiveProject ? 'Project archive' : 'View system';
+
+        return `
         <article class="test-record-card">
-            <a class="test-record-media project-deep-link" href="#project/${event.projectId}" data-project-id="${event.projectId}" aria-label="Open ${event.title}">
+            <a class="test-record-media${projectClass}" href="${projectHref}" ${projectAttributes} aria-label="Open ${event.title}">
                 <img src="${event.image}" alt="" loading="lazy">
             </a>
             <div class="test-record-content">
@@ -204,17 +224,18 @@ async function loadTestHistory() {
                     <span>${event.date}</span>
                     <strong>${event.result}</strong>
                 </div>
-                <h3><a class="project-deep-link" href="#project/${event.projectId}" data-project-id="${event.projectId}">${event.title}</a></h3>
+                <h3><a class="${projectClass.trim()}" href="${projectHref}" ${projectAttributes}>${event.title}</a></h3>
                 <p>${event.summary}</p>
                 <div class="test-record-actions">
-                    <a class="project-deep-link" href="#project/${event.projectId}" data-project-id="${event.projectId}">View system</a>
+                    <a class="${projectClass.trim()}" href="${projectHref}" ${projectAttributes}>${actionLabel}</a>
                     ${event.source
                         ? `<a href="${event.source}" target="_blank" rel="noopener">${event.sourceLabel}</a>`
                         : `<span>${event.sourceLabel}</span>`}
                 </div>
             </div>
         </article>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function initProjectCarousels() {
@@ -272,6 +293,7 @@ function openProjectModal(projectId, { updateHistory = false, trigger = null } =
     const galleryDots = document.getElementById('galleryDots');
     const modalAbout = document.getElementById('modalAbout');
     const modalNewMembers = document.getElementById('modalNewMembers');
+    const modalCareerOutcomes = document.getElementById('modalCareerOutcomes');
     const modalSpecs = document.getElementById('modalSpecs');
     const modalShareStatus = document.getElementById('modalShareStatus');
 
@@ -338,6 +360,19 @@ function openProjectModal(projectId, { updateHistory = false, trigger = null } =
             modalNewMembers.style.display = 'none';
         }
 
+        if (project.details.careerOutcomes) {
+            const outcomes = project.details.careerOutcomes;
+            modalCareerOutcomes.innerHTML = `
+                <p class="modal-outcomes-kicker">Where this experience leads</p>
+                <p>${outcomes.summary}</p>
+                <ul>${outcomes.roles.map(role => `<li>${role}</li>`).join('')}</ul>
+            `;
+            modalCareerOutcomes.style.display = 'block';
+        } else {
+            modalCareerOutcomes.innerHTML = '';
+            modalCareerOutcomes.style.display = 'none';
+        }
+
         // Build specs if available
         if (project.details.specs) {
             const specs = project.details.specs;
@@ -365,6 +400,7 @@ function openProjectModal(projectId, { updateHistory = false, trigger = null } =
         modalAbout.textContent = project.description;
         modalStatus.style.display = 'none';
         modalNewMembers.style.display = 'none';
+        modalCareerOutcomes.style.display = 'none';
         modalSpecs.style.display = 'none';
     }
 
