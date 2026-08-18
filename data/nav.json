@@ -8,8 +8,9 @@
         "link": "#projects-full"
     },
     {
-        "name": "Leadership",
-        "link": "#leadership"
+        "name": "New Members",
+        "link": "#new-members",
+        "highlight": true
     },
     {
         "name": "Sponsors",

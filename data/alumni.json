@@ -3,8 +3,8 @@
   "subtitle": "ERPL members have interned and worked across aerospace, defense, research, and advanced manufacturing.",
   "description": "ERPL members build experience in cryogenic fluid systems, avionics architecture, composite manufacturing, hazardous test operations, and more. That work has helped members and alumni earn internships and full-time roles across leading technical organizations. You do not need to arrive knowing everything. You need to be curious, committed, and ready to contribute.",
   "callToAction": {
-    "title": "Ready to build flight hardware?",
-    "text": "In the classroom, you learn the equations. At ERPL, you learn why they matter. We bridge the gap between academic theory and aerospace reality by tackling projects that are technically difficult and operationally complex.",
+    "title": "Start before you feel ready.",
+    "text": "You do not need prior rocket experience. Pick a division, learn the fundamentals, and earn responsibility by doing reliable work.",
     "buttonText": "Join ERPL",
     "buttonLink": "https://campusgroups.erau.edu/erpl/club_signup"
   },
@@ -14,12 +14,12 @@
       "description": "Students own their subsystems from PDR to test."
     },
     {
-      "title": "Transparency",
-      "description": "We analyze our failures as rigorously as our successes."
+      "title": "Rigor",
+      "description": "Reviews, procedures, and test data turn ambitious hardware into defensible engineering."
     },
     {
-      "title": "Teamwork",
-      "description": "A rocket needs many things to work at once. No one launches alone."
+      "title": "Follow-through",
+      "description": "Members carry work from analysis to hardware, test, and the next iteration."
     }
   ],
   "companies": [
