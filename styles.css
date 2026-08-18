@@ -566,6 +566,153 @@ footer span {
     }
 }
 
+/* ===== Test Record ===== */
+.section-test-record {
+    background: var(--bg-primary);
+}
+
+.test-record-header {
+    margin-bottom: var(--spacing-md);
+}
+
+.test-record-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+}
+
+.test-record-card {
+    display: grid;
+    grid-template-columns: minmax(140px, 0.72fr) minmax(0, 1.28fr);
+    min-height: 260px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary);
+}
+
+.test-record-media {
+    min-height: 100%;
+    overflow: hidden;
+    background: var(--bg-tertiary);
+}
+
+.test-record-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.08);
+    transition: transform 0.45s ease, filter 0.45s ease;
+}
+
+.test-record-card:hover .test-record-media img {
+    transform: scale(1.025);
+    filter: grayscale(0.55) contrast(1.08);
+}
+
+.test-record-content {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.test-record-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-bottom: auto;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.test-record-meta span {
+    color: var(--text-muted);
+}
+
+.test-record-meta strong {
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-align: right;
+}
+
+.test-record-content h3 {
+    margin: 2.2rem 0 0.7rem;
+    font-size: clamp(1.1rem, 2vw, 1.45rem);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+}
+
+.test-record-content h3 a {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.test-record-content > p {
+    margin-bottom: 1.1rem;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    line-height: 1.65;
+}
+
+.test-record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.2rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border);
+}
+
+.test-record-actions a {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.test-record-actions a:hover {
+    color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+    .test-record-card {
+        grid-template-columns: 1fr;
+    }
+
+    .test-record-media {
+        min-height: 0;
+        aspect-ratio: 16 / 7;
+    }
+}
+
+@media (max-width: 600px) {
+    .test-record-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .test-record-card {
+        min-height: 0;
+    }
+
+    .test-record-content {
+        padding: 1.15rem;
+    }
+
+    .test-record-content h3 {
+        margin-top: 1.6rem;
+        font-size: 1.05rem;
+    }
+
+    .test-record-content > p {
+        font-size: 0.8rem;
+    }
+}
+
 /* ===== Project Highlights (Teaser) Section ===== */
 .project-flagship {
     display: grid;
@@ -1687,8 +1834,8 @@ footer p {
     position: relative;
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    max-width: 600px;
+    border-radius: 0;
+    max-width: 720px;
     width: 100%;
     max-height: 85vh;
     overflow-y: auto;
@@ -1729,7 +1876,8 @@ footer p {
     padding: var(--spacing-md);
     border-bottom: 1px solid var(--border);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: var(--spacing-sm);
     flex-wrap: wrap;
 }
@@ -1740,14 +1888,48 @@ footer p {
     margin: 0;
 }
 
+.modal-header-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    padding-right: 2.5rem;
+}
+
 .modal-status {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     padding: 4px 12px;
-    border-radius: 20px;
+    border-radius: 0;
     background: var(--bg-tertiary);
     color: var(--text-secondary);
+}
+
+.modal-share {
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.modal-share:hover,
+.modal-share:focus-visible {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.modal-share-status {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .modal-body {
@@ -1842,9 +2024,54 @@ footer p {
     margin-bottom: var(--spacing-md);
 }
 
+.modal-new-members {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+}
+
+.modal-new-members .modal-new-members-kicker {
+    margin-bottom: 0.65rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.modal-new-members h4 {
+    margin-bottom: 0.65rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.modal-new-members > p:not(.modal-new-members-kicker) {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.modal-new-members ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+}
+
+.modal-new-members li {
+    padding: 0.9rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.55;
+}
+
 .modal-specs {
     background: var(--bg-tertiary);
-    border-radius: 8px;
+    border-radius: 0;
     padding: var(--spacing-md);
 }
 
@@ -1879,6 +2106,32 @@ footer p {
 
     .modal-header h2 {
         font-size: 1.25rem;
+    }
+
+    .modal-header-meta {
+        flex-basis: 100%;
+        padding-right: 0;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .gallery-images {
+        height: 230px;
+        border-radius: 0;
+    }
+
+    .modal-body > p {
+        font-size: 0.875rem;
+    }
+
+    .modal-new-members {
+        padding: 1rem;
+    }
+
+    .modal-new-members ul {
+        grid-template-columns: 1fr;
     }
 
     .modal-specs ul {

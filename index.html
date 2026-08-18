@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERPL – Experimental Rocket Propulsion Laboratory | Embry-Riddle Aeronautical University</title>
     <meta name="description"
-        content="The Experimental Rocket Propulsion Lab (ERPL) at Embry-Riddle Aeronautical University is a student-run organization dedicated to designing, building, and testing experimental liquid bi-propellant rocket engines.">
+        content="Since 2007, ERPL students at Embry-Riddle have designed and tested liquid rocket engines, cryogenic feed systems, avionics, and flight hardware.">
     <meta name="keywords"
         content="ERPL, Experimental Rocket Propulsion Laboratory, Embry-Riddle Aeronautical University, ERAU, rocket engine, liquid rocket, hybrid rocket, student rocketry, aerospace engineering, MOE rocket, Juno engine, Triton engine, Odyssey engine, collegiate rocketry, rocket propulsion, bi-propellant, cryogenic propulsion">
     <meta name="author" content="ERPL - Experimental Rocket Propulsion Laboratory">
@@ -18,7 +18,7 @@
     <meta property="og:url" content="https://erpl.space/">
     <meta property="og:title" content="ERPL – Experimental Rocket Propulsion Laboratory">
     <meta property="og:description"
-        content="Student-run rocket propulsion lab at Embry-Riddle Aeronautical University. Designing and testing liquid bi-propellant rocket engines.">
+        content="Student-built liquid propulsion since 2007. From design review to hot fire and flight.">
     <meta property="og:image" content="https://erpl.space/assets/logo/ERPL Logo Vectorized_flame (1).png">
 
     <!-- Twitter -->
@@ -26,7 +26,7 @@
     <meta name="twitter:url" content="https://erpl.space/">
     <meta name="twitter:title" content="ERPL – Experimental Rocket Propulsion Laboratory">
     <meta name="twitter:description"
-        content="Student-run rocket propulsion lab at Embry-Riddle Aeronautical University. Designing and testing liquid bi-propellant rocket engines.">
+        content="Student-built liquid propulsion since 2007. From design review to hot fire and flight.">
     <meta name="twitter:image" content="https://erpl.space/assets/logo/ERPL Logo Vectorized_flame (1).png">
 
     <!-- Structured Data -->
@@ -38,7 +38,8 @@
         "alternateName": "ERPL",
         "url": "https://erpl.space",
         "logo": "https://erpl.space/assets/logo/ERPL Logo Vectorized_flame (1).png",
-        "description": "Student-run organization at Embry-Riddle Aeronautical University dedicated to designing, building, and testing experimental rocket engines.",
+        "description": "Student-run liquid rocket propulsion laboratory at Embry-Riddle Aeronautical University, established in 2007.",
+        "foundingDate": "2007",
         "parentOrganization": {
             "@type": "CollegeOrUniversity",
             "name": "Embry-Riddle Aeronautical University",
@@ -75,7 +76,7 @@
     <header id="header">
         <div class="header-container">
             <div class="header-left">
-                <a href="#" class="logo">
+                <a href="#home" class="logo">
                     <img src="assets/logo/ERPL Logo Vectorized_flame (1).png" alt="ERPL" class="logo-img">
                 </a>
                 <nav class="nav-links" id="navLinks">
@@ -87,7 +88,7 @@
                 <div class="countdowns" id="countdowns">
                     <!-- Populated by JS -->
                 </div>
-                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-controls="navLinks" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -142,7 +143,7 @@
                     <h2>Built by students.<br>Proven in testing.</h2>
                     <div class="accent-line"></div>
                     <h3>The Experimental Rocket Propulsion Lab<br>at Embry-Riddle Aeronautical University</h3>
-                    <p class="differentiator">The work spans engines, cryogenic feed systems, avionics, structures, and test operations. All developed and tested by students.</p>
+                    <p class="differentiator">The work spans engines, cryogenic feed systems, avionics, structures, and test operations. Small teams take ownership early and stay with hardware through test and analysis.</p>
                     <p id="aboutDescription"></p>
                 </div>
                 <div class="about-image">
@@ -163,13 +164,27 @@
         </div>
     </section>
 
+    <!-- Test Record Section -->
+    <section class="section section-dark section-test-record" id="test-record" aria-label="ERPL Test Record">
+        <div class="container">
+            <div class="section-header test-record-header">
+                <p class="section-kicker">02 / TEST RECORD</p>
+                <h2>Test. Learn. Rebuild.</h2>
+                <p class="section-subtitle">Short development loops, direct ownership, and decisions backed by data.</p>
+            </div>
+            <div class="test-record-grid" id="testRecordGrid">
+                <!-- Populated by JS from test-history.json -->
+            </div>
+        </div>
+    </section>
+
     <!-- Project Highlights (Teaser) Section -->
     <section class="section section-dark" id="projects" aria-label="ERPL Projects Overview">
         <div class="container">
             <div class="section-header">
-                <p class="section-kicker">02 / PROGRAMS</p>
+                <p class="section-kicker">03 / PROGRAMS</p>
                 <h2>What We're Building</h2>
-                <p class="section-subtitle">One vehicle. Four technical divisions. Every system developed in-house.</p>
+                <p class="section-subtitle">One vehicle. Four technical divisions. Student-owned from design review to test.</p>
             </div>
             
             <div class="project-flagship" id="projectFlagship">
@@ -177,22 +192,22 @@
             </div>
 
             <div class="divisions-grid">
-                <a class="division-item" href="#project-fluids">
+                <a class="division-item project-deep-link" href="#project/fluids" data-project-id="fluids">
                     <span class="division-index">01</span>
                     <h4>Fluids</h4>
                     <p>High-pressure cryogenic feed systems and ground test stand operations.</p>
                 </a>
-                <a class="division-item" href="#project-electronics">
+                <a class="division-item project-deep-link" href="#project/electronics" data-project-id="electronics">
                     <span class="division-index">02</span>
                     <h4>Electronics</h4>
                     <p>Custom avionics, data acquisition, and flight control systems.</p>
                 </a>
-                <a class="division-item" href="#project-flight">
+                <a class="division-item project-deep-link" href="#project/flight" data-project-id="flight">
                     <span class="division-index">03</span>
                     <h4>Structures & Dynamics</h4>
                     <p>Aerodynamics, composite structures, and recovery systems.</p>
                 </a>
-                <a class="division-item" href="#project-engines">
+                <a class="division-item project-deep-link" href="#project/engines" data-project-id="engines">
                     <span class="division-index">04</span>
                     <h4>Engines</h4>
                     <p>Thrust chambers, injectors, and cooling system design.</p>
@@ -209,7 +224,7 @@
     <section class="section" id="leadership" aria-label="ERPL Leadership Team">
         <div class="container">
             <div class="section-header">
-                <p class="section-kicker">03 / LEADERSHIP</p>
+                <p class="section-kicker">04 / LEADERSHIP</p>
                 <h2>Leadership</h2>
                 <p class="section-subtitle">Students leading our technical teams, projects, and test operations.</p>
             </div>
@@ -223,7 +238,7 @@
     <section class="section section-dark" id="projects-full" aria-label="ERPL Project Details">
         <div class="container">
             <div class="section-header">
-                <p class="section-kicker">04 / SYSTEMS</p>
+                <p class="section-kicker">05 / SYSTEMS</p>
                 <h2>Systems & Programs</h2>
                 <p class="section-subtitle">Our divisions, engines, and evolution</p>
             </div>
@@ -237,7 +252,7 @@
     <section class="section" id="sponsors">
         <div class="container">
             <div class="section-header">
-                <p class="section-kicker">05 / PARTNERS</p>
+                <p class="section-kicker">06 / PARTNERS</p>
                 <h2>Our Sponsors</h2>
                 <p class="section-subtitle">Industry partners enabling student-built propulsion.</p>
             </div>
@@ -251,7 +266,7 @@
     <section class="section section-outcomes" id="outcomes">
         <div class="container">
             <div class="outcomes-header">
-                <p class="section-kicker">06 / OUTCOMES</p>
+                <p class="section-kicker">07 / OUTCOMES</p>
                 <h2 id="outcomesHeadline">Where Members Go</h2>
                 <p class="outcomes-subtitle" id="outcomesSubtitle">ERPL members have interned and worked across aerospace, defense, research, and advanced manufacturing.</p>
             </div>
@@ -287,7 +302,7 @@
     <section class="section section-dark" id="contact">
         <div class="container">
             <div class="section-header">
-                <p class="section-kicker">07 / CONTACT</p>
+                <p class="section-kicker">08 / CONTACT</p>
                 <h2>Contact Us</h2>
                 <p class="section-subtitle">Recruits / sponsors / media</p>
             </div>
@@ -304,24 +319,29 @@
         </div>
     </footer>
     <!-- Project Modal -->
-    <div id="projectModal" class="modal">
+    <div id="projectModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
-            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <button type="button" class="modal-close" aria-label="Close modal">&times;</button>
             <div class="modal-header">
                 <h2 id="modalTitle">Project Title</h2>
-                <span id="modalStatus" class="modal-status"></span>
+                <div class="modal-header-meta">
+                    <span id="modalStatus" class="modal-status"></span>
+                    <button type="button" class="modal-share" id="modalShare">Copy link</button>
+                    <span class="modal-share-status" id="modalShareStatus" aria-live="polite"></span>
+                </div>
             </div>
             <div class="modal-body">
                 <div class="modal-gallery">
-                    <button class="gallery-nav gallery-prev" aria-label="Previous image">&#10094;</button>
+                    <button type="button" class="gallery-nav gallery-prev" aria-label="Previous image">&#10094;</button>
                     <div class="gallery-images" id="modalGallery">
                         <!-- Images populated by JS -->
                     </div>
-                    <button class="gallery-nav gallery-next" aria-label="Next image">&#10095;</button>
+                    <button type="button" class="gallery-nav gallery-next" aria-label="Next image">&#10095;</button>
                     <div class="gallery-dots" id="galleryDots"></div>
                 </div>
                 <p id="modalAbout"></p>
+                <div id="modalNewMembers" class="modal-new-members"></div>
                 <div id="modalSpecs" class="modal-specs"></div>
             </div>
         </div>
