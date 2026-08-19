@@ -164,7 +164,7 @@
             "assets/projects/tritonhotfire.jpg"
         ],
         "details": {
-            "about": "Triton represents a significant step up in engine capability from Juno. The first engine at ERPL designed and built by first-year members, Triton moved from initial training to two successful hot fires in ten months. After Draco was rebuilt, the team paired Triton's smaller injector with a composite chamber and successfully hotfired the combination.",
+            "about": "Triton represents a significant step up in engine capability from Juno. The first engine at ERPL designed and built by first-year members, Triton moved from RFP to two successful hot fires in ten months. After Draco was rebuilt, the team paired Triton's smaller injector with a composite chamber and successfully hotfired the combination, paving the way for a lighter MOE engine in the fall.",
             "specs": {
                 "thrust": "950 lbf nominal (~1,000 lbf class)",
                 "chamberPressure": "400 psia",
