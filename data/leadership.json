@@ -1,7 +1,8 @@
 [
     {
         "name": "Darren Nguyen",
-        "role": "President"
+        "role": "President",
+        "photo": "assets/team/darren.jpg"
     },
     {
         "name": "Justin Robinson",

@@ -3,6 +3,10 @@
     "slides": [
         {
             "type": "video",
+            "src": "assets/projects/extratrim2.mp4"
+        },
+        {
+            "type": "video",
             "src": "assets/projects/moehotfire.mp4",
             "startTime": 2,
             "endTime": 9
@@ -10,10 +14,6 @@
         {
             "type": "video",
             "src": "assets/projects/highspeedmoeclipped.mov"
-        },
-        {
-            "type": "video",
-            "src": "assets/projects/extratrim2.mp4"
         },
         {
             "type": "image",

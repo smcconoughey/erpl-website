@@ -13,7 +13,7 @@
   {
     "date": "TRITON / SPRING 2025",
     "title": "Triton completes two successful hot fires",
-    "summary": "A first-year team moved a LOX/ethanol engine from training to two successful tests at Cecil Spaceport in ten months.",
+    "summary": "A first-year team moved a LOX/ethanol engine from RFP to hot fire at Cecil Spaceport in ten months.",
     "result": "2 SUCCESSFUL HOT FIRES",
     "image": "assets/projects/tritonhotfire.jpg",
     "projectId": "triton",
@@ -54,7 +54,7 @@
   {
     "date": "TRITON / 2026",
     "title": "The composite chamber returns to hot fire",
-    "summary": "After rebuilding Draco, the team paired a composite chamber with Triton's smaller injector and successfully hotfired it, validating the chamber concept at reduced scale.",
+    "summary": "After rebuilding Draco, the team paired a composite chamber with Triton's smaller injector and successfully hotfired it, validating the chamber concept at reduced scale and paving the way for a lighter MOE engine in the fall.",
     "result": "SUCCESSFUL COMPOSITE FIRE",
     "image": "assets/projects/triton-composite.jpg",
     "projectId": "triton",
