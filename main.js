@@ -571,16 +571,22 @@ async function loadLeadership() {
     if (!leaders) return;
 
     const grid = document.getElementById('leadershipGrid');
-    grid.innerHTML = leaders.map(leader => `
+    grid.innerHTML = leaders.map(leader => {
+        const initials = leader.name.split(' ').map(n => n[0]).join('');
+        const photo = leader.photo
+            ? `<img src="${leader.photo}" alt="${leader.name}" onerror="this.parentElement.classList.add('is-placeholder'); this.parentElement.innerHTML='<span>${initials}</span>'">`
+            : `<span>${initials}</span>`;
+
+        return `
         <div class="leader-card">
-            <div class="leader-photo">
-                <img src="${leader.photo}" alt="${leader.name}"
-                     onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:2rem;\\'>${leader.name.split(' ').map(n => n[0]).join('')}</span>'">
+            <div class="leader-photo${leader.photo ? '' : ' is-placeholder'}">
+                ${photo}
             </div>
             <h3>${leader.name}</h3>
             <p class="role">${leader.role}</p>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 async function loadSocialLinks() {

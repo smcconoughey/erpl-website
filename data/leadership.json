@@ -1,8 +1,7 @@
 [
     {
-        "name": "Sean McConoughey",
-        "role": "President",
-        "photo": "assets/team/sean.png"
+        "name": "Darren Nguyen",
+        "role": "President"
     },
     {
         "name": "Justin Robinson",
@@ -10,9 +9,14 @@
         "photo": "assets/team/justin.png"
     },
     {
-        "name": "Kendall Pielin",
+        "name": "Georgia Riley",
         "role": "Treasurer",
-        "photo": "assets/team/kendall.png"
+        "photo": "assets/team/georgia.jpg"
+    },
+    {
+        "name": "Madelyn Massucci",
+        "role": "Public Relations Officer",
+        "photo": "assets/team/madelyn.jpg"
     },
     {
         "name": "Samuel Muller",
@@ -20,14 +24,8 @@
         "photo": "assets/team/samuel.jpg"
     },
     {
-        "name": "Jay Parikh",
-        "role": "Public Relations Officer",
-        "photo": "assets/team/jay.jpg"
-    },
-    {
-        "name": "Josafath Villegas",
-        "role": "Safety",
-        "photo": "assets/team/josafath.jpg"
+        "name": "Amin Salemi",
+        "role": "Safety Officer"
     },
     {
         "name": "Rex Gavsie",
@@ -35,9 +33,8 @@
         "photo": "assets/team/rex.png"
     },
     {
-        "name": "Patrick Gawel",
-        "role": "Structures & Dynamics Lead",
-        "photo": "assets/team/patrick.jpg"
+        "name": "Sakshi Khidake",
+        "role": "Structures & Dynamics Lead"
     },
     {
         "name": "Zane Reed",

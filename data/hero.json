@@ -12,6 +12,10 @@
             "src": "assets/projects/highspeedmoeclipped.mov"
         },
         {
+            "type": "video",
+            "src": "assets/projects/extratrim2.mp4"
+        },
+        {
             "type": "image",
             "src": "assets/team/IMG_6035.png"
         },

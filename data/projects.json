@@ -6,7 +6,8 @@
         "images": [
             "assets/projects/IMG_5980-2.jpg",
             "assets/projects/moe_tanks.jpg",
-            "assets/projects/moeengine.jpg"
+            "assets/projects/moeengine.jpg",
+            "assets/projects/moe-explosion.jpg"
         ],
         "details": {
             "about": "MOE is a LOX/IPA liquid bipropellant rocket designed to reach approximately 60,000 feet. Its engine reached hot fire and ran through roughly half of the planned burn before a nozzle shear ended the test. The team then used that data to continue engine development and prepare the integrated vehicle for the Friends of Amateur Rocketry Dollar-Per-Foot Challenge.",
@@ -29,7 +30,8 @@
             "assets/projects/fluids_6678.jpg",
             "assets/projects/fluids_6690.jpg",
             "assets/projects/redteam.jpg",
-            "assets/projects/fluids_stew.jpg"
+            "assets/projects/fluids_stew.jpg",
+            "assets/projects/draco-rebuild-team.jpg"
         ],
         "details": {
             "about": "Fluids designs, integrates, and operates ERPL's propellant feed systems, pressurization systems, and ground support equipment. Its members size components, produce system layouts, assemble hardware, and run supervised cryogenic and high-pressure operations on Draco and MOE.",
@@ -124,7 +126,8 @@
         "images": [
             "assets/projects/engines_aiden.jpg",
             "assets/projects/moeengine.jpg",
-            "assets/projects/tritonhotfire.jpg"
+            "assets/projects/tritonhotfire.jpg",
+            "assets/projects/triton-composite.jpg"
         ],
         "details": {
             "about": "Engines owns propulsion design, integration, test support, and data reduction. The program has progressed from the Odyssey hybrid to the Juno and Triton liquid engines, with MOE combining those lessons at flight scale.",
@@ -155,7 +158,11 @@
         "archive": true,
         "archiveOrder": 4,
         "description": "Triton is a LOX/ethanol engine in the 1,000 lbf class. Designed and built by first-year members, it completed two successful hot-fire tests at Cecil Spaceport in spring 2025.",
-        "image": "assets/projects/triton.png",
+        "images": [
+            "assets/projects/triton-composite.jpg",
+            "assets/projects/triton.png",
+            "assets/projects/tritonhotfire.jpg"
+        ],
         "details": {
             "about": "Triton represents a significant step up in engine capability from Juno. The first engine at ERPL designed and built by first-year members, Triton moved from initial training to two successful hot fires in ten months. After Draco was rebuilt, the team paired Triton's smaller injector with a composite chamber and successfully hotfired the combination.",
             "specs": {

@@ -36,7 +36,7 @@
     "title": "A composite chamber test finds the next limit",
     "summary": "A full-scale composite chamber attempt destroyed the engine and damaged Draco. The result produced a clear integration lesson and an immediate rebuild plan.",
     "result": "LIMIT FOUND / REBUILD",
-    "image": "assets/projects/redteam.jpg",
+    "image": "assets/projects/moe-explosion.jpg",
     "projectId": "moe",
     "source": "https://erau.edu/about/news-and-stories/hub-spoke/stories/get-involved-early-at-embry-riddle-and-change-your-trajectory-with-erpl",
     "sourceLabel": "EMBRY-RIDDLE REPORT"
@@ -46,7 +46,7 @@
     "title": "Five freshmen rebuild Draco in weeks",
     "summary": "First-year members redesigned the LOX and pressurant systems, tank restraints, relief sizing, and thrust structure, returning the stand to operation within weeks.",
     "result": "REBUILT AND OPERATIONAL",
-    "image": "assets/projects/fluids_stew.jpg",
+    "image": "assets/projects/draco-rebuild-team.jpg",
     "projectId": "fluids",
     "source": "https://erau.edu/about/news-and-stories/hub-spoke/stories/get-involved-early-at-embry-riddle-and-change-your-trajectory-with-erpl",
     "sourceLabel": "EMBRY-RIDDLE REPORT"
@@ -56,7 +56,7 @@
     "title": "The composite chamber returns to hot fire",
     "summary": "After rebuilding Draco, the team paired a composite chamber with Triton's smaller injector and successfully hotfired it, validating the chamber concept at reduced scale.",
     "result": "SUCCESSFUL COMPOSITE FIRE",
-    "image": "assets/projects/triton.png",
+    "image": "assets/projects/triton-composite.jpg",
     "projectId": "triton",
     "archiveProject": true,
     "source": null,
