@@ -21,6 +21,7 @@
     --spacing-lg: 3rem;
     --spacing-xl: 4rem;
     --container-max: 1280px;
+    --frame-max: 1480px;
     --header-height: 88px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -73,7 +74,7 @@ header {
 }
 
 .header-container {
-    max-width: 1480px;
+    max-width: var(--frame-max);
     margin: 0 auto;
     padding: 0 var(--spacing-md);
     display: flex;
@@ -227,8 +228,8 @@ header {
     z-index: 1;
     top: var(--header-height);
     bottom: 0;
-    left: max(2rem, calc((100vw - 1480px) / 2));
-    right: max(2rem, calc((100vw - 1480px) / 2));
+    left: max(2rem, calc((100vw - var(--frame-max)) / 2));
+    right: max(2rem, calc((100vw - var(--frame-max)) / 2));
     border-left: 1px solid rgba(255, 255, 255, 0.16);
     border-right: 1px solid rgba(255, 255, 255, 0.16);
     pointer-events: none;
@@ -286,10 +287,12 @@ header {
 .hero-content {
     position: relative;
     z-index: 2;
-    width: min(1480px, 100%);
+    width: min(var(--frame-max), 100%);
     max-width: none;
     margin: 0 auto;
-    padding: calc(var(--header-height) + 4rem) max(4rem, calc((100% - 1280px) / 2)) 11rem;
+    /* Match the header inset. Percentage padding is viewport-relative and
+       pinned the heromark toward the center on wide screens. */
+    padding: calc(var(--header-height) + 4rem) var(--spacing-md) 11rem;
 }
 
 .hero-eyebrow,
@@ -354,8 +357,8 @@ footer span {
 .hero-specs {
     position: absolute;
     z-index: 3;
-    left: max(2rem, calc((100vw - 1480px) / 2));
-    right: max(2rem, calc((100vw - 1480px) / 2));
+    left: max(2rem, calc((100vw - var(--frame-max)) / 2));
+    right: max(2rem, calc((100vw - var(--frame-max)) / 2));
     bottom: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
