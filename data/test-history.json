@@ -1,7 +1,7 @@
 [
   {
     "date": "ODYSSEY / 2023-2024",
-    "title": "Odyssey successfully hotfires for the lander challenge",
+    "title": "Odyssey successfully hot fires for the lander challenge",
     "summary": "ERPL's HTPB/nitrous oxide hybrid completed a successful hot fire as part of the team's lander challenge entry. The campaign established the feed, data acquisition, and operating foundation used by later liquid engines.",
     "result": "SUCCESSFUL HOT FIRE",
     "image": "assets/projects/odyssey.jpg",
@@ -54,7 +54,7 @@
   {
     "date": "TRITON / 2026",
     "title": "The composite chamber returns to hot fire",
-    "summary": "After rebuilding Draco, the team paired a composite chamber with Triton's smaller injector and successfully hotfired it, validating the chamber concept at reduced scale and paving the way for a lighter MOE engine in the Fall.",
+    "summary": "After rebuilding Draco, the team paired a composite chamber with Triton's smaller injector and successfully hot fired it, validating the chamber concept at reduced scale and paving the way for a lighter MOE engine in the Fall.",
     "result": "SUCCESSFUL COMPOSITE FIRE",
     "image": "assets/projects/triton-composite.jpg",
     "projectId": "triton",
