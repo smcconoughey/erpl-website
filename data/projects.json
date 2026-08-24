@@ -157,7 +157,7 @@
         "name": "Triton",
         "archive": true,
         "archiveOrder": 4,
-        "description": "Triton is a LOX/ethanol engine in the 1,000 lbf class. Designed and built by first-year members, it completed two successful hot-fire tests at Cecil Spaceport in Spring 2025.",
+        "description": "Triton is a LOX/ethanol engine in the 1,000 lbf class. Designed and built by first-year members, it completed two successful hot fire tests at Cecil Spaceport in Spring 2025.",
         "images": [
             "assets/projects/triton-composite.jpg",
             "assets/projects/triton.png",
@@ -199,7 +199,7 @@
         "name": "Odyssey",
         "archive": true,
         "archiveOrder": 1,
-        "description": "Odyssey was ERPL's HTPB/nitrous oxide entry into a lander challenge. The 500 lbf nominal hybrid successfully hotfired, reached approximately 600 lbf at peak, and rebuilt the team's experience in feed systems, data acquisition, and test operations.",
+        "description": "Odyssey was ERPL's HTPB/nitrous oxide entry into a lander challenge. The 500 lbf nominal hybrid successfully hot fired, reached approximately 600 lbf at peak, and rebuilt the team's experience in feed systems, data acquisition, and test operations.",
         "image": "assets/projects/odyssey.jpg",
         "details": {
             "about": "Project Odyssey was a 500 lbf nominal HTPB/nitrous oxide hybrid developed as ERPL's entry into a lander challenge. It successfully hotfired and reached approximately 600 lbf at peak. Its campaign established the propellant feed infrastructure, custom data collection, and operating procedures used by later engines. Odyssey is retired and on display in the College of Engineering.",
