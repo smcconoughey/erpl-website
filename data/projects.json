@@ -199,10 +199,10 @@
         "name": "Odyssey",
         "archive": true,
         "archiveOrder": 1,
-        "description": "Odyssey was ERPL's HTPB/nitrous oxide entry into a lander challenge. The 500 lbf nominal hybrid successfully hot fired, reached approximately 600 lbf at peak, and rebuilt the team's experience in feed systems, data acquisition, and test operations.",
+        "description": "Odyssey was ERPL's HTPB/nitrous oxide entry into a lander challenge. The 500 lbf nominal hybrid successfully hot fired, reached approximately 600 lbf thrust at peak, and rebuilt the team's experience in feed systems, data acquisition, and test operations.",
         "image": "assets/projects/odyssey.jpg",
         "details": {
-            "about": "Project Odyssey was a 500 lbf nominal HTPB/nitrous oxide hybrid developed as ERPL's entry into a lander challenge. It successfully hotfired and reached approximately 600 lbf at peak. Its campaign established the propellant feed infrastructure, custom data collection, and operating procedures used by later engines. Odyssey is retired and on display in the College of Engineering.",
+            "about": "Project Odyssey's campaign established the propellant feed infrastructure, custom data collection, and operating procedures used by later engines. Odyssey is retired and on display in the College of Engineering.",
             "specs": {
                 "thrust": "500 lbf nominal / ~600 lbf peak",
                 "chamberPressure": "500 psia",
