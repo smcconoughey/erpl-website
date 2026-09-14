@@ -95,24 +95,3 @@ export function sourcesFromFileList(list: FileList | File[]): SourceFile[] {
       return { file, folder, name }
     })
 }
-
-export type CampaignIndex = {
-  root: string
-  files: { path: string; name: string; folder: string; size: number }[]
-}
-
-export async function fetchCampaign(): Promise<CampaignIndex | null> {
-  try {
-    const res = await fetch('/api/campaign')
-    if (!res.ok) return null
-    return (await res.json()) as CampaignIndex
-  } catch {
-    return null
-  }
-}
-
-export async function fetchCampaignCsv(path: string): Promise<ArrayBuffer> {
-  const res = await fetch(`/api/csv?path=${encodeURIComponent(path)}`)
-  if (!res.ok) throw new Error(`Failed to load ${path}`)
-  return res.arrayBuffer()
-}

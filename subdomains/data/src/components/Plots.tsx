@@ -12,7 +12,7 @@ export function Plots() {
     visibleRange,
     fullSpan,
     tool,
-    measureTimes,
+    measureCursors,
     showInfoEvents,
     dispatch,
   } = useTelemetry()
@@ -179,13 +179,13 @@ export function Plots() {
               fullT1={fullSpan.t1}
               absolute={timeMode === 'absolute'}
               tool={tool}
-              measureTimes={measureTimes}
+              measureCursors={measureCursors}
               active={activePlotId === plot.id}
               onPan={(t0, t1) => dispatch({ type: 'set-range', range: { t0, t1 } })}
               onZoom={(t0, t1) => dispatch({ type: 'set-range', range: { t0, t1 } })}
               onMeasureAdd={(t) => dispatch({ type: 'add-measure', t })}
-              onMeasureMove={(index, t) => dispatch({ type: 'move-measure', index, t })}
-              onMeasureRemove={(index) => dispatch({ type: 'remove-measure', index })}
+              onMeasureMove={(id, t) => dispatch({ type: 'move-measure', id, t })}
+              onMeasureRemove={(id) => dispatch({ type: 'remove-measure', id })}
               onActivate={() => dispatch({ type: 'set-active-plot', plotId: plot.id })}
             />
           </section>

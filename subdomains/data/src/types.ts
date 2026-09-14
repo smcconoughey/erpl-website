@@ -63,3 +63,8 @@ export type TimeRange = {
   t0: number
   t1: number
 }
+
+export type MeasureCursor = {
+  id: string
+  t: number
+}

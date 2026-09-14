@@ -14,7 +14,7 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually http://localhost:5173).
+Node 22.12+ is required (Vite 7). Open the URL Vite prints (usually http://localhost:5173).
 
 ## Load data
 

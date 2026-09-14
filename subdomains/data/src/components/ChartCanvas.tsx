@@ -11,6 +11,7 @@ import {
   windowRange,
 } from '../lib/math'
 import type { ChartEvent, ChartSeries, ChartTool } from './chartTypes'
+import type { MeasureCursor } from '../types'
 
 type AxisDef = {
   id: string
@@ -28,13 +29,13 @@ type Props = {
   fullT1: number
   absolute: boolean
   tool: ChartTool
-  measureTimes: number[]
+  measureCursors: MeasureCursor[]
   active?: boolean
   onPan: (t0: number, t1: number) => void
   onZoom: (t0: number, t1: number) => void
   onMeasureAdd: (t: number) => void
-  onMeasureMove: (index: number, t: number) => void
-  onMeasureRemove: (index: number) => void
+  onMeasureMove: (id: string, t: number) => void
+  onMeasureRemove: (id: string) => void
   onActivate?: () => void
 }
 
@@ -88,7 +89,7 @@ export function ChartCanvas({
   fullT1,
   absolute,
   tool,
-  measureTimes,
+  measureCursors,
   active,
   onPan,
   onZoom,
@@ -114,12 +115,12 @@ export function ChartCanvas({
   axesRef.current = axes
   const eventsRef = useRef(events)
   eventsRef.current = events
-  const rangeRef = useRef({ t0, t1, fullT0, fullT1, absolute, tool, measureTimes, active: Boolean(active) })
-  rangeRef.current = { t0, t1, fullT0, fullT1, absolute, tool, measureTimes, active: Boolean(active) }
+  const rangeRef = useRef({ t0, t1, fullT0, fullT1, absolute, tool, measureCursors, active: Boolean(active) })
+  rangeRef.current = { t0, t1, fullT0, fullT1, absolute, tool, measureCursors, active: Boolean(active) }
 
   const panRef = useRef<{ x: number; t0: number; t1: number } | null>(null)
   const zoomRef = useRef<{ x0: number; y0: number; x1: number; y1: number } | null>(null)
-  const dragMeasureRef = useRef<number | null>(null)
+  const dragMeasureRef = useRef<string | null>(null)
   const hoverTRef = useRef<number | null>(null)
   const pointerRef = useRef<{ x: number; y: number } | null>(null)
 
@@ -144,7 +145,7 @@ export function ChartCanvas({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, cssW, cssH)
 
-      const { t0: rt0, t1: rt1, absolute: abs, measureTimes: cursors, tool: currentTool } = rangeRef.current
+      const { t0: rt0, t1: rt1, absolute: abs, measureCursors: cursors, tool: currentTool } = rangeRef.current
       const sers = seriesRef.current
       const axisDefs = axesRef.current
       const evs = eventsRef.current
@@ -317,8 +318,8 @@ export function ChartCanvas({
 
       if (cursors.length > 0) {
         ctx.font = '10px ui-monospace, Consolas, monospace'
-        cursors.forEach((t, i) => {
-          const x = toX(t)
+        cursors.forEach((cursor, i) => {
+          const x = toX(cursor.t)
           ctx.strokeStyle = 'rgba(240,193,75,0.9)'
           ctx.lineWidth = 1.25
           ctx.beginPath()
@@ -331,8 +332,8 @@ export function ChartCanvas({
         })
 
         for (let i = 0; i < cursors.length - 1; i++) {
-          const ta = cursors[i]
-          const tb = cursors[i + 1]
+          const ta = cursors[i].t
+          const tb = cursors[i + 1].t
           for (const s of sers) {
             if (!s.visible) continue
             const axis = axisLayouts.find((a) => a.id === s.axisId)
@@ -468,7 +469,7 @@ export function ChartCanvas({
 
   useEffect(() => {
     drawRef.current()
-  }, [series, axes, events, t0, t1, fullT0, fullT1, absolute, tool, measureTimes, active])
+  }, [series, axes, events, t0, t1, fullT0, fullT1, absolute, tool, measureCursors, active])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -496,19 +497,19 @@ export function ChartCanvas({
       return src.t[i]
     }
 
-    const nearCursor = (x: number) => {
+    const nearCursor = (x: number): string | null => {
       const layout = layoutRef.current
-      if (!layout) return -1
-      const { t0: rt0, t1: rt1, measureTimes } = rangeRef.current
+      if (!layout) return null
+      const { t0: rt0, t1: rt1, measureCursors: cursors } = rangeRef.current
       const span = rt1 - rt0
-      let best = -1
+      let best: string | null = null
       let bestD = 7
-      measureTimes.forEach((t, i) => {
-        const cx = layout.plot.x + ((t - rt0) / span) * layout.plot.w
+      cursors.forEach((cursor) => {
+        const cx = layout.plot.x + ((cursor.t - rt0) / span) * layout.plot.w
         const d = Math.abs(cx - x)
         if (d < bestD) {
           bestD = d
-          best = i
+          best = cursor.id
         }
       })
       return best
@@ -522,13 +523,13 @@ export function ChartCanvas({
       const { tool: currentTool, t0: rt0, t1: rt1 } = rangeRef.current
       if (currentTool === 'measure') {
         if (ev.button === 2) {
-          const idx = nearCursor(hit.x)
-          if (idx >= 0) onMeasureRemove(idx)
+          const id = nearCursor(hit.x)
+          if (id) onMeasureRemove(id)
           ev.preventDefault()
           return
         }
-        const idx = nearCursor(hit.x)
-        if (idx >= 0) dragMeasureRef.current = idx
+        const id = nearCursor(hit.x)
+        if (id) dragMeasureRef.current = id
         else onMeasureAdd(snapT(hit.t))
         return
       }

@@ -1,13 +1,11 @@
 import { useTelemetry } from '../store'
 
 type Props = {
-  campaignCount: number | null
   onOpenFolder: () => void
   onOpenFiles: () => void
-  onLoadCampaign: () => void
 }
 
-export function Toolbar({ campaignCount, onOpenFolder, onOpenFiles, onLoadCampaign }: Props) {
+export function Toolbar({ onOpenFolder, onOpenFiles }: Props) {
   const { tool, timeMode, hasAbsolute, loading, fullSpan, dispatch } = useTelemetry()
 
   return (
@@ -32,11 +30,6 @@ export function Toolbar({ campaignCount, onOpenFolder, onOpenFiles, onLoadCampai
         <button type="button" className="btn" onClick={onOpenFiles}>
           Open files
         </button>
-        {campaignCount ? (
-          <button type="button" className="btn accent" onClick={() => void onLoadCampaign()}>
-            Load this folder
-          </button>
-        ) : null}
       </div>
 
       <div className="tool-group segmented">

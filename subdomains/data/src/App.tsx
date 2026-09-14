@@ -4,7 +4,7 @@ import { Minimap } from './components/Minimap'
 import { Plots } from './components/Plots'
 import { Sidebar } from './components/Sidebar'
 import { Toolbar } from './components/Toolbar'
-import { fetchCampaign, fetchCampaignCsv, sourcesFromDataTransfer, sourcesFromFileList } from './lib/files'
+import { sourcesFromDataTransfer, sourcesFromFileList } from './lib/files'
 import { uid } from './lib/math'
 import { TelemetryProvider, useLoadFiles, useTelemetry } from './store'
 
@@ -20,17 +20,12 @@ function Shell() {
   const { files, error, dispatch, loading } = useTelemetry()
   const load = useLoadFiles()
   const [dragging, setDragging] = useState(false)
-  const [campaignCount, setCampaignCount] = useState<number | null>(null)
   const folderRef = useRef<HTMLInputElement>(null)
   const filesRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     folderRef.current?.setAttribute('webkitdirectory', '')
     folderRef.current?.setAttribute('directory', '')
-  }, [])
-
-  useEffect(() => {
-    void fetchCampaign().then((c) => setCampaignCount(c?.files.length ?? 0))
   }, [])
 
   useEffect(() => {
@@ -65,23 +60,6 @@ function Shell() {
     await ingestBuffers(items)
   }
 
-  const loadCampaign = async () => {
-    const campaign = await fetchCampaign()
-    if (!campaign || campaign.files.length === 0) {
-      dispatch({ type: 'set-error', error: 'No campaign CSVs found.' })
-      return
-    }
-    const items = []
-    for (const f of campaign.files) {
-      items.push({
-        name: f.name,
-        folder: f.folder || campaign.root,
-        buffer: await fetchCampaignCsv(f.path),
-      })
-    }
-    await ingestBuffers(items)
-  }
-
   return (
     <div
       className="app"
@@ -105,19 +83,15 @@ function Shell() {
       }}
     >
       <Toolbar
-        campaignCount={campaignCount}
         onOpenFolder={() => folderRef.current?.click()}
         onOpenFiles={() => filesRef.current?.click()}
-        onLoadCampaign={loadCampaign}
       />
       {error ? <div className="banner">{error}</div> : null}
       {files.length === 0 ? (
         <EmptyState
-          campaignCount={campaignCount}
           loading={Boolean(loading)}
           onOpenFolder={() => folderRef.current?.click()}
           onOpenFiles={() => filesRef.current?.click()}
-          onLoadCampaign={loadCampaign}
         />
       ) : (
         <div className="workspace">
@@ -157,17 +131,13 @@ function Shell() {
 }
 
 function EmptyState({
-  campaignCount,
   loading,
   onOpenFolder,
   onOpenFiles,
-  onLoadCampaign,
 }: {
-  campaignCount: number | null
   loading: boolean
   onOpenFolder: () => void
   onOpenFiles: () => void
-  onLoadCampaign: () => void
 }) {
   return (
     <div className="empty">
@@ -186,11 +156,6 @@ function EmptyState({
           <button type="button" className="btn" disabled={loading} onClick={onOpenFiles}>
             Open files
           </button>
-          {campaignCount ? (
-            <button type="button" className="btn" disabled={loading} onClick={onLoadCampaign}>
-              Load this folder ({campaignCount} CSV{campaignCount === 1 ? '' : 's'})
-            </button>
-          ) : null}
         </div>
         <ul className="legend-help">
           <li>

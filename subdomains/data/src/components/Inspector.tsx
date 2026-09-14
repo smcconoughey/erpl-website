@@ -3,12 +3,12 @@ import { fmtNum, fmtTime, sampleAt } from '../lib/math'
 import { useTelemetry } from '../store'
 
 export function Inspector() {
-  const { measureTimes, plots, channelMap, timeMode, visibleRange, dispatch, views, showInfoEvents } =
+  const { measureCursors, plots, channelMap, timeMode, visibleRange, dispatch, views, showInfoEvents } =
     useTelemetry()
   const [viewName, setViewName] = useState('')
   const span = visibleRange ? visibleRange.t1 - visibleRange.t0 : 1
   const absolute = timeMode === 'absolute'
-  const cursors = [...measureTimes].sort((a, b) => a - b)
+  const cursors = measureCursors.map((c) => c.t)
 
   const series = useMemo(() => {
     const out: {
@@ -104,19 +104,14 @@ export function Inspector() {
           <div className="empty-lite">No cursors</div>
         ) : (
           <ol className="cursor-list">
-            {cursors.map((t, i) => (
-              <li key={`${t}-${i}`}>
+            {measureCursors.map((cursor, i) => (
+              <li key={cursor.id}>
                 <span className="badge">{String.fromCharCode(65 + i)}</span>
-                <span>{fmtTime(t, span, absolute)}</span>
+                <span>{fmtTime(cursor.t, span, absolute)}</span>
                 <button
                   type="button"
                   className="tiny"
-                  onClick={() =>
-                    dispatch({
-                      type: 'remove-measure',
-                      index: measureTimes.indexOf(t),
-                    })
-                  }
+                  onClick={() => dispatch({ type: 'remove-measure', id: cursor.id })}
                 >
                   ×
                 </button>

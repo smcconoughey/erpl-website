@@ -9,6 +9,7 @@ import {
 } from 'react'
 import { colorFor, uid } from './lib/math'
 import type {
+  MeasureCursor,
   Plot,
   PlotAxis,
   PlotSeries,
@@ -18,6 +19,16 @@ import type {
   TimeRange,
   Tool,
 } from './types'
+
+const PARSE_TIMEOUT_MS = 120_000
+
+function spawnParser(): Worker {
+  return new Worker(new URL('./parseWorker.ts', import.meta.url), { type: 'module' })
+}
+
+function orderCursors(cursors: MeasureCursor[]): MeasureCursor[] {
+  return [...cursors].sort((a, b) => (a.t !== b.t ? a.t - b.t : a.id.localeCompare(b.id)))
+}
 
 const VIEWS_KEY = 'datanator.views'
 
@@ -47,7 +58,7 @@ type State = {
   tool: Tool
   timeMode: TimeMode
   range: TimeRange | null
-  measureTimes: number[]
+  measureCursors: MeasureCursor[]
   views: SavedView[]
   loading: { current: number; total: number; name: string } | null
   error: string | null
@@ -74,8 +85,8 @@ type Action =
   | { type: 'merge-axis'; plotId: string; seriesKey: string }
   | { type: 'set-measure'; times: number[] }
   | { type: 'add-measure'; t: number }
-  | { type: 'move-measure'; index: number; t: number }
-  | { type: 'remove-measure'; index: number }
+  | { type: 'move-measure'; id: string; t: number }
+  | { type: 'remove-measure'; id: string }
   | { type: 'clear-measure' }
   | { type: 'save-view'; name: string; t0: number; t1: number }
   | { type: 'delete-view'; id: string }
@@ -166,7 +177,7 @@ function reducer(state: State, action: Action): State {
         plots: [],
         activePlotId: null,
         range: null,
-        measureTimes: [],
+        measureCursors: [],
         error: null,
       }
     case 'set-loading':
@@ -279,23 +290,33 @@ function reducer(state: State, action: Action): State {
       return { ...state, plots }
     }
     case 'set-measure':
-      return { ...state, measureTimes: [...action.times].sort((a, b) => a - b) }
+      return {
+        ...state,
+        measureCursors: orderCursors(action.times.map((t) => ({ id: uid('cur'), t }))),
+      }
     case 'add-measure': {
-      if (state.measureTimes.some((t) => Math.abs(t - action.t) < 1e-9)) return state
-      return { ...state, measureTimes: [...state.measureTimes, action.t].sort((a, b) => a - b) }
+      if (state.measureCursors.some((c) => Math.abs(c.t - action.t) < 1e-9)) return state
+      return {
+        ...state,
+        measureCursors: orderCursors([...state.measureCursors, { id: uid('cur'), t: action.t }]),
+      }
     }
     case 'move-measure': {
-      const next = state.measureTimes.slice()
-      next[action.index] = action.t
-      return { ...state, measureTimes: next }
+      if (!state.measureCursors.some((c) => c.id === action.id)) return state
+      return {
+        ...state,
+        measureCursors: orderCursors(
+          state.measureCursors.map((c) => (c.id === action.id ? { ...c, t: action.t } : c)),
+        ),
+      }
     }
     case 'remove-measure':
       return {
         ...state,
-        measureTimes: state.measureTimes.filter((_, i) => i !== action.index),
+        measureCursors: state.measureCursors.filter((c) => c.id !== action.id),
       }
     case 'clear-measure':
-      return { ...state, measureTimes: [] }
+      return { ...state, measureCursors: [] }
     case 'save-view': {
       const view: SavedView = {
         id: uid('view'),
@@ -327,7 +348,7 @@ const initial: State = {
   tool: 'pan',
   timeMode: 'elapsed',
   range: null,
-  measureTimes: [],
+  measureCursors: [],
   views: loadViews(),
   loading: null,
   error: null,
@@ -339,6 +360,7 @@ type TelemetryContextValue = State & {
   fullSpan: TimeRange | null
   visibleRange: TimeRange | null
   hasAbsolute: boolean
+  measureTimes: number[]
   channelMap: Map<string, { file: TelemetryFile; name: string; unit: string; group: string; step: boolean; values: Float64Array; tElapsed: Float64Array; tAbs: Float64Array }>
 }
 
@@ -398,9 +420,14 @@ export function TelemetryProvider({ children }: { children: ReactNode }) {
     return map
   }, [state.files])
 
+  const measureTimes = useMemo(
+    () => state.measureCursors.map((c) => c.t),
+    [state.measureCursors],
+  )
+
   const value = useMemo<TelemetryContextValue>(
-    () => ({ ...state, dispatch, fullSpan, visibleRange, hasAbsolute, channelMap }),
-    [state, fullSpan, visibleRange, hasAbsolute, channelMap],
+    () => ({ ...state, dispatch, fullSpan, visibleRange, hasAbsolute, measureTimes, channelMap }),
+    [state, fullSpan, visibleRange, hasAbsolute, measureTimes, channelMap],
   )
 
   return <TelemetryContext.Provider value={value}>{children}</TelemetryContext.Provider>
@@ -412,6 +439,48 @@ export function useTelemetry() {
   return ctx
 }
 
+function parseOne(
+  worker: Worker,
+  item: { id: string; name: string; folder: string; buffer: ArrayBuffer },
+): Promise<TelemetryFile> {
+  return new Promise((resolve, reject) => {
+    let settled = false
+    const finish = (fn: () => void) => {
+      if (settled) return
+      settled = true
+      window.clearTimeout(timer)
+      worker.removeEventListener('message', onMsg)
+      worker.removeEventListener('error', onErr)
+      worker.removeEventListener('messageerror', onMsgErr)
+      fn()
+    }
+    const timer = window.setTimeout(() => {
+      finish(() => reject(new Error(`Timed out parsing ${item.name}`)))
+    }, PARSE_TIMEOUT_MS)
+    const onMsg = (e: MessageEvent) => {
+      finish(() => {
+        if (e.data?.ok) resolve(e.data.file as TelemetryFile)
+        else reject(new Error(e.data?.error ?? `Failed to parse ${item.name}`))
+      })
+    }
+    const onErr = (e: ErrorEvent) => {
+      finish(() => reject(new Error(e.message || `Worker failed on ${item.name}`)))
+    }
+    const onMsgErr = () => {
+      finish(() => reject(new Error(`Worker message error on ${item.name}`)))
+    }
+    worker.addEventListener('message', onMsg)
+    worker.addEventListener('error', onErr)
+    worker.addEventListener('messageerror', onMsgErr)
+    worker.postMessage({
+      id: item.id,
+      name: item.name,
+      folder: item.folder,
+      buffer: item.buffer,
+    })
+  })
+}
+
 export function useLoadFiles() {
   const { dispatch } = useTelemetry()
 
@@ -419,32 +488,40 @@ export function useLoadFiles() {
     async (items: { id?: string; name: string; folder: string; buffer: ArrayBuffer }[]) => {
       if (items.length === 0) return
       dispatch({ type: 'set-error', error: null })
-      const worker = new Worker(new URL('./parseWorker.ts', import.meta.url), { type: 'module' })
+      let worker = spawnParser()
+      const skipped: string[] = []
+      let loaded = 0
       try {
         for (let i = 0; i < items.length; i++) {
           const item = items[i]
+          const id = item.id ?? uid('file')
           dispatch({
             type: 'set-loading',
             loading: { current: i + 1, total: items.length, name: item.name },
           })
-          const file = await new Promise<TelemetryFile>((resolve, reject) => {
-            const onMsg = (e: MessageEvent) => {
-              worker.removeEventListener('message', onMsg)
-              if (e.data?.ok) resolve(e.data.file as TelemetryFile)
-              else reject(new Error(e.data?.error ?? `Failed to parse ${item.name}`))
-            }
-            worker.addEventListener('message', onMsg)
-            worker.postMessage({
-              id: item.id ?? uid('file'),
+          try {
+            const file = await parseOne(worker, {
+              id,
               name: item.name,
               folder: item.folder,
               buffer: item.buffer,
             })
-          })
-          dispatch({ type: 'add-files', files: [file] })
+            dispatch({ type: 'add-files', files: [file] })
+            loaded += 1
+          } catch (err) {
+            const reason = err instanceof Error ? err.message : String(err)
+            skipped.push(`${item.name}: ${reason}`)
+            worker.terminate()
+            worker = spawnParser()
+          }
         }
-      } catch (err) {
-        dispatch({ type: 'set-error', error: err instanceof Error ? err.message : String(err) })
+        if (skipped.length > 0) {
+          const summary =
+            loaded === 0
+              ? `Could not parse any CSVs. ${skipped.join('; ')}`
+              : `Loaded ${loaded}/${items.length}. Skipped ${skipped.join('; ')}`
+          dispatch({ type: 'set-error', error: summary })
+        }
       } finally {
         worker.terminate()
         dispatch({ type: 'set-loading', loading: null })

@@ -1,5 +1,12 @@
 # Deploy this Blueprint once in Render to provision the data subdomain site.
 # The existing erpl.space service is managed separately.
+#
+# MERGE BLOCKER: the live erpl-data service was created in the dashboard, not
+# from this Blueprint. Before merging to main, set these two dashboard fields
+# to match this file or the site will publish Vite source and Datanator will
+# not load:
+#   Build command:       cd subdomains/data && npm ci && npm run build
+#   Publish directory:   ./subdomains/data/dist
 services:
   - type: web
     name: erpl-data
@@ -8,6 +15,9 @@ services:
     autoDeployTrigger: commit
     buildCommand: cd subdomains/data && npm ci && npm run build
     staticPublishPath: ./subdomains/data/dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22.12.0"
     domains:
       - data.erpl.space
     headers:
