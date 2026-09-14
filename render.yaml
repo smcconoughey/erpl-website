@@ -6,8 +6,8 @@ services:
     runtime: static
     branch: main
     autoDeployTrigger: commit
-    buildCommand: test -f subdomains/data/index.html
-    staticPublishPath: ./subdomains/data
+    buildCommand: cd subdomains/data && npm ci && npm run build
+    staticPublishPath: ./subdomains/data/dist
     domains:
       - data.erpl.space
     headers:
