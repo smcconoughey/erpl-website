@@ -46,16 +46,22 @@ and is live at https://erpl-data.onrender.com/.
 - Service ID: `srv-dajun1qd0e5s73dqcgt0`
 - Branch: `main`, with automatic deployment enabled
 
-Datanator is a Vite app. The live service was created in the dashboard, not
-from this Blueprint. **Merging to `main` without updating those two dashboard
-fields ships Vite source (`/src/main.tsx`) and the tool will not load.**
+Datanator is a Vite app. Update the **existing** `erpl-data` dashboard settings
+**before merging this PR** (the Blueprint will not change that service):
 
 - Build command: `cd subdomains/data && npm ci && npm run build`
 - Publish directory: `./subdomains/data/dist`
 - Environment: `NODE_VERSION=22.12.0` (Vite 7 requires Node `^20.19` or `>=22.12`)
 
-Do not create another service from the Blueprint as an activation step. The
-existing main website service is managed separately.
+That is safe to do now. Current `main` has no Vite app under `subdomains/data`,
+so Render may kick a deploy that **fails**. The live blank page stays until
+this PR lands; the merge deploy is the one that publishes Datanator.
+
+Do **not** merge first with the old settings still in place — that would
+publish source `index.html` (`/src/main.tsx`) and the tool will not load.
+
+Do not create another service from the Blueprint. The existing main website
+service is managed separately.
 
 ### Remaining custom-domain activation
 
