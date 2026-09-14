@@ -26,24 +26,35 @@ The site is configured to use `erpl.space` as a custom domain through Render.
 search indexing is disabled. The existing `data/` directory contains the main
 website's JSON content and is not the data subdomain's publish directory.
 
-`render.yaml` defines a separate Render static site named `erpl-data`, publishing
-only `subdomains/data` from `main`. This Blueprint does not manage the existing
-main website service.
+### Render service
 
-### One-time activation
+The `erpl-data` static site was created directly in Render on September 14, 2026,
+and its initial deployment is live at https://erpl-data.onrender.com/.
 
-Adding this file to GitHub alone does not create a Render service or a DNS record.
+- Dashboard: https://dashboard.render.com/static/srv-dajun1qd0e5s73dqcgt0
+- Service ID: `srv-dajun1qd0e5s73dqcgt0`
+- Branch: `main`, with automatic deployment enabled
+- Build command: `test -f subdomains/data/index.html`
+- Publish directory: `./subdomains/data`
 
-1. In Render, create a Blueprint from this repository using `render.yaml` on
-   `main`, and deploy the `erpl-data` static site.
-2. At the DNS provider for `erpl.space`, create a `CNAME` record named `data`
-   pointing to the actual `onrender.com` hostname assigned to that new service.
-   Copy the target from Render; do not point it at the main website service.
-3. In the new service's Render settings, verify `data.erpl.space` under Custom
-   Domains and confirm HTTPS is available.
+Edit files inside `subdomains/data/` and merge into `main` to deploy changes.
+
+`render.yaml` records the intended separate data-site configuration, including
+the custom domain and an indexing header. The service was created directly;
+the Blueprint has not been applied and its domain/header declarations are not
+active. Do not create another service from the Blueprint as an activation step.
+The existing main website service is managed separately.
+
+### Remaining custom-domain activation
+
+The Render service is live, but the custom-domain association and DNS setup
+have not been completed or verified.
+
+1. Open the data service's Render dashboard above. In **Settings > Custom
+   Domains**, add `data.erpl.space`.
+2. At the DNS provider for `erpl.space`, create a `CNAME` record with name
+   `data` and target `erpl-data.onrender.com`.
+3. In Render, click **Verify** for `data.erpl.space` and confirm HTTPS is ready.
 4. Open `https://data.erpl.space/` and confirm it returns the blank page.
 
-Subsequent pushes to `main` automatically deploy the data site after activation.
-
-See Render's [Blueprint reference](https://render.com/docs/blueprint-spec) and
-[custom domain instructions](https://render.com/docs/custom-domains).
+See Render's [custom domain instructions](https://render.com/docs/custom-domains).
