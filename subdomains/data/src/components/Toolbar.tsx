@@ -11,7 +11,9 @@ export function Toolbar({ onOpenFolder, onOpenFiles }: Props) {
   return (
     <header className="toolbar">
       <div className="brand">
-        <div className="mark" />
+        <a className="mark-link" href="https://erpl.space/" target="_blank" rel="noopener">
+          <img className="mark" src={`${import.meta.env.BASE_URL}erpl-mark.png`} alt="ERPL" />
+        </a>
         <div>
           <div className="title">Datanator</div>
           <div className="sub">
