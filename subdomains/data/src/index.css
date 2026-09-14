@@ -65,10 +65,19 @@ button {
   margin-right: 8px;
 }
 
+.mark-link {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .mark {
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--accent);
+  height: 28px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  background: none;
+  border: 0;
 }
 
 .brand .title {
