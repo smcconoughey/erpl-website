@@ -414,12 +414,38 @@ input[type='text'] {
   margin-bottom: 4px;
 }
 
+.chart-hover .row {
+  padding: 1px 0;
+}
+
+.chart-hover .row.hot {
+  color: var(--text);
+  background: rgba(230, 234, 240, 0.08);
+  margin: 0 -4px;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.chart-hover .row.hot b {
+  color: var(--text);
+}
+
+.chart-hover .row.dim {
+  opacity: 0.38;
+}
+
 .chart-hover .swatch {
   display: inline-block;
   width: 7px;
   height: 7px;
   border-radius: 50%;
   margin-right: 6px;
+}
+
+.chart-hover .row.hot .swatch {
+  width: 9px;
+  height: 9px;
+  box-shadow: 0 0 0 1px rgba(230, 234, 240, 0.7);
 }
 
 .minimap {
