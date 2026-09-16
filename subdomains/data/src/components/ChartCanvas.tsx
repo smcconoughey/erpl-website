@@ -43,6 +43,8 @@ const AXIS_W = 62
 const BOTTOM = 26
 const TOP = 10
 const GAP = 8
+const HOVER_HIT_PX = 14
+const HOVER_FALLBACK_PX = 38
 
 type AxisLayout = {
   id: string
@@ -53,6 +55,31 @@ type AxisLayout = {
   max: number
   toY: (v: number) => number
   color: string
+}
+
+function nearestHoverKeys(
+  sers: ChartSeries[],
+  axisLayouts: AxisLayout[],
+  hoverT: number,
+  pointerY: number,
+): Set<string> {
+  const hits: { key: string; d: number }[] = []
+  for (const s of sers) {
+    if (!s.visible) continue
+    const axis = axisLayouts.find((a) => a.id === s.axisId)
+    if (!axis) continue
+    const yv = sampleAt(s.t, s.y, hoverT, s.step)
+    if (!Number.isFinite(yv)) continue
+    hits.push({ key: s.key, d: Math.abs(axis.toY(yv) - pointerY) })
+  }
+  if (hits.length === 0) return new Set()
+  const close = hits.filter((h) => h.d <= HOVER_HIT_PX)
+  if (close.length > 0) return new Set(close.map((h) => h.key))
+  let best = hits[0]
+  for (const h of hits) {
+    if (h.d < best.d) best = h
+  }
+  return best.d <= HOVER_FALLBACK_PX ? new Set([best.key]) : new Set()
 }
 
 function clampRange(t0: number, t1: number, fullT0: number, fullT1: number): { t0: number; t1: number } {
@@ -246,16 +273,26 @@ export function ChartCanvas({
         }
       }
 
+      const hoverT = hoverTRef.current
+      const ptr = pointerRef.current
+      const hoverKeys =
+        hoverT != null && ptr ? nearestHoverKeys(sers, axisLayouts, hoverT, ptr.y) : new Set<string>()
+      const focusing = hoverKeys.size > 0
+      const drawOrder = sers.filter((s) => s.visible)
+      if (focusing) {
+        drawOrder.sort((a, b) => Number(hoverKeys.has(a.key)) - Number(hoverKeys.has(b.key)))
+      }
+
       const buckets = Math.max(32, Math.floor(plot.w))
-      for (const s of sers) {
-        if (!s.visible) continue
+      for (const s of drawOrder) {
         const axis = axisLayouts.find((a) => a.id === s.axisId)
         if (!axis) continue
         const { i0, i1 } = visibleBounds(s.t, rt0, rt1)
+        const isHot = hoverKeys.has(s.key)
         ctx.strokeStyle = s.color
         ctx.fillStyle = s.color
-        ctx.globalAlpha = 0.95
-        ctx.lineWidth = s.step ? 1.6 : 1.35
+        ctx.globalAlpha = !focusing ? 0.95 : isHot ? 1 : 0.22
+        ctx.lineWidth = (s.step ? 1.6 : 1.35) * (focusing && isHot ? 1.5 : 1)
         ctx.beginPath()
         if (i1 - i0 <= buckets) {
           let moved = false
@@ -341,27 +378,27 @@ export function ChartCanvas({
             const ya = sampleAt(s.t, s.y, ta, s.step)
             const yb = sampleAt(s.t, s.y, tb, s.step)
             if (!Number.isFinite(ya) || !Number.isFinite(yb)) continue
+            const isHot = hoverKeys.has(s.key)
             ctx.strokeStyle = s.color
-            ctx.globalAlpha = 0.7
+            ctx.globalAlpha = !focusing ? 0.7 : isHot ? 0.9 : 0.18
             ctx.setLineDash([5, 4])
             ctx.beginPath()
             ctx.moveTo(toX(ta), axis.toY(ya))
             ctx.lineTo(toX(tb), axis.toY(yb))
             ctx.stroke()
             ctx.setLineDash([])
-            ctx.globalAlpha = 1
+            ctx.globalAlpha = !focusing ? 1 : isHot ? 1 : 0.22
             const dt = tb - ta
             const slope = dt === 0 ? NaN : (yb - ya) / dt
             const mx = (toX(ta) + toX(tb)) / 2
             const my = (axis.toY(ya) + axis.toY(yb)) / 2
             ctx.fillStyle = s.color
             ctx.fillText(`${fmtNum(slope, 2)}${s.unit ? ` ${s.unit}/s` : '/s'}`, mx + 4, my - 4)
+            ctx.globalAlpha = 1
           }
         }
       }
 
-      const hoverT = hoverTRef.current
-      const ptr = pointerRef.current
       if (hoverT != null && ptr && ptr.x >= plot.x && ptr.x <= plot.x + plot.w) {
         const x = toX(hoverT)
         ctx.strokeStyle = 'rgba(230,234,240,0.28)'
@@ -369,16 +406,23 @@ export function ChartCanvas({
         ctx.moveTo(x, plot.y)
         ctx.lineTo(x, plot.y + plot.h)
         ctx.stroke()
-        for (const s of sers) {
-          if (!s.visible) continue
+        for (const s of drawOrder) {
           const axis = axisLayouts.find((a) => a.id === s.axisId)
           if (!axis) continue
           const yv = sampleAt(s.t, s.y, hoverT, s.step)
           if (!Number.isFinite(yv)) continue
+          const isHot = hoverKeys.has(s.key)
+          if (focusing && !isHot) continue
           const y = axis.toY(yv)
+          if (isHot) {
+            ctx.fillStyle = 'rgba(230,234,240,0.9)'
+            ctx.beginPath()
+            ctx.arc(x, y, 6, 0, Math.PI * 2)
+            ctx.fill()
+          }
           ctx.fillStyle = s.color
           ctx.beginPath()
-          ctx.arc(x, y, 3.2, 0, Math.PI * 2)
+          ctx.arc(x, y, isHot ? 4.2 : 3.2, 0, Math.PI * 2)
           ctx.fill()
         }
       }
@@ -445,10 +489,17 @@ export function ChartCanvas({
             .filter((s) => s.visible)
             .map((s) => {
               const yv = sampleAt(s.t, s.y, hoverT, s.step)
-              return `<div><span class="swatch" style="background:${s.color}"></span>${escapeHtml(s.name)} <b>${fmtNum(yv, 3)}</b> ${escapeHtml(s.unit)}</div>`
+              const hot = hoverKeys.has(s.key)
+              return { s, yv, hot }
+            })
+          if (focusing) rows.sort((a, b) => Number(b.hot) - Number(a.hot))
+          const html = rows
+            .map((row) => {
+              const cls = row.hot ? 'row hot' : focusing ? 'row dim' : 'row'
+              return `<div class="${cls}"><span class="swatch" style="background:${row.s.color}"></span>${escapeHtml(row.s.name)} <b>${fmtNum(row.yv, 3)}</b> ${escapeHtml(row.s.unit)}</div>`
             })
             .join('')
-          hoverEl.innerHTML = `<div class="t">${fmtTime(hoverT, span, abs)}</div>${rows}`
+          hoverEl.innerHTML = `<div class="t">${fmtTime(hoverT, span, abs)}</div>${html}`
           hoverEl.style.display = 'block'
           const left = Math.min(ptr.x + 14, cssW - 220)
           const top = Math.min(ptr.y + 14, cssH - 12 - hoverEl.offsetHeight)
