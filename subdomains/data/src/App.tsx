@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Inspector } from './components/Inspector'
 import { Minimap } from './components/Minimap'
+import { OnlineDataDialog } from './components/OnlineDataDialog'
 import { Plots } from './components/Plots'
 import { Sidebar } from './components/Sidebar'
 import { Toolbar } from './components/Toolbar'
@@ -20,6 +21,7 @@ function Shell() {
   const { files, error, dispatch, loading } = useTelemetry()
   const load = useLoadFiles()
   const [dragging, setDragging] = useState(false)
+  const [onlineOpen, setOnlineOpen] = useState(false)
   const folderRef = useRef<HTMLInputElement>(null)
   const filesRef = useRef<HTMLInputElement>(null)
 
@@ -45,8 +47,8 @@ function Shell() {
     return () => window.removeEventListener('keydown', onKey)
   }, [dispatch])
 
-  const ingestBuffers = async (items: { name: string; folder: string; buffer: ArrayBuffer }[]) => {
-    await load(items.map((item) => ({ ...item, id: uid('file') })))
+  const ingestBuffers = async (items: { id?: string; name: string; folder: string; buffer: ArrayBuffer }[]) => {
+    await load(items.map((item) => ({ ...item, id: item.id ?? uid('file') })))
   }
 
   const ingestSources = async (sources: { file: File; folder: string; name: string }[]) => {
@@ -85,6 +87,7 @@ function Shell() {
       <Toolbar
         onOpenFolder={() => folderRef.current?.click()}
         onOpenFiles={() => filesRef.current?.click()}
+        onOpenOnline={() => setOnlineOpen(true)}
       />
       {error ? <div className="banner">{error}</div> : null}
       {files.length === 0 ? (
@@ -92,6 +95,7 @@ function Shell() {
           loading={Boolean(loading)}
           onOpenFolder={() => folderRef.current?.click()}
           onOpenFiles={() => filesRef.current?.click()}
+          onOpenOnline={() => setOnlineOpen(true)}
         />
       ) : (
         <div className="workspace">
@@ -104,6 +108,7 @@ function Shell() {
         </div>
       )}
       {dragging ? <div className="drop-overlay">Drop CSV files or folders</div> : null}
+      {onlineOpen && <OnlineDataDialog onClose={() => setOnlineOpen(false)} onLoad={ingestBuffers} />}
       <input
         ref={folderRef}
         type="file"
@@ -134,10 +139,12 @@ function EmptyState({
   loading,
   onOpenFolder,
   onOpenFiles,
+  onOpenOnline,
 }: {
   loading: boolean
   onOpenFolder: () => void
   onOpenFiles: () => void
+  onOpenOnline: () => void
 }) {
   return (
     <div className="empty">
@@ -156,6 +163,12 @@ function EmptyState({
           <button type="button" className="btn" disabled={loading} onClick={onOpenFiles}>
             Open files
           </button>
+          <div className="online-action">
+            <button type="button" className="btn accent" disabled={loading} onClick={onOpenOnline}>
+              Open Online ERPL Data
+            </button>
+            <span className="hint">Shared password required</span>
+          </div>
         </div>
         <ul className="legend-help">
           <li>

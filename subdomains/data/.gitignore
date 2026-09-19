@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+testdata/*
+!testdata/README.md
 
 # Editor directories and files
 .vscode/*

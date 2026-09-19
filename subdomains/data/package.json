@@ -8,10 +8,14 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:server": "node --env-file-if-exists=.env --watch server/index.mjs",
     "build": "tsc && vite build",
+    "start": "node --env-file-if-exists=.env server/index.mjs",
+    "test": "node --test server/*.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

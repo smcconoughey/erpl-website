@@ -56,6 +56,15 @@ button {
   border-bottom: 1px solid var(--border);
   background: var(--panel);
   min-width: 0;
+  overflow-x: auto;
+}
+
+.toolbar > * {
+  flex-shrink: 0;
+}
+
+.toolbar .btn {
+  white-space: nowrap;
 }
 
 .brand {
@@ -602,6 +611,123 @@ input[type='text'] {
   flex-wrap: wrap;
   gap: 8px;
   margin: 18px 0 22px;
+}
+
+.online-action {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.online-action .hint {
+  margin: 0;
+}
+
+.online-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 24px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.online-dialog::backdrop {
+  background: rgba(11, 13, 17, 0.8);
+}
+
+.online-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.online-heading h2 {
+  margin-top: 5px;
+}
+
+.online-password-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.online-dialog input[type='password'] {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.online-dialog :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.online-error {
+  color: var(--danger);
+}
+
+.online-days {
+  max-height: 45dvh;
+  overflow-y: auto;
+}
+
+.online-day {
+  margin: 12px 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+
+.online-day legend {
+  padding: 0 6px;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.online-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  overflow-wrap: anywhere;
+}
+
+.online-file input {
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.online-select-day {
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.online-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.online-actions .hint {
+  margin: 0 auto 0 0;
+}
+
+.online-status {
+  color: var(--muted);
+  margin-top: 10px;
+  overflow-wrap: anywhere;
 }
 
 .brand .sub a {

@@ -3,9 +3,10 @@ import { useTelemetry } from '../store'
 type Props = {
   onOpenFolder: () => void
   onOpenFiles: () => void
+  onOpenOnline: () => void
 }
 
-export function Toolbar({ onOpenFolder, onOpenFiles }: Props) {
+export function Toolbar({ onOpenFolder, onOpenFiles, onOpenOnline }: Props) {
   const { tool, timeMode, hasAbsolute, loading, fullSpan, dispatch } = useTelemetry()
 
   return (
@@ -31,6 +32,9 @@ export function Toolbar({ onOpenFolder, onOpenFiles }: Props) {
         </button>
         <button type="button" className="btn" onClick={onOpenFiles}>
           Open files
+        </button>
+        <button type="button" className="btn accent" disabled={Boolean(loading)} onClick={onOpenOnline}>
+          Open Online ERPL Data
         </button>
       </div>
 
