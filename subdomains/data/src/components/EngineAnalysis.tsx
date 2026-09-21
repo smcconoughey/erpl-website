@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadRunConfig, type RunConfig } from '../lib/dataConfig'
-import { detectedEnd, runEngineAnalysis, type EngineAnalysisResult } from '../lib/engineAnalysis'
+import { detectedFiringWindow, runEngineAnalysis, type EngineAnalysisResult } from '../lib/engineAnalysis'
 import { fmtNum } from '../lib/math'
 import { useTelemetry } from '../store'
 import type { TelemetryFile } from '../types'
@@ -22,6 +22,14 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
   const [result, setResult] = useState<EngineAnalysisResult | null>(null)
   const [resultFileId, setResultFileId] = useState('')
   const [error, setError] = useState('')
+  const [windowSource, setWindowSource] = useState('')
+
+  function applyDetectedWindow(file: TelemetryFile, runConfig: RunConfig) {
+    const detected = detectedFiringWindow(file, runConfig)
+    setStart(detected ? String(Number(detected.start.toFixed(4))) : '0')
+    setEnd(detected ? String(Number(detected.end.toFixed(4))) : '')
+    setWindowSource(detected?.source || '')
+  }
 
   useEffect(() => {
     if (!source) {
@@ -32,8 +40,7 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
     if (source.id !== sourceId) setSourceId(source.id)
     const loaded = loadRunConfig(source)
     setConfig(loaded)
-    setStart('0')
-    setEnd(detectedEnd(source, loaded.chamberPressureKey))
+    applyDetectedWindow(source, loaded)
     setResult(null)
     setError('')
   }, [source?.id])
@@ -97,7 +104,8 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
         <input type="number" step="any" placeholder="End of run" value={end} onChange={(event) => setEnd(event.target.value)} />
       </label>
       <button type="button" className="btn compact" disabled={!source || !config}
-        onClick={() => source && config && setEnd(detectedEnd(source, config.chamberPressureKey))}>Auto firing window</button>
+        onClick={() => source && config && applyDetectedWindow(source, config)}>Auto firing window</button>
+      {windowSource && <span className="window-source">Detected from {windowSource}</span>}
     </div>
     <div className="analysis-basis">
       <span>Solve basis</span>
@@ -120,6 +128,7 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
             onClick={() => dispatch({ type: 'toggle-channel', channelKey: key })}>{plotted.has(key) ? 'Plotted' : 'Plot'}</button>
         </div>
       })}
+      {result.notes.map((note) => <p className="analysis-note" key={note}>{note}</p>)}
       {result.warnings.length > 0 && <ul className="cea-warnings">{result.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul>}
     </div>}
   </section>

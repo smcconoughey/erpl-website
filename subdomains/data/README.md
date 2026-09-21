@@ -52,14 +52,16 @@ Event strings become markers on the plot.
 ## Inverse performance analysis
 
 The bottom-right inspector has separate **Analysis** and **Config** tabs. Config
-is saved in the browser per CSV and maps chamber pressure, thrust, and each
-venturi's inlet/throat pressure pair. Each venturi stores a calibrated `CdA` and
+is saved in the browser per CSV and maps chamber pressure, thrust, runline states,
+and each venturi's inlet/throat pressure pair. Each venturi stores a calibrated `CdA` and
 fluid density; the current Draco source-of-truth `CdA` of `3.22e-05 m²` is the
 default. Mass flow is calculated from:
 
 `mdot = CdA * sqrt(2 * density * (P_inlet - P_throat))`
 
-Analysis defaults to `t = 0` through an automatically detected firing end. It
+IPA and ethanol selections fill editable nominal fuel densities of 785 and
+789 kg/m³, respectively. Analysis prefers the overlapping oxidizer/fuel runline
+interval for its automatic firing window, then falls back to chamber pressure. It
 creates plot-ready oxidizer, fuel, and total mass-flow channels plus O/F and
 measured specific impulse. Engine performance uses one explicit solve basis:
 known throat area, reference Cf, or reference c-star. This is required because
@@ -67,6 +69,11 @@ throat area, Cf, and c-star are not independently identifiable from chamber
 pressure, thrust, and mass flow alone. Depending on the selected basis, the tool
 derives measured Cf, measured c-star, and effective throat area/diameter without
 silently inventing the missing constraint.
+
+Thrust polarity, pre-fire tare, and scale are configurable per run. The default
+auto mode preserves normal positive thrust traces while correcting an inverted
+load-cell deflection. Implausible thrust and Cf values produce warnings instead
+of being presented without qualification.
 
 ## Private online data
 

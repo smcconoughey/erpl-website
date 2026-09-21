@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   detectedRunConfig,
   loadRunConfig,
+  nominalFuelDensity,
   resetRunConfig,
   saveRunConfig,
   type RunConfig,
@@ -22,6 +23,21 @@ function PressureSelect({ label, file, value, onChange }: {
   onChange: (value: string) => void
 }) {
   const channels = file.channels.filter((channel) => /^(psi|psia|psig|pa|kpa|mpa|bar)$/i.test(channel.unit.trim()))
+  return <label className="cea-field">{label}
+    <select value={value} onChange={(event) => onChange(event.target.value)}>
+      <option value="">Not mapped</option>
+      {channels.map((channel) => <option key={channel.key} value={channel.key}>{channelLabel(channel)}</option>)}
+    </select>
+  </label>
+}
+
+function StateSelect({ label, file, value, onChange }: {
+  label: string
+  file: TelemetryFile
+  value: string
+  onChange: (value: string) => void
+}) {
+  const channels = file.channels.filter((channel) => /^(state|flag|bool|boolean)$/i.test(channel.unit.trim()))
   return <label className="cea-field">{label}
     <select value={value} onChange={(event) => onChange(event.target.value)}>
       <option value="">Not mapped</option>
@@ -79,6 +95,10 @@ export function DataConfig({ onAnalyze }: { onAnalyze: () => void }) {
     saveRunConfig(source, next)
   }
   const update = <K extends keyof RunConfig>(key: K, value: RunConfig[K]) => commit({ ...config, [key]: value })
+  const throatArea = Number(config.throatAreaIn2)
+  const throatDiameter = config.throatAreaIn2.trim() && Number.isFinite(throatArea) && throatArea > 0
+    ? String(Number(Math.sqrt(4 * throatArea / Math.PI).toPrecision(8)))
+    : ''
 
   const autoMap = () => {
     const detected = detectedRunConfig(source)
@@ -86,6 +106,8 @@ export function DataConfig({ onAnalyze }: { onAnalyze: () => void }) {
       ...config,
       chamberPressureKey: detected.chamberPressureKey,
       thrustKey: detected.thrustKey,
+      oxidizerRunlineKey: detected.oxidizerRunlineKey,
+      fuelRunlineKey: detected.fuelRunlineKey,
       oxidizer: {
         ...config.oxidizer,
         inletPressureKey: detected.oxidizer.inletPressureKey,
@@ -122,11 +144,61 @@ export function DataConfig({ onAnalyze }: { onAnalyze: () => void }) {
             <option key={channel.key} value={channel.key}>{channelLabel(channel)}</option>)}
         </select>
       </label>
+      <StateSelect label="Oxidizer runline" file={source} value={config.oxidizerRunlineKey}
+        onChange={(value) => update('oxidizerRunlineKey', value)} />
+      <StateSelect label="Fuel runline" file={source} value={config.fuelRunlineKey}
+        onChange={(value) => update('fuelRunlineKey', value)} />
+    </details>
+
+    <details className="cea-details">
+      <summary>Thrust calibration</summary>
+      <p className="field-help">Auto tare uses the pre-fire samples. Auto polarity makes the firing deflection positive. Use scale when the CSV channel is mislabeled or still in acquisition counts.</p>
+      <label className="cea-field">Polarity
+        <select value={config.thrustPolarity}
+          onChange={(event) => update('thrustPolarity', event.target.value as RunConfig['thrustPolarity'])}>
+          <option value="auto">Auto from firing deflection</option>
+          <option value="positive">Positive is thrust</option>
+          <option value="negative">Negative is thrust</option>
+        </select>
+      </label>
+      <label className="cea-field">Tare
+        <select value={config.thrustTareMode}
+          onChange={(event) => update('thrustTareMode', event.target.value as RunConfig['thrustTareMode'])}>
+          <option value="auto">Auto from pre-fire baseline</option>
+          <option value="none">No tare</option>
+          <option value="manual">Manual tare</option>
+        </select>
+      </label>
+      <div className="cea-fixed-grid">
+        <label className="cea-field">Scale multiplier
+          <input type="number" step="any" value={config.thrustScale}
+            onChange={(event) => update('thrustScale', event.target.value)} />
+        </label>
+        {config.thrustTareMode === 'manual' && <label className="cea-field">Manual tare (lbf)
+          <input type="number" step="any" value={config.thrustTareLbf}
+            onChange={(event) => update('thrustTareLbf', event.target.value)} />
+        </label>}
+      </div>
+    </details>
+
+    <details className="cea-details" open>
+      <summary>Propellants</summary>
+      <label className="cea-field">Fuel
+        <select value={config.fuelType} onChange={(event) => {
+          const fuelType = event.target.value as RunConfig['fuelType']
+          commit({ ...config, fuelType, fuel: { ...config.fuel, densityKgM3: nominalFuelDensity(fuelType) } })
+        }}>
+          <option value="ipa">Isopropyl alcohol (IPA)</option>
+          <option value="ethanol">Ethanol</option>
+          <option value="custom">Custom density</option>
+        </select>
+      </label>
+      <p className="field-help">Nominal liquid density is filled at approximately 20 °C and remains editable below for measured propellant temperature or concentration.</p>
     </details>
 
     <VenturiFields title="Oxidizer" file={source} value={config.oxidizer} densityHint="e.g. LOX 1141"
       onChange={(value) => update('oxidizer', value)} />
-    <VenturiFields title="Fuel" file={source} value={config.fuel} densityHint="Set for propellant"
+    <VenturiFields title="Fuel" file={source} value={config.fuel} densityHint="Fuel selection fills this"
       onChange={(value) => update('fuel', value)} />
 
     <details className="cea-details" open>
@@ -139,10 +211,20 @@ export function DataConfig({ onAnalyze }: { onAnalyze: () => void }) {
           <option value="cstar">Reference c* → solve throat and Cf</option>
         </select>
       </label>
-      {config.solveBasis === 'throat-area' && <label className="cea-field">Engine throat area (in²)
-        <input type="number" min="0" step="any" placeholder="Known nozzle geometry" value={config.throatAreaIn2}
-          onChange={(event) => update('throatAreaIn2', event.target.value)} />
-      </label>}
+      {config.solveBasis === 'throat-area' && <div className="cea-fixed-grid">
+        <label className="cea-field">Throat diameter (in)
+          <input type="number" min="0" step="any" placeholder="Either geometry input" value={throatDiameter}
+            onChange={(event) => {
+              const diameter = Number(event.target.value)
+              update('throatAreaIn2', event.target.value.trim() && Number.isFinite(diameter) && diameter > 0
+                ? String(Math.PI * diameter ** 2 / 4) : '')
+            }} />
+        </label>
+        <label className="cea-field">Throat area (in²)
+          <input type="number" min="0" step="any" placeholder="Either geometry input" value={config.throatAreaIn2}
+            onChange={(event) => update('throatAreaIn2', event.target.value)} />
+        </label>
+      </div>}
       {config.solveBasis === 'cf' && <label className="cea-field">Reference Cf
         <input type="number" min="0" step="any" placeholder="CEA or design value" value={config.referenceCf}
           onChange={(event) => update('referenceCf', event.target.value)} />
