@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { downloadServerFile, fetchServerCatalog, onlineFileId, onlineRequest,
+import { downloadServerFile, fetchServerCatalog, normalizeCsvName, onlineFileId, onlineRequest,
   type OnlineApiError, type ServerDay } from '../lib/online'
 import { useTelemetry } from '../store'
 
 type Source = { id: string; name: string; folder: string; buffer: ArrayBuffer }
+type RenameTarget = { day: string; name: string; newDay: string; newName: string }
 
 export function ServerFilesPanel({ revision, onOpenManager, onLoad }: {
   revision: number
@@ -15,6 +16,7 @@ export function ServerFilesPanel({ revision, onOpenManager, onLoad }: {
   const [checking, setChecking] = useState(true)
   const [busyKey, setBusyKey] = useState('')
   const [error, setError] = useState('')
+  const [editing, setEditing] = useState<RenameTarget | null>(null)
   const loaded = new Set(files.map((file) => file.id))
   const count = days?.reduce((total, day) => total + day.files.length, 0) ?? 0
 
@@ -53,21 +55,32 @@ export function ServerFilesPanel({ revision, onOpenManager, onLoad }: {
     finally { setBusyKey('') }
   }
 
-  async function renameFile(day: string, name: string) {
-    const nextName = window.prompt('Rename server CSV', name)?.trim()
-    if (!nextName || nextName === name) return
-    const id = onlineFileId(day, name)
+  async function renameFile(event: React.FormEvent) {
+    event.preventDefault()
+    if (!editing) return
+    const nextName = normalizeCsvName(editing.newName)
+    const nextDay = editing.newDay.trim()
+    if (!nextDay || !nextName) {
+      setError('Enter a testing date and CSV filename.')
+      return
+    }
+    if (nextDay === editing.day && nextName === editing.name) {
+      setError('Change the testing date or filename before saving.')
+      return
+    }
+    const id = onlineFileId(editing.day, editing.name)
     setBusyKey(id)
     setError('')
     try {
       await onlineRequest('file', {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ day, name, newDay: day, newName: nextName }),
+        body: JSON.stringify({ day: editing.day, name: editing.name, newDay: nextDay, newName: nextName }),
       })
       if (loaded.has(id)) {
         dispatch({ type: 'remove-file', fileId: id })
-        await onLoad([await downloadServerFile(day, nextName)])
+        await onLoad([await downloadServerFile(nextDay, nextName)])
       }
+      setEditing(null)
       await refresh()
     } catch (caught) { setError((caught as Error).message) }
     finally { setBusyKey('') }
@@ -125,7 +138,10 @@ export function ServerFilesPanel({ revision, onOpenManager, onLoad }: {
                     </button>
                     <a className="tiny" title="Download CSV" href={`/api/online/file?${query}`} download={file.name}>↓</a>
                     <button type="button" className="tiny" title="Rename CSV" disabled={Boolean(busyKey)}
-                      onClick={() => void renameFile(day.name, file.name)}>✎</button>
+                      onClick={() => {
+                        setError('')
+                        setEditing({ day: day.name, name: file.name, newDay: day.name, newName: file.name })
+                      }}>✎</button>
                     <button type="button" className="tiny danger" title="Delete CSV" disabled={Boolean(busyKey)}
                       onClick={() => void deleteFile(day.name, file.name)}>×</button>
                   </div>
@@ -134,6 +150,25 @@ export function ServerFilesPanel({ revision, onOpenManager, onLoad }: {
             </div>
           ))}
         </div>
+      )}
+      {editing && (
+        <form className="server-rename-form" onSubmit={(event) => void renameFile(event)}>
+          <div className="server-rename-title" title={`${editing.day}/${editing.name}`}>
+            Move or rename <strong>{editing.name}</strong>
+          </div>
+          <label>Date
+            <input type="date" required disabled={Boolean(busyKey)} value={editing.newDay}
+              onChange={(event) => setEditing({ ...editing, newDay: event.target.value })} />
+          </label>
+          <label>Filename
+            <input type="text" required disabled={Boolean(busyKey)} value={editing.newName}
+              aria-label="New CSV filename" onChange={(event) => setEditing({ ...editing, newName: event.target.value })} />
+          </label>
+          <div className="server-rename-actions">
+            <button type="button" className="btn compact" disabled={Boolean(busyKey)} onClick={() => setEditing(null)}>Cancel</button>
+            <button type="submit" className="btn compact accent" disabled={Boolean(busyKey)}>Save</button>
+          </div>
+        </form>
       )}
       {error && <p className="server-file-error" role="alert">{error}</p>}
     </section>

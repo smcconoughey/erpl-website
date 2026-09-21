@@ -10,6 +10,11 @@ export type OnlineApiError = Error & {
 export const onlineFileId = (day: string, name: string) =>
   `online:${JSON.stringify([day, name])}`
 
+export const normalizeCsvName = (name: string) => {
+  const trimmed = name.trim()
+  return trimmed && !/\.csv$/i.test(trimmed) ? `${trimmed}.csv` : trimmed
+}
+
 export async function onlineRequest(path: string, init?: RequestInit) {
   const response = await fetch(`/api/online/${path}`, {
     ...init,

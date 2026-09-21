@@ -160,21 +160,21 @@ test('authenticated browser uploads are persisted and immediately appear in the 
   const jsonHeaders = { Cookie: headers.Cookie, 'Content-Type': 'application/json' }
   const renamed = await fetch(`${base}/api/online/file`, {
     method: 'PATCH', headers: jsonHeaders,
-    body: JSON.stringify({ day: '2026-09-20', name: 'cold flow.csv', newDay: '2026-09-20', newName: 'cold-flow-renamed.csv' }),
+    body: JSON.stringify({ day: '2026-09-20', name: 'cold flow.csv', newDay: '2026-09-22', newName: 'cold-flow-renamed.csv' }),
   })
   assert.equal(renamed.status, 200)
   assert.equal((await fetch(`${base}/api/online/file?day=2026-09-20&name=cold%20flow.csv`, {
     headers: { Cookie: headers.Cookie },
   })).status, 404)
-  assert.equal((await fetch(`${base}/api/online/file?day=2026-09-20&name=cold-flow-renamed.csv`, {
+  assert.equal((await fetch(`${base}/api/online/file?day=2026-09-22&name=cold-flow-renamed.csv`, {
     headers: { Cookie: headers.Cookie },
   })).status, 200)
   const removed = await fetch(`${base}/api/online/file`, {
     method: 'DELETE', headers: jsonHeaders,
-    body: JSON.stringify({ day: '2026-09-20', name: 'cold-flow-renamed.csv' }),
+    body: JSON.stringify({ day: '2026-09-22', name: 'cold-flow-renamed.csv' }),
   })
   assert.equal(removed.status, 200)
-  assert.equal((await fetch(`${base}/api/online/file?day=2026-09-20&name=cold-flow-renamed.csv`, {
+  assert.equal((await fetch(`${base}/api/online/file?day=2026-09-22&name=cold-flow-renamed.csv`, {
     headers: { Cookie: headers.Cookie },
   })).status, 404)
 })

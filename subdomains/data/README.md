@@ -41,8 +41,8 @@ production build at `http://localhost:3001` (leave `NODE_ENV` unset for local HT
   the workspace (or use Clear) to make it available for loading again. Local files
   with matching names are kept separate from online files.
 - **Server files** — the lower-left library lists every uploaded CSV after sign-in.
-  Open a file directly, download it, rename it, delete it with confirmation, or
-  use **Upload new** without leaving the plotting workspace.
+  Open a file directly, download it, change its date or filename, delete it with
+  confirmation, or use **Upload new** without leaving the plotting workspace.
 - **Live** — connect to a named telemetry stream from the top toolbar. Incoming
   samples are archived immediately and the browser redraws at a one-second cadence.
 
@@ -81,10 +81,12 @@ People sharing a public IP share the attempt budget. A new network/IP has a
 separate budget. Existing authorized sessions last until their normal expiry.
 
 Signed-in members can upload one or more CSVs from the online-data dialog. Each
-upload is limited to 25 MB and is written atomically to the selected testing-day
-folder, so a partial upload never appears in the catalog. Uploading the same name
-again replaces that file. The lower-left server-file library also supports
-authenticated rename, delete, download, refresh, and open actions.
+queued file has an editable testing date and destination filename before upload.
+Each upload is limited to 25 MB and is written atomically to the selected
+testing-day folder, so a partial upload never appears in the catalog. Uploading
+the same name again replaces that file. The lower-left server-file library also
+supports authenticated date changes, rename, delete, download, refresh, and open
+actions.
 
 Lockout state is stored in `testdata/.auth/attempts.json`. Run one server process
 and one instance, with this folder on persistent storage. Do not run multiple

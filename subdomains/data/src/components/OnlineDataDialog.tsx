@@ -1,11 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
+import { normalizeCsvName } from '../lib/online'
 import { useTelemetry } from '../store'
 
 type TestDay = { name: string; files: { name: string }[] }
 type Source = { id: string; name: string; folder: string; buffer: ArrayBuffer }
 type ApiError = { error?: string; retryAfter?: number; attemptsRemaining?: number }
+type UploadItem = { id: string; file: File; day: string; name: string }
 // Stable online identities distinguish server files from local files with the same name.
 const key = (day: string, name: string) => `online:${JSON.stringify([day, name])}`
+const localDate = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 async function request(path: string, init?: RequestInit) {
   const response = await fetch(`/api/online/${path}`, { ...init, credentials: 'same-origin', cache: 'no-store' })
@@ -36,7 +45,8 @@ export function OnlineDataDialog({ onClose, onLoad }: {
   const [attempts, setAttempts] = useState(5)
   const [lockedUntil, setLockedUntil] = useState(0)
   const [now, setNow] = useState(Date.now())
-  const [uploadDay, setUploadDay] = useState(() => new Date().toISOString().slice(0, 10))
+  const [uploadDay, setUploadDay] = useState(localDate)
+  const [uploads, setUploads] = useState<UploadItem[]>([])
   const controllerRef = useRef<AbortController | null>(null)
   const remaining = Math.max(0, Math.ceil((lockedUntil - now) / 1000))
   const newCount = [...selected].filter((id) => !loadedIds.has(id)).length
@@ -167,24 +177,29 @@ export function OnlineDataDialog({ onClose, onLoad }: {
   }
 
   async function uploadCsvs() {
-    const files = [...(uploadRef.current?.files || [])]
-    if (busy || !uploadDay || !files.length) return
+    if (busy || !uploads.length) return
+    const destinations = uploads.map((item) => ({ ...item, day: item.day.trim(), name: normalizeCsvName(item.name) }))
+    if (destinations.some((item) => !item.day || !item.name)) {
+      setError('Every upload needs a testing date and CSV filename.')
+      return
+    }
     const controller = new AbortController()
     controllerRef.current = controller
     setBusy(true)
     setError('')
     try {
-      for (let index = 0; index < files.length; index++) {
-        const file = files[index]
-        setMessage(`Uploading ${index + 1}/${files.length} · ${file.name}`)
-        const query = new URLSearchParams({ day: uploadDay, name: file.name })
+      for (let index = 0; index < destinations.length; index++) {
+        const item = destinations[index]
+        setMessage(`Uploading ${index + 1}/${destinations.length} · ${item.name}`)
+        const query = new URLSearchParams({ day: item.day, name: item.name })
         await request(`upload?${query}`, {
-          method: 'PUT', headers: { 'Content-Type': 'text/csv' }, body: file, signal: controller.signal,
+          method: 'PUT', headers: { 'Content-Type': 'text/csv' }, body: item.file, signal: controller.signal,
         })
       }
       if (uploadRef.current) uploadRef.current.value = ''
+      setUploads([])
       await openCatalog(controller.signal)
-      setMessage(`${files.length} ${files.length === 1 ? 'CSV' : 'CSVs'} uploaded.`)
+      setMessage(`${destinations.length} ${destinations.length === 1 ? 'CSV' : 'CSVs'} uploaded.`)
     } catch (caught) {
       if (!controller.signal.aborted) showError(caught)
     } finally {
@@ -255,13 +270,46 @@ export function OnlineDataDialog({ onClose, onLoad }: {
             <legend>Upload test data</legend>
             <p className="hint">CSV files are stored on the private server disk and appear in the catalog immediately.</p>
             <div className="online-upload-fields">
-              <label>Testing day
+              <label>Default testing date
                 <input type="date" value={uploadDay} onChange={(event) => setUploadDay(event.target.value)} />
               </label>
-              <label>CSV files
-                <input ref={uploadRef} type="file" accept=".csv,text/csv" multiple />
+              <label>Choose CSV files
+                <input ref={uploadRef} type="file" accept=".csv,text/csv" multiple onChange={(event) => {
+                  const selectedFiles = [...(event.target.files || [])]
+                  const batch = `${Date.now()}-${uploads.length}`
+                  setUploads((current) => [...current, ...selectedFiles.map((file, index) => ({
+                    id: `${batch}-${index}`, file, day: uploadDay, name: file.name,
+                  }))])
+                  event.target.value = ''
+                }} />
               </label>
-              <button type="button" className="btn" onClick={() => void uploadCsvs()}>Upload</button>
+            </div>
+            {uploads.length > 0 && (
+              <div className="online-upload-queue" aria-label="Files ready to upload">
+                {uploads.map((item) => (
+                  <div key={item.id} className="online-upload-row">
+                    <label>Date
+                      <input type="date" required value={item.day} aria-label={`Testing date for ${item.name}`}
+                        onChange={(event) => setUploads((current) => current.map((candidate) =>
+                          candidate.id === item.id ? { ...candidate, day: event.target.value } : candidate))} />
+                    </label>
+                    <label>Filename
+                      <input type="text" required value={item.name} aria-label={`Filename for ${item.file.name}`}
+                        onChange={(event) => setUploads((current) => current.map((candidate) =>
+                          candidate.id === item.id ? { ...candidate, name: event.target.value } : candidate))} />
+                    </label>
+                    <button type="button" className="tiny danger" title={`Remove ${item.file.name} from upload`}
+                      aria-label={`Remove ${item.file.name} from upload`}
+                      onClick={() => setUploads((current) => current.filter((candidate) => candidate.id !== item.id))}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="online-upload-submit">
+              <span className="hint">{uploads.length ? `${uploads.length} ready · edit each destination before uploading` : 'Choose one or more CSV files to begin.'}</span>
+              <button type="button" className="btn" disabled={!uploads.length} onClick={() => void uploadCsvs()}>
+                Upload{uploads.length ? ` ${uploads.length}` : ''}
+              </button>
             </div>
           </fieldset>
           {error && <p className="online-error" role="alert">{error}</p>}
