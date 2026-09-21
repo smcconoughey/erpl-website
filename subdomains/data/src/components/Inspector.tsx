@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { fmtNum, fmtTime, sampleAt } from '../lib/math'
 import { useTelemetry } from '../store'
+import { CeaAnalysis } from './CeaAnalysis'
 
 export function Inspector() {
   const { measureCursors, plots, channelMap, timeMode, visibleRange, dispatch, views, showInfoEvents } =
@@ -237,6 +238,7 @@ export function Inspector() {
           Show info events
         </label>
       </section>
+      <CeaAnalysis />
     </aside>
   )
 }

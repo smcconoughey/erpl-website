@@ -49,6 +49,24 @@ Time is taken from `elapsed_s` when present, otherwise from a timestamp column.
 Numeric channels are grouped (pressure, load, temperature, discrete, bang-bang).
 Event strings become markers on the plot.
 
+## Inverse performance analysis
+
+The bottom-right **CEA analysis (Beta)** panel provides a fast first-pass inverse
+performance workflow while the full NASA CEA equilibrium backend is being added.
+It automatically maps likely chamber-pressure, combined-thrust, total-flow,
+oxidizer-flow, and fuel-flow channels from the selected run. Calculations default
+to `t = 0` through an automatically detected firing end based on chamber-pressure
+decay; both bounds and every channel mapping are editable. Fixed throat diameter,
+thrust coefficient, and ideal c-star inputs are remembered locally for the next
+run.
+
+Depending on available channels and fixed inputs, the panel calculates measured
+Cf, effective throat diameter, predicted thrust, estimated total mass flow,
+measured c-star, c-star efficiency, measured specific impulse, and O/F ratio.
+Every time-varying result is added as an Analysis channel and can be plotted with
+one click. These calculations use standard performance relationships and are not
+yet equilibrium results from NASA CEA; the panel labels that limitation directly.
+
 ## Private online data
 
 Place files on the server under `subdomains/data/testdata/<testing-day>/*.csv`.
