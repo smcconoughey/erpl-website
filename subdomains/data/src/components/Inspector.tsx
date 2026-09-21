@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 import { fmtNum, fmtTime, sampleAt } from '../lib/math'
 import { useTelemetry } from '../store'
-import { CeaAnalysis } from './CeaAnalysis'
+import { DataConfig } from './DataConfig'
+import { EngineAnalysis } from './EngineAnalysis'
 
 export function Inspector() {
   const { measureCursors, plots, channelMap, timeMode, visibleRange, dispatch, views, showInfoEvents } =
     useTelemetry()
   const [viewName, setViewName] = useState('')
+  const [tab, setTab] = useState<'inspect' | 'analysis' | 'config'>('inspect')
   const span = visibleRange ? visibleRange.t1 - visibleRange.t0 : 1
   const absolute = timeMode === 'absolute'
   const cursors = measureCursors.map((c) => c.t)
@@ -87,6 +89,12 @@ export function Inspector() {
 
   return (
     <aside className="inspector">
+      <nav className="inspector-tabs" aria-label="Inspector panels">
+        <button type="button" className={tab === 'inspect' ? 'active' : ''} onClick={() => setTab('inspect')}>Inspect</button>
+        <button type="button" className={tab === 'analysis' ? 'active' : ''} onClick={() => setTab('analysis')}>Analysis</button>
+        <button type="button" className={tab === 'config' ? 'active' : ''} onClick={() => setTab('config')}>Config</button>
+      </nav>
+      {tab === 'inspect' && <>
       <section>
         <div className="side-head">
           <div>
@@ -238,7 +246,9 @@ export function Inspector() {
           Show info events
         </label>
       </section>
-      <CeaAnalysis />
+      </>}
+      {tab === 'analysis' && <EngineAnalysis onConfigure={() => setTab('config')} />}
+      {tab === 'config' && <DataConfig onAnalyze={() => setTab('analysis')} />}
     </aside>
   )
 }

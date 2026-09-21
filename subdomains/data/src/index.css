@@ -218,6 +218,36 @@ h2 {
   gap: 22px;
 }
 
+.inspector-tabs {
+  position: sticky;
+  z-index: 5;
+  top: -12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: -12px -10px 0;
+  padding: 8px 10px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.inspector-tabs button {
+  padding: 8px 4px 7px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  background: transparent;
+  font-size: 11px;
+}
+
+.inspector-tabs button:hover {
+  color: var(--text);
+}
+
+.inspector-tabs button.active {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
 .side-head {
   display: flex;
   align-items: flex-start;
@@ -791,6 +821,11 @@ input[type='text'] {
   border-top: 1px solid var(--border);
 }
 
+.cea-panel.tab-panel {
+  padding-top: 0;
+  border-top: 0;
+}
+
 .cea-panel h2 {
   display: flex;
   align-items: center;
@@ -862,6 +897,48 @@ input[type='text'] {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+.field-help {
+  margin: 5px 0 8px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.saved-state {
+  color: #62c59a;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.config-actions {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.config-actions .accent {
+  justify-self: end;
+}
+
+.analysis-basis {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.analysis-basis strong {
+  color: var(--text);
+  font-weight: 500;
 }
 
 .cea-fixed-grid {

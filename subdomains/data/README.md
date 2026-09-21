@@ -51,21 +51,22 @@ Event strings become markers on the plot.
 
 ## Inverse performance analysis
 
-The bottom-right **CEA analysis (Beta)** panel provides a fast first-pass inverse
-performance workflow while the full NASA CEA equilibrium backend is being added.
-It automatically maps likely chamber-pressure, combined-thrust, total-flow,
-oxidizer-flow, and fuel-flow channels from the selected run. Calculations default
-to `t = 0` through an automatically detected firing end based on chamber-pressure
-decay; both bounds and every channel mapping are editable. Fixed throat diameter,
-thrust coefficient, and ideal c-star inputs are remembered locally for the next
-run.
+The bottom-right inspector has separate **Analysis** and **Config** tabs. Config
+is saved in the browser per CSV and maps chamber pressure, thrust, and each
+venturi's inlet/throat pressure pair. Each venturi stores a calibrated `CdA` and
+fluid density; the current Draco source-of-truth `CdA` of `3.22e-05 m²` is the
+default. Mass flow is calculated from:
 
-Depending on available channels and fixed inputs, the panel calculates measured
-Cf, effective throat diameter, predicted thrust, estimated total mass flow,
-measured c-star, c-star efficiency, measured specific impulse, and O/F ratio.
-Every time-varying result is added as an Analysis channel and can be plotted with
-one click. These calculations use standard performance relationships and are not
-yet equilibrium results from NASA CEA; the panel labels that limitation directly.
+`mdot = CdA * sqrt(2 * density * (P_inlet - P_throat))`
+
+Analysis defaults to `t = 0` through an automatically detected firing end. It
+creates plot-ready oxidizer, fuel, and total mass-flow channels plus O/F and
+measured specific impulse. Engine performance uses one explicit solve basis:
+known throat area, reference Cf, or reference c-star. This is required because
+throat area, Cf, and c-star are not independently identifiable from chamber
+pressure, thrust, and mass flow alone. Depending on the selected basis, the tool
+derives measured Cf, measured c-star, and effective throat area/diameter without
+silently inventing the missing constraint.
 
 ## Private online data
 
