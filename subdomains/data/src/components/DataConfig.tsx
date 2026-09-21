@@ -196,6 +196,45 @@ export function DataConfig({ onAnalyze }: { onAnalyze: () => void }) {
       <p className="field-help">Nominal liquid density is filled at approximately 20 °C and remains editable below for measured propellant temperature or concentration.</p>
     </details>
 
+    <details className="cea-details" open>
+      <summary>NASA CEA conditions</summary>
+      <p className="field-help">Blank Pc and O/F fields use the averages backed out from the selected firing window. CEA evaluates the average operating point.</p>
+      <label className="cea-field">Chemistry model
+        <select value={config.ceaMode}
+          onChange={(event) => update('ceaMode', event.target.value as RunConfig['ceaMode'])}>
+          <option value="equilibrium">Equilibrium expansion</option>
+          <option value="frozen">Frozen from throat</option>
+        </select>
+      </label>
+      <div className="cea-fixed-grid">
+        <label className="cea-field">Pc override (psi)
+          <input type="number" min="0" step="any" placeholder="Measured average" value={config.ceaChamberPressurePsi}
+            onChange={(event) => update('ceaChamberPressurePsi', event.target.value)} />
+        </label>
+        <label className="cea-field">O/F override
+          <input type="number" min="0" step="any" placeholder="Measured average" value={config.ceaOfRatio}
+            onChange={(event) => update('ceaOfRatio', event.target.value)} />
+        </label>
+        <label className="cea-field">Nozzle Ae/At
+          <input type="number" min="1" step="any" value={config.ceaExpansionRatio}
+            onChange={(event) => update('ceaExpansionRatio', event.target.value)} />
+        </label>
+        <label className="cea-field">Ambient (psia)
+          <input type="number" min="0" step="any" value={config.ceaAmbientPressurePsi}
+            onChange={(event) => update('ceaAmbientPressurePsi', event.target.value)} />
+        </label>
+        <label className="cea-field">Fuel inlet (K)
+          <input type="number" min="0" step="any" value={config.fuelTemperatureK}
+            onChange={(event) => update('fuelTemperatureK', event.target.value)} />
+        </label>
+        <label className="cea-field">LOX inlet (K)
+          <input type="number" min="0" step="any" value={config.oxidizerTemperatureK}
+            onChange={(event) => update('oxidizerTemperatureK', event.target.value)} />
+        </label>
+      </div>
+      <p className="field-help">Ethanol uses CEA's liquid species. IPA uses a custom liquid C₃H₈O reactant based on NIST formation enthalpy and liquid heat capacity.</p>
+    </details>
+
     <VenturiFields title="Oxidizer" file={source} value={config.oxidizer} densityHint="e.g. LOX 1141"
       onChange={(value) => update('oxidizer', value)} />
     <VenturiFields title="Fuel" file={source} value={config.fuel} densityHint="Fuel selection fills this"

@@ -4,6 +4,7 @@ import { lstat, readdir, realpath } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createAuth } from './auth.mjs'
+import { createCeaSolver, validateCeaRequest } from './cea.mjs'
 import { createIngest, MAX_CSV_BYTES } from './ingest.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -30,6 +31,8 @@ export function createApp(options = {}) {
     stateFile: options.stateFile ?? join(dataDir, '.auth', 'attempts.json') })
   const ingest = createIngest({ dataDir, token: options.ingestToken ?? process.env.ERPL_INGEST_TOKEN,
     now: options.now, heartbeatMs: options.heartbeatMs })
+  const solveCea = options.solveCea ?? createCeaSolver({ root,
+    pythonPath: options.pythonPath, runnerPath: options.ceaRunnerPath })
   const app = express()
   app.disable('x-powered-by')
   app.set('trust proxy', proxyHops)
@@ -66,6 +69,10 @@ export function createApp(options = {}) {
   app.delete('/api/online/file', requireJson, express.json({ limit: '8kb' }), ingest.deleteCsv)
   app.get('/api/online/streams', ingest.listStreams)
   app.get('/api/online/streams/:stream/events', ingest.liveEvents)
+  app.post('/api/online/cea/rocket', requireJson, express.json({ limit: '16kb' }), async (req, res) => {
+    const input = validateCeaRequest(req.body)
+    res.json({ result: await solveCea(input) })
+  })
 
   async function resolveDay(day) {
     if (!safeName(day)) return null
@@ -117,7 +124,7 @@ export function createApp(options = {}) {
   app.use((_req, res) => res.status(404).send('Not found'))
   app.use((error, _req, res, next) => {
     if (res.headersSent) return next(error)
-    const status = [400, 401, 404, 409, 413, 415, 422].includes(error.status) ? error.status : 500
+    const status = [400, 401, 404, 409, 413, 415, 422, 429, 503].includes(error.status) ? error.status : 500
     if (status === 500) console.error('Online data request failed:', error.code || error.name)
     res.status(status).json({ error: status === 500 ? 'Online data is temporarily unavailable. Please try again.' : error.message })
   })

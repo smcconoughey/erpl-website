@@ -1029,6 +1029,71 @@ input[type='text'] {
   font-size: 9px;
 }
 
+.cea-reference {
+  margin-top: 10px;
+  padding: 9px;
+  border: 1px solid #285b8f;
+  background: #0d1520;
+}
+
+.cea-reference-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cea-reference-head strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.cea-converged {
+  padding: 2px 5px;
+  border: 1px solid #25775f;
+  color: var(--green);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.cea-reference > p {
+  margin: 7px 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.cea-reference-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+
+.cea-reference-grid span {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.cea-reference-grid strong {
+  color: var(--text);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.cea-reference .cea-species {
+  margin-bottom: 0;
+  color: #8190a5;
+}
+
 .empty {
   display: grid;
   place-items: center;

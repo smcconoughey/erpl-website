@@ -70,6 +70,35 @@ test('catalog and bytes require authentication; only dist is public', async (t) 
   assert.equal(await file.text(), csv)
 })
 
+test('NASA CEA rocket solves are authenticated and validated before execution', async (t) => {
+  let received
+  const result = { solver: 'NASA CEA', version: 'test', converged: true, cf: 1.42 }
+  const { base, login } = await fixture(t, { solveCea: async (input) => { received = input; return result } })
+  const input = {
+    fuel: 'ipa', mode: 'equilibrium', chamberPressurePsi: 300, ofRatio: 1.7,
+    expansionRatio: 4, ambientPressurePsi: 14.696, fuelTemperatureK: 293.15,
+    oxidizerTemperatureK: 90.17,
+  }
+  assert.equal((await fetch(`${base}/api/online/cea/rocket`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
+  })).status, 401)
+  const headers = { Cookie: cookieOf(await login()), 'Content-Type': 'application/json' }
+  const response = await fetch(`${base}/api/online/cea/rocket`, {
+    method: 'POST', headers, body: JSON.stringify(input),
+  })
+  assert.equal(response.status, 200)
+  assert.deepEqual(await response.json(), { result })
+  assert.deepEqual(received, input)
+  const invalid = await fetch(`${base}/api/online/cea/rocket`, {
+    method: 'POST', headers, body: JSON.stringify({ ...input, chamberPressurePsi: 10 }),
+  })
+  assert.equal(invalid.status, 422)
+  assert.match((await invalid.json()).error, /greater than ambient/)
+  assert.equal((await fetch(`${base}/api/online/cea/rocket`, {
+    method: 'POST', headers: { Cookie: headers.Cookie, 'Content-Type': 'text/plain' }, body: '{}',
+  })).status, 415)
+})
+
 test('fifth failed attempt locks even the correct password for exactly five minutes, including after restart', async (t) => {
   const { base, login, advance, start } = await fixture(t)
   for (let failure = 1; failure <= 4; failure++) {

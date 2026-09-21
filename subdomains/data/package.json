@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "dev:server": "node --env-file-if-exists=.env --watch server/index.mjs",
+    "prebuild": "node server/install-cea.mjs",
     "build": "tsc && vite build",
     "start": "node --env-file-if-exists=.env server/index.mjs",
     "test": "node --test server/*.test.mjs",

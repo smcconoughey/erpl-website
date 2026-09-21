@@ -11,6 +11,31 @@ function finiteInput(value: string) {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+type CeaResult = {
+  solver: string
+  version: string
+  converged: boolean
+  fuelModel: string
+  mode: 'equilibrium' | 'frozen'
+  chamberTemperatureK: number
+  chamberGamma: number
+  chamberMolecularWeight: number
+  cStarMps: number
+  cf: number
+  ispSeconds: number
+  ispVacuumSeconds: number
+  exitTemperatureK: number
+  exitPressureBar: number
+  exitMach: number
+  exitAreaRatio: number
+  chamberSpecies: { name: string; moleFraction: number }[]
+}
+
+function positiveConfig(value: string) {
+  const parsed = finiteInput(value)
+  return parsed !== null && parsed > 0 ? parsed : null
+}
+
 export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
   const { files, plots, dispatch } = useTelemetry()
   const sourceFiles = useMemo(() => files.filter((file) => !file.id.startsWith('analysis:')), [files])
@@ -23,6 +48,9 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
   const [resultFileId, setResultFileId] = useState('')
   const [error, setError] = useState('')
   const [windowSource, setWindowSource] = useState('')
+  const [ceaResult, setCeaResult] = useState<CeaResult | null>(null)
+  const [ceaError, setCeaError] = useState('')
+  const [ceaLoading, setCeaLoading] = useState(false)
 
   function applyDetectedWindow(file: TelemetryFile, runConfig: RunConfig) {
     const detected = detectedFiringWindow(file, runConfig)
@@ -43,12 +71,17 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
     applyDetectedWindow(source, loaded)
     setResult(null)
     setError('')
+    setCeaResult(null)
+    setCeaError('')
   }, [source?.id])
 
   const plotted = new Set(plots.flatMap((plot) => plot.series.map((series) => series.channelKey)))
 
-  function analyze(file: TelemetryFile, runConfig: RunConfig) {
+  async function analyze(file: TelemetryFile, runConfig: RunConfig) {
     setError('')
+    setCeaError('')
+    setCeaResult(null)
+    let measuredReady = false
     try {
       const analysis = runEngineAnalysis(file, runConfig, finiteInput(start) ?? 0, finiteInput(end))
       const fileId = `analysis:engine:${file.id}`
@@ -78,9 +111,51 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
       }
       setResultFileId(fileId)
       setResult(analysis)
+      measuredReady = true
+
+      if (runConfig.fuelType === 'custom') {
+        setCeaError('NASA CEA currently supports the IPA and ethanol fuel selections.')
+        return
+      }
+      const measuredPc = analysis.averages.find((item) => item.label === 'Chamber pressure')?.value
+      const measuredOf = analysis.metrics.find((metric) => metric.id === 'of-ratio')?.average
+      const chamberPressurePsi = positiveConfig(runConfig.ceaChamberPressurePsi) ?? measuredPc
+      const ofRatio = positiveConfig(runConfig.ceaOfRatio) ?? measuredOf
+      if (!chamberPressurePsi || !Number.isFinite(chamberPressurePsi) || !ofRatio || !Number.isFinite(ofRatio)) {
+        setCeaError('NASA CEA needs chamber pressure and O/F. Map both venturis or enter Pc and O/F overrides in Config.')
+        return
+      }
+      const request = {
+        fuel: runConfig.fuelType,
+        mode: runConfig.ceaMode,
+        chamberPressurePsi,
+        ofRatio,
+        expansionRatio: positiveConfig(runConfig.ceaExpansionRatio),
+        ambientPressurePsi: positiveConfig(runConfig.ceaAmbientPressurePsi),
+        fuelTemperatureK: positiveConfig(runConfig.fuelTemperatureK),
+        oxidizerTemperatureK: positiveConfig(runConfig.oxidizerTemperatureK),
+      }
+      if (Object.values(request).some((value) => value === null)) {
+        setCeaError('Complete the NASA CEA conditions in Config.')
+        return
+      }
+      setCeaLoading(true)
+      const response = await fetch('/api/online/cea/rocket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(payload.error || 'NASA CEA could not solve this operating point.')
+      setCeaResult(payload.result as CeaResult)
     } catch (caught) {
-      setResult(null)
-      setError(caught instanceof Error ? caught.message : String(caught))
+      if (measuredReady) setCeaError(caught instanceof Error ? caught.message : String(caught))
+      else {
+        setResult(null)
+        setError(caught instanceof Error ? caught.message : String(caught))
+      }
+    } finally {
+      setCeaLoading(false)
     }
   }
 
@@ -89,7 +164,7 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
       <div><div className="kicker">Inverse performance</div><h2>Engine analysis</h2></div>
       <button type="button" className="tiny" onClick={onConfigure}>Config</button>
     </div>
-    <p className="hint">Derive venturi mass flows, O/F, Isp, Cf, c*, and effective throat geometry from the saved run configuration.</p>
+    <p className="hint">Back out measured performance, then run the official NASA CEA Python solver at the average operating point.</p>
     <label className="cea-field">Run
       <select value={source?.id || ''} disabled={!sourceFiles.length} onChange={(event) => setSourceId(event.target.value)}>
         {sourceFiles.length === 0 ? <option value="">Load a CSV first</option> : sourceFiles.map((file) =>
@@ -112,8 +187,8 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
       <strong>{config?.solveBasis === 'throat-area' ? 'Known throat area' : config?.solveBasis === 'cf' ? 'Reference Cf' : 'Reference c*'}</strong>
       <button type="button" className="tiny" onClick={onConfigure}>Edit</button>
     </div>
-    <button type="button" className="btn accent cea-run" disabled={!source || !config}
-      onClick={() => source && config && analyze(source, config)}>Calculate + create channels</button>
+    <button type="button" className="btn accent cea-run" disabled={!source || !config || ceaLoading}
+      onClick={() => source && config && analyze(source, config)}>{ceaLoading ? 'Running NASA CEA…' : 'Calculate + run NASA CEA'}</button>
     {error && <p className="cea-error" role="alert">{error}</p>}
     {result && <div className="cea-results">
       <div className="cea-window">{result.samples.toLocaleString()} samples · {fmtNum(result.t0, 3)} to {fmtNum(result.t1, 3)} s</div>
@@ -130,6 +205,26 @@ export function EngineAnalysis({ onConfigure }: { onConfigure: () => void }) {
       })}
       {result.notes.map((note) => <p className="analysis-note" key={note}>{note}</p>)}
       {result.warnings.length > 0 && <ul className="cea-warnings">{result.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul>}
+    </div>}
+    {ceaError && <p className="cea-error" role="alert">{ceaError}</p>}
+    {ceaResult && <div className="cea-reference">
+      <div className="cea-reference-head">
+        <div><span className="kicker">Chemical equilibrium</span><strong>NASA CEA {ceaResult.version}</strong></div>
+        <span className="cea-converged">Converged</span>
+      </div>
+      <p>{ceaResult.mode === 'frozen' ? 'Frozen from throat' : 'Equilibrium expansion'} · {ceaResult.fuelModel}</p>
+      <div className="cea-reference-grid">
+        <span>Chamber T<strong>{fmtNum(ceaResult.chamberTemperatureK, 1)} K</strong></span>
+        <span>Ideal c*<strong>{fmtNum(ceaResult.cStarMps / 0.3048, 1)} ft/s</strong></span>
+        <span>Ideal Cf<strong>{fmtNum(ceaResult.cf, 4)}</strong></span>
+        <span>Ideal Isp<strong>{fmtNum(ceaResult.ispSeconds, 2)} s</strong></span>
+        <span>Vacuum Isp<strong>{fmtNum(ceaResult.ispVacuumSeconds, 2)} s</strong></span>
+        <span>Chamber γ<strong>{fmtNum(ceaResult.chamberGamma, 4)}</strong></span>
+        <span>Molecular wt.<strong>{fmtNum(ceaResult.chamberMolecularWeight, 3)}</strong></span>
+        <span>Exit Mach<strong>{fmtNum(ceaResult.exitMach, 3)}</strong></span>
+      </div>
+      <p className="cea-species">Chamber: {ceaResult.chamberSpecies.map((species) =>
+        `${species.name} ${(species.moleFraction * 100).toFixed(1)}%`).join(' · ')}</p>
     </div>}
   </section>
 }

@@ -75,6 +75,27 @@ auto mode preserves normal positive thrust traces while correcting an inverted
 load-cell deflection. Implausible thrust and Cf values produce warnings instead
 of being presented without qualification.
 
+### NASA CEA
+
+The analysis action also sends the firing-window average chamber pressure and
+O/F ratio to the authenticated `/api/online/cea/rocket` endpoint. The endpoint
+runs NASA's official `cea==3.3.4` Python package and returns equilibrium or
+frozen-from-throat ideal chamber/nozzle results, including flame temperature,
+gamma, molecular weight, c-star, Cf, Isp, exit Mach, and major chamber species.
+Pc and O/F can be overridden per CSV, along with inlet temperatures, ambient
+pressure, and nozzle area ratio.
+
+CEA includes liquid oxygen and liquid ethanol in its thermodynamic database.
+It does not include condensed 2-propanol, so IPA is supplied as a custom liquid
+`C3H8O` reactant using NIST's standard liquid formation enthalpy (-317.0 kJ/mol)
+and 298.15 K liquid heat capacity (161.2 J/mol-K) for the inlet-temperature
+sensible correction. The UI identifies this model explicitly.
+
+`npm run build` installs the pinned CEA wheel into `.python` when Python 3.11+
+is available. Render's native runtime provides Python and pip alongside Node;
+the Express server launches a bounded Python solve for each authenticated CEA
+request.
+
 ## Private online data
 
 Place files on the server under `subdomains/data/testdata/<testing-day>/*.csv`.

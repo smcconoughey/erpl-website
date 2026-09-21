@@ -6,6 +6,7 @@ export type SolveBasis = 'throat-area' | 'cf' | 'cstar'
 export type FuelType = 'ipa' | 'ethanol' | 'custom'
 export type ThrustPolarity = 'auto' | 'positive' | 'negative'
 export type ThrustTareMode = 'auto' | 'none' | 'manual'
+export type CeaMode = 'equilibrium' | 'frozen'
 
 export type VenturiConfig = {
   inletPressureKey: string
@@ -24,6 +25,13 @@ export type RunConfig = {
   thrustTareMode: ThrustTareMode
   thrustTareLbf: string
   thrustScale: string
+  ceaMode: CeaMode
+  ceaOfRatio: string
+  ceaChamberPressurePsi: string
+  ceaExpansionRatio: string
+  ceaAmbientPressurePsi: string
+  fuelTemperatureK: string
+  oxidizerTemperatureK: string
   solveBasis: SolveBasis
   throatAreaIn2: string
   referenceCf: string
@@ -49,6 +57,13 @@ export const EMPTY_RUN_CONFIG: RunConfig = {
   thrustTareMode: 'auto',
   thrustTareLbf: '',
   thrustScale: '1',
+  ceaMode: 'equilibrium',
+  ceaOfRatio: '',
+  ceaChamberPressurePsi: '',
+  ceaExpansionRatio: '4',
+  ceaAmbientPressurePsi: '14.696',
+  fuelTemperatureK: '293.15',
+  oxidizerTemperatureK: '90.17',
   solveBasis: 'throat-area',
   throatAreaIn2: '',
   referenceCf: '',
