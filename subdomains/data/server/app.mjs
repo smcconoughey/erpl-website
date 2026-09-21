@@ -14,6 +14,11 @@ const inside = (parent, child) => {
   const path = relative(parent, child)
   return path !== '..' && !path.startsWith(`..${sep}`) && !isAbsolute(path)
 }
+const CEA_SMOKE_INPUT = {
+  fuel: 'ethanol', mode: 'equilibrium', chamberPressurePsi: 300, ofRatio: 1.7,
+  expansionRatio: 4, ambientPressurePsi: 14.696, fuelTemperatureK: 293.15,
+  oxidizerTemperatureK: 90.17,
+}
 
 export function createApp(options = {}) {
   const production = options.production ?? process.env.NODE_ENV === 'production'
@@ -33,6 +38,7 @@ export function createApp(options = {}) {
     now: options.now, heartbeatMs: options.heartbeatMs })
   const solveCea = options.solveCea ?? createCeaSolver({ root,
     pythonPath: options.pythonPath, runnerPath: options.ceaRunnerPath })
+  let ceaHealth
   const app = express()
   app.disable('x-powered-by')
   app.set('trust proxy', proxyHops)
@@ -41,7 +47,15 @@ export function createApp(options = {}) {
       'Referrer-Policy': 'same-origin', 'X-Frame-Options': 'DENY' })
     next()
   })
-  app.get('/healthz', (_req, res) => res.json({ ok: true }))
+  app.get('/healthz', async (_req, res) => {
+    try {
+      ceaHealth ??= solveCea(CEA_SMOKE_INPUT)
+      const result = await ceaHealth
+      res.json({ ok: true, cea: { solver: result.solver, version: result.version, converged: result.converged } })
+    } catch {
+      res.status(503).json({ ok: false, cea: { available: false } })
+    }
+  })
   app.use('/api', (req, res, next) => {
     res.set('Cache-Control', 'no-store')
     // Same-origin JSON requests only; never enable CORS on these endpoints.

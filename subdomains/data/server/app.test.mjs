@@ -99,6 +99,20 @@ test('NASA CEA rocket solves are authenticated and validated before execution', 
   })).status, 415)
 })
 
+test('health check proves the cached NASA CEA solver can converge', async (t) => {
+  let solves = 0
+  const solveCea = async () => { solves += 1; return { solver: 'NASA CEA', version: '3.3.4', converged: true } }
+  const { base } = await fixture(t, { solveCea })
+  for (let check = 0; check < 2; check++) {
+    const response = await fetch(`${base}/healthz`)
+    assert.equal(response.status, 200)
+    assert.deepEqual(await response.json(), {
+      ok: true, cea: { solver: 'NASA CEA', version: '3.3.4', converged: true },
+    })
+  }
+  assert.equal(solves, 1)
+})
+
 test('fifth failed attempt locks even the correct password for exactly five minutes, including after restart', async (t) => {
   const { base, login, advance, start } = await fixture(t)
   for (let failure = 1; failure <= 4; failure++) {
