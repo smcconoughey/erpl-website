@@ -33,13 +33,12 @@ production build at `http://localhost:3001` (leave `NODE_ENV` unset for local HT
 
 - **Open folder / Open files** — pick any nested set of CSVs on disk.
 - Drag and drop files or folders onto the window.
-- **Open Online ERPL Data** — enter the shared password, then choose CSVs from
-  one or more testing days. Each day has a Select all checkbox. Selected files
-  are added to the same workspace and parsed just like local files. Reopening the
-  picker reuses your sign-in and checks files already open in the workspace. Those
-  files stay selected and are not downloaded or added again. Remove a file from
-  the workspace (or use Clear) to make it available for loading again. Local files
-  with matching names are kept separate from online files.
+- **Open Online ERPL Data** — enter the shared password to automatically open
+  every server CSV that is not already in the workspace.
+  The lower-left server library still lets you open individual files and use
+  **Upload new** to browse, select, and upload data. Reopening either view reuses
+  your sign-in. Local files with matching names are kept separate from online
+  files.
 - **Server files** — the lower-left library lists every uploaded CSV after sign-in.
   Open a file directly, download it, change its date or filename, delete it with
   confirmation, or use **Upload new** without leaving the plotting workspace.

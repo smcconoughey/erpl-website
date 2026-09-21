@@ -23,7 +23,7 @@ function Shell() {
   const { files, error, dispatch, loading } = useTelemetry()
   const load = useLoadFiles()
   const [dragging, setDragging] = useState(false)
-  const [onlineOpen, setOnlineOpen] = useState(false)
+  const [onlineMode, setOnlineMode] = useState<'open' | 'manage' | null>(null)
   const [onlineRevision, setOnlineRevision] = useState(0)
   const [liveOpen, setLiveOpen] = useState(false)
   const [liveInfoOpen, setLiveInfoOpen] = useState(false)
@@ -93,21 +93,21 @@ function Shell() {
       <Toolbar
         onOpenFolder={() => folderRef.current?.click()}
         onOpenFiles={() => filesRef.current?.click()}
-        onOpenOnline={() => setOnlineOpen(true)}
+        onOpenOnline={() => setOnlineMode('open')}
         onOpenLive={() => setLiveOpen(true)}
         onOpenLiveInfo={() => setLiveInfoOpen(true)}
         live={live.status !== 'idle'}
       />
       <div className={`banner${error ? '' : ' empty'}`}>{error}</div>
       <div className="workspace">
-        <Sidebar serverRevision={onlineRevision} onOpenServer={() => setOnlineOpen(true)} onLoadServer={ingestBuffers} />
+        <Sidebar serverRevision={onlineRevision} onOpenServer={() => setOnlineMode('manage')} onLoadServer={ingestBuffers} />
         <main className="stage">
           {files.length === 0 ? (
             <EmptyState
               loading={Boolean(loading)}
               onOpenFolder={() => folderRef.current?.click()}
               onOpenFiles={() => filesRef.current?.click()}
-              onOpenOnline={() => setOnlineOpen(true)}
+              onOpenOnline={() => setOnlineMode('open')}
             />
           ) : <>
             <Plots />
@@ -117,12 +117,12 @@ function Shell() {
         <Inspector />
       </div>
       {dragging ? <div className="drop-overlay">Drop CSV files or folders</div> : null}
-      {onlineOpen && <OnlineDataDialog onClose={() => {
-        setOnlineOpen(false)
+      {onlineMode && <OnlineDataDialog autoLoad={onlineMode === 'open'} onClose={() => {
+        setOnlineMode(null)
         setOnlineRevision((revision) => revision + 1)
       }} onLoad={ingestBuffers} />}
       {liveOpen && <LiveDialog live={live} onClose={() => setLiveOpen(false)}
-        onNeedUnlock={() => { setLiveOpen(false); setOnlineOpen(true) }}
+        onNeedUnlock={() => { setLiveOpen(false); setOnlineMode('manage') }}
         onInfo={() => { setLiveOpen(false); setLiveInfoOpen(true) }} />}
       {liveInfoOpen && <LiveInfoDialog onClose={() => setLiveInfoOpen(false)} />}
       <input

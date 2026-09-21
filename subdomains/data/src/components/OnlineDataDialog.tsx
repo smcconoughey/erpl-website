@@ -25,7 +25,8 @@ async function request(path: string, init?: RequestInit) {
   return response
 }
 
-export function OnlineDataDialog({ onClose, onLoad }: {
+export function OnlineDataDialog({ autoLoad = false, onClose, onLoad }: {
+  autoLoad?: boolean
   onClose: () => void
   onLoad: (items: Source[]) => Promise<void>
 }) {
@@ -58,6 +59,28 @@ export function OnlineDataDialog({ onClose, onLoad }: {
     setDays(catalog.days)
     setSelected(new Set(catalog.days.flatMap((day) => day.files
       .map((file) => key(day.name, file.name)).filter((id) => loadedIds.has(id)))))
+    if (autoLoad) await loadFiles(catalog.days, signal)
+  }
+
+  async function loadFiles(catalogDays: TestDay[], signal: AbortSignal, include?: Set<string>) {
+    const pending = catalogDays.flatMap((day) => day.files
+      .map((file) => ({ day: day.name, name: file.name, id: key(day.name, file.name) })))
+      .filter((file) => !loadedIds.has(file.id) && (!include || include.has(file.id)))
+    if (!pending.length) {
+      onClose()
+      return
+    }
+    const sources: Source[] = []
+    for (const file of pending) {
+      setMessage(`Downloading ${sources.length + 1}/${pending.length} · ${file.name}`)
+      const query = new URLSearchParams({ day: file.day, name: file.name })
+      const response = await request(`file?${query}`, { signal })
+      sources.push({ id: file.id, name: file.name, folder: file.day, buffer: await response.arrayBuffer() })
+    }
+    if (signal.aborted) return
+    setMessage(`Loading ${sources.length} server ${sources.length === 1 ? 'CSV' : 'CSVs'}…`)
+    await onLoad(sources)
+    if (!signal.aborted) onClose()
   }
 
   function showError(caught: unknown) {
@@ -122,7 +145,7 @@ export function OnlineDataDialog({ onClose, onLoad }: {
     controllerRef.current = controller
     setBusy(true)
     setError('')
-    setMessage('Opening online data…')
+    setMessage(autoLoad ? 'Opening all online data…' : 'Opening online data…')
     try {
       await request('login', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -154,21 +177,7 @@ export function OnlineDataDialog({ onClose, onLoad }: {
     setBusy(true)
     setError('')
     try {
-      const sources: Source[] = []
-      for (const day of days) {
-        for (const file of day.files) {
-          const id = key(day.name, file.name)
-          if (!selected.has(id) || loadedIds.has(id)) continue
-          setMessage(`Downloading ${sources.length + 1}/${newCount} · ${file.name}`)
-          const query = new URLSearchParams({ day: day.name, name: file.name })
-          const response = await request(`file?${query}`, { signal: controller.signal })
-          sources.push({ id, name: file.name, folder: day.name, buffer: await response.arrayBuffer() })
-        }
-      }
-      if (controller.signal.aborted) return
-      setMessage('Loading selected CSVs…')
-      await onLoad(sources)
-      if (!controller.signal.aborted) onClose()
+      await loadFiles(days, controller.signal, selected)
     } catch (caught) {
       if (!controller.signal.aborted) showError(caught)
     } finally {
@@ -219,7 +228,9 @@ export function OnlineDataDialog({ onClose, onLoad }: {
       </div>
       {checking ? null : days === null ? (
         <form onSubmit={(event) => void unlock(event)}>
-          <p className="hint">Enter the shared ERPL password to browse testing days and CSV files.</p>
+          <p className="hint">{autoLoad
+            ? 'Enter the shared ERPL password. Every server CSV will open automatically.'
+            : 'Enter the shared ERPL password to browse testing days and CSV files.'}</p>
           <label className="online-password-label" htmlFor="online-password">Password</label>
           <input ref={passwordRef} id="online-password" type="password" autoComplete="current-password"
             value={password} maxLength={1024} required disabled={busy || remaining > 0}
@@ -232,7 +243,9 @@ export function OnlineDataDialog({ onClose, onLoad }: {
           {error && <p className="online-error" role="alert">{error}</p>}
           <div className="online-actions">
             <button type="button" className="btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn accent" disabled={busy || remaining > 0 || !password}>Unlock data</button>
+            <button type="submit" className="btn accent" disabled={busy || remaining > 0 || !password}>
+              {autoLoad ? 'Open all data' : 'Unlock data'}
+            </button>
           </div>
         </form>
       ) : (
