@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Inspector } from './components/Inspector'
+import { LiveDialog, LiveInfoDialog } from './components/LiveDialog'
 import { Minimap } from './components/Minimap'
 import { OnlineDataDialog } from './components/OnlineDataDialog'
 import { Plots } from './components/Plots'
@@ -7,6 +8,7 @@ import { Sidebar } from './components/Sidebar'
 import { Toolbar } from './components/Toolbar'
 import { sourcesFromDataTransfer, sourcesFromFileList } from './lib/files'
 import { uid } from './lib/math'
+import { useLiveTelemetry } from './live'
 import { TelemetryProvider, useLoadFiles, useTelemetry } from './store'
 
 export function App() {
@@ -22,6 +24,10 @@ function Shell() {
   const load = useLoadFiles()
   const [dragging, setDragging] = useState(false)
   const [onlineOpen, setOnlineOpen] = useState(false)
+  const [onlineRevision, setOnlineRevision] = useState(0)
+  const [liveOpen, setLiveOpen] = useState(false)
+  const [liveInfoOpen, setLiveInfoOpen] = useState(false)
+  const live = useLiveTelemetry()
   const folderRef = useRef<HTMLInputElement>(null)
   const filesRef = useRef<HTMLInputElement>(null)
 
@@ -88,27 +94,37 @@ function Shell() {
         onOpenFolder={() => folderRef.current?.click()}
         onOpenFiles={() => filesRef.current?.click()}
         onOpenOnline={() => setOnlineOpen(true)}
+        onOpenLive={() => setLiveOpen(true)}
+        onOpenLiveInfo={() => setLiveInfoOpen(true)}
+        live={live.status !== 'idle'}
       />
-      {error ? <div className="banner">{error}</div> : null}
-      {files.length === 0 ? (
-        <EmptyState
-          loading={Boolean(loading)}
-          onOpenFolder={() => folderRef.current?.click()}
-          onOpenFiles={() => filesRef.current?.click()}
-          onOpenOnline={() => setOnlineOpen(true)}
-        />
-      ) : (
-        <div className="workspace">
-          <Sidebar />
-          <main className="stage">
+      <div className={`banner${error ? '' : ' empty'}`}>{error}</div>
+      <div className="workspace">
+        <Sidebar serverRevision={onlineRevision} onOpenServer={() => setOnlineOpen(true)} onLoadServer={ingestBuffers} />
+        <main className="stage">
+          {files.length === 0 ? (
+            <EmptyState
+              loading={Boolean(loading)}
+              onOpenFolder={() => folderRef.current?.click()}
+              onOpenFiles={() => filesRef.current?.click()}
+              onOpenOnline={() => setOnlineOpen(true)}
+            />
+          ) : <>
             <Plots />
             <Minimap />
-          </main>
-          <Inspector />
-        </div>
-      )}
+          </>}
+        </main>
+        <Inspector />
+      </div>
       {dragging ? <div className="drop-overlay">Drop CSV files or folders</div> : null}
-      {onlineOpen && <OnlineDataDialog onClose={() => setOnlineOpen(false)} onLoad={ingestBuffers} />}
+      {onlineOpen && <OnlineDataDialog onClose={() => {
+        setOnlineOpen(false)
+        setOnlineRevision((revision) => revision + 1)
+      }} onLoad={ingestBuffers} />}
+      {liveOpen && <LiveDialog live={live} onClose={() => setLiveOpen(false)}
+        onNeedUnlock={() => { setLiveOpen(false); setOnlineOpen(true) }}
+        onInfo={() => { setLiveOpen(false); setLiveInfoOpen(true) }} />}
+      {liveInfoOpen && <LiveInfoDialog onClose={() => setLiveInfoOpen(false)} />}
       <input
         ref={folderRef}
         type="file"

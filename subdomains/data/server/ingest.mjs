@@ -1,5 +1,5 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
-import { appendFile, lstat, mkdir, readdir, realpath, rename, rm, writeFile } from 'node:fs/promises'
+import { appendFile, link, lstat, mkdir, readdir, realpath, rename, rm, rmdir, writeFile } from 'node:fs/promises'
 import { isAbsolute, join, relative, sep } from 'node:path'
 
 const MAX_CSV_BYTES = 25 * 1024 * 1024
@@ -69,6 +69,67 @@ export function createIngest({ dataDir, token, now = Date.now, heartbeatMs = 150
     return { day, name, bytes: bytes.length }
   }
 
+  async function existingCsv(day, name) {
+    if (!safeSegment(day) || !safeSegment(name, 255) || !/\.csv$/i.test(name)) {
+      throw new RequestError(400, 'Select a safe CSV from a testing-day folder.')
+    }
+    try {
+      const root = await realpath(dataDir)
+      const folder = join(root, day)
+      if (!(await lstat(folder)).isDirectory()) throw new RequestError(404, 'CSV not found.')
+      const resolvedFolder = await realpath(folder)
+      if (!inside(root, resolvedFolder)) throw new RequestError(404, 'CSV not found.')
+      const path = join(resolvedFolder, name)
+      if (!(await lstat(path)).isFile() || !inside(resolvedFolder, await realpath(path))) {
+        throw new RequestError(404, 'CSV not found.')
+      }
+      return { folder: resolvedFolder, path }
+    } catch (error) {
+      if (error instanceof RequestError) throw error
+      if (error.code === 'ENOENT' || error.code === 'ENOTDIR') throw new RequestError(404, 'CSV not found.')
+      throw error
+    }
+  }
+
+  async function renameStoredCsv(day, name, newDay, newName) {
+    if (day === newDay && name === newName) throw new RequestError(400, 'Choose a different file name.')
+    const source = await existingCsv(day, name)
+    const target = await csvPath(newDay, newName)
+    try {
+      await lstat(target.path)
+      throw new RequestError(409, 'A CSV with that name already exists.')
+    } catch (error) {
+      if (error instanceof RequestError) throw error
+      if (error.code !== 'ENOENT') throw error
+    }
+    try {
+      await link(source.path, target.path)
+    } catch (error) {
+      if (error.code === 'EEXIST') throw new RequestError(409, 'A CSV with that name already exists.')
+      throw error
+    }
+    try { await rm(source.path) }
+    catch (error) {
+      await rm(target.path, { force: true })
+      throw error
+    }
+    if (source.folder !== target.folder) {
+      await rmdir(source.folder).catch((error) => {
+        if (error.code !== 'ENOTEMPTY' && error.code !== 'EEXIST') throw error
+      })
+    }
+    return { day: newDay, name: newName }
+  }
+
+  async function deleteStoredCsv(day, name) {
+    const source = await existingCsv(day, name)
+    await rm(source.path)
+    await rmdir(source.folder).catch((error) => {
+      if (error.code !== 'ENOTEMPTY' && error.code !== 'EEXIST') throw error
+    })
+    return { day, name }
+  }
+
   function browserUpload(req, res, next) {
     saveCsv(req.query.day, req.query.name, req.body)
       .then((saved) => res.status(201).json({ ok: true, file: saved }))
@@ -78,6 +139,18 @@ export function createIngest({ dataDir, token, now = Date.now, heartbeatMs = 150
   function machineUpload(req, res, next) {
     saveCsv(req.params.day, req.params.name, req.body)
       .then((saved) => res.status(201).json({ ok: true, file: saved }))
+      .catch(next)
+  }
+
+  function renameCsv(req, res, next) {
+    renameStoredCsv(req.body?.day, req.body?.name, req.body?.newDay, req.body?.newName)
+      .then((file) => res.json({ ok: true, file }))
+      .catch(next)
+  }
+
+  function deleteCsv(req, res, next) {
+    deleteStoredCsv(req.body?.day, req.body?.name)
+      .then((file) => res.json({ ok: true, file }))
       .catch(next)
   }
 
@@ -171,7 +244,7 @@ export function createIngest({ dataDir, token, now = Date.now, heartbeatMs = 150
     res.once('close', close)
   }
 
-  return { browserUpload, ingestSample, listStreams, liveEvents, machineUpload, requireToken }
+  return { browserUpload, deleteCsv, ingestSample, listStreams, liveEvents, machineUpload, renameCsv, requireToken }
 }
 
 export { MAX_CSV_BYTES }

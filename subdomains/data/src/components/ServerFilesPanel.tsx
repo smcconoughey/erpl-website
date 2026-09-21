@@ -1,0 +1,141 @@
+import { useCallback, useEffect, useState } from 'react'
+import { downloadServerFile, fetchServerCatalog, onlineFileId, onlineRequest,
+  type OnlineApiError, type ServerDay } from '../lib/online'
+import { useTelemetry } from '../store'
+
+type Source = { id: string; name: string; folder: string; buffer: ArrayBuffer }
+
+export function ServerFilesPanel({ revision, onOpenManager, onLoad }: {
+  revision: number
+  onOpenManager: () => void
+  onLoad: (items: Source[]) => Promise<void>
+}) {
+  const { files, dispatch } = useTelemetry()
+  const [days, setDays] = useState<ServerDay[] | null>(null)
+  const [checking, setChecking] = useState(true)
+  const [busyKey, setBusyKey] = useState('')
+  const [error, setError] = useState('')
+  const loaded = new Set(files.map((file) => file.id))
+  const count = days?.reduce((total, day) => total + day.files.length, 0) ?? 0
+
+  const refresh = useCallback(async (signal?: AbortSignal) => {
+    setChecking(true)
+    setError('')
+    try {
+      const status = await onlineRequest('status', { signal })
+      const body = await status.json() as { authenticated: boolean }
+      if (!body.authenticated) setDays(null)
+      else setDays(await fetchServerCatalog(signal))
+    } catch (caught) {
+      if (!signal?.aborted) {
+        const failure = caught as OnlineApiError
+        setDays(null)
+        setError(failure.message)
+      }
+    } finally {
+      if (!signal?.aborted) setChecking(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    void refresh(controller.signal)
+    return () => controller.abort()
+  }, [refresh, revision])
+
+  async function open(day: string, name: string) {
+    const id = onlineFileId(day, name)
+    if (loaded.has(id)) return
+    setBusyKey(id)
+    setError('')
+    try { await onLoad([await downloadServerFile(day, name)]) }
+    catch (caught) { setError((caught as Error).message) }
+    finally { setBusyKey('') }
+  }
+
+  async function renameFile(day: string, name: string) {
+    const nextName = window.prompt('Rename server CSV', name)?.trim()
+    if (!nextName || nextName === name) return
+    const id = onlineFileId(day, name)
+    setBusyKey(id)
+    setError('')
+    try {
+      await onlineRequest('file', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day, name, newDay: day, newName: nextName }),
+      })
+      if (loaded.has(id)) {
+        dispatch({ type: 'remove-file', fileId: id })
+        await onLoad([await downloadServerFile(day, nextName)])
+      }
+      await refresh()
+    } catch (caught) { setError((caught as Error).message) }
+    finally { setBusyKey('') }
+  }
+
+  async function deleteFile(day: string, name: string) {
+    if (!window.confirm(`Delete ${day}/${name} from the server? This cannot be undone.`)) return
+    const id = onlineFileId(day, name)
+    setBusyKey(id)
+    setError('')
+    try {
+      await onlineRequest('file', {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ day, name }),
+      })
+      if (loaded.has(id)) dispatch({ type: 'remove-file', fileId: id })
+      await refresh()
+    } catch (caught) { setError((caught as Error).message) }
+    finally { setBusyKey('') }
+  }
+
+  return (
+    <section className="server-files" aria-label="Server files">
+      <div className="server-files-head">
+        <div>
+          <div className="kicker">Server files</div>
+          <strong>{days === null ? 'Locked' : `${count} CSV${count === 1 ? '' : 's'}`}</strong>
+        </div>
+        <div className="server-file-actions">
+          <button type="button" className="tiny" title="Refresh server files" onClick={() => void refresh()}>↻</button>
+          <button type="button" className="btn compact accent" onClick={onOpenManager}>
+            {days === null ? 'Unlock' : 'Upload new'}
+          </button>
+        </div>
+      </div>
+      {checking ? <p className="empty-lite">Checking server…</p> : days === null ? (
+        <p className="empty-lite">Unlock to browse and manage the persistent file library.</p>
+      ) : days.length === 0 ? (
+        <p className="empty-lite">No server CSVs yet. Use Upload new to add one.</p>
+      ) : (
+        <div className="server-file-list">
+          {days.map((day) => (
+            <div key={day.name} className="server-day">
+              <div className="server-day-name"><span>{day.name}</span><span>{day.files.length}</span></div>
+              {day.files.map((file) => {
+                const id = onlineFileId(day.name, file.name)
+                const isLoaded = loaded.has(id)
+                const query = new URLSearchParams({ day: day.name, name: file.name })
+                return (
+                  <div key={file.name} className="server-file-row">
+                    <button type="button" className="server-file-name" title={file.name}
+                      disabled={Boolean(busyKey) || isLoaded} onClick={() => void open(day.name, file.name)}>
+                      <span>{file.name.replace(/\.csv$/i, '')}</span>
+                      {isLoaded && <em>open</em>}
+                    </button>
+                    <a className="tiny" title="Download CSV" href={`/api/online/file?${query}`} download={file.name}>↓</a>
+                    <button type="button" className="tiny" title="Rename CSV" disabled={Boolean(busyKey)}
+                      onClick={() => void renameFile(day.name, file.name)}>✎</button>
+                    <button type="button" className="tiny danger" title="Delete CSV" disabled={Boolean(busyKey)}
+                      onClick={() => void deleteFile(day.name, file.name)}>×</button>
+                  </div>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+      {error && <p className="server-file-error" role="alert">{error}</p>}
+    </section>
+  )
+}

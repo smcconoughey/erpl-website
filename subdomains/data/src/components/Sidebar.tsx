@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fmtNum } from '../lib/math'
 import { useTelemetry } from '../store'
+import { ServerFilesPanel } from './ServerFilesPanel'
 
-export function Sidebar() {
+type Source = { id: string; name: string; folder: string; buffer: ArrayBuffer }
+
+export function Sidebar({ serverRevision, onOpenServer, onLoadServer }: {
+  serverRevision: number
+  onOpenServer: () => void
+  onLoadServer: (items: Source[]) => Promise<void>
+}) {
   const { files, plots, activePlotId, dispatch } = useTelemetry()
   const [q, setQ] = useState('')
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set())
@@ -56,6 +63,7 @@ export function Sidebar() {
         placeholder="Filter channels"
       />
       <div className="tree">
+        {files.length === 0 && <p className="empty-lite">Open a local or server CSV to see its channels.</p>}
         {tree.map((folder) => {
           const folderId = `folder:${folder.path || '_root'}`
           const hideFolder = collapsed.has(folderId) && !query
@@ -154,6 +162,7 @@ export function Sidebar() {
           )
         })}
       </div>
+      <ServerFilesPanel revision={serverRevision} onOpenManager={onOpenServer} onLoad={onLoadServer} />
     </aside>
   )
 }

@@ -4,9 +4,12 @@ type Props = {
   onOpenFolder: () => void
   onOpenFiles: () => void
   onOpenOnline: () => void
+  onOpenLive: () => void
+  onOpenLiveInfo: () => void
+  live: boolean
 }
 
-export function Toolbar({ onOpenFolder, onOpenFiles, onOpenOnline }: Props) {
+export function Toolbar({ onOpenFolder, onOpenFiles, onOpenOnline, onOpenLive, onOpenLiveInfo, live }: Props) {
   const { tool, timeMode, hasAbsolute, loading, fullSpan, dispatch } = useTelemetry()
 
   return (
@@ -36,6 +39,13 @@ export function Toolbar({ onOpenFolder, onOpenFiles, onOpenOnline }: Props) {
         <button type="button" className="btn accent" disabled={Boolean(loading)} onClick={onOpenOnline}>
           Open Online ERPL Data
         </button>
+        <span className="live-toolbar">
+          <button type="button" className={`btn live-btn${live ? ' on' : ''}`} onClick={onOpenLive}>
+            <span className="live-dot" /> Live
+          </button>
+          <button type="button" className="btn info-btn" title="Live telemetry endpoint setup"
+            aria-label="Live telemetry endpoint setup" onClick={onOpenLiveInfo}>ⓘ</button>
+        </span>
       </div>
 
       <div className="tool-group segmented">

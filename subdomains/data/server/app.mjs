@@ -62,6 +62,8 @@ export function createApp(options = {}) {
     express.json({ limit: '256kb' }), ingest.ingestSample)
   app.use('/api/online', auth.requireSession)
   app.put('/api/online/upload', requireCsv, csvBody, ingest.browserUpload)
+  app.patch('/api/online/file', requireJson, express.json({ limit: '8kb' }), ingest.renameCsv)
+  app.delete('/api/online/file', requireJson, express.json({ limit: '8kb' }), ingest.deleteCsv)
   app.get('/api/online/streams', ingest.listStreams)
   app.get('/api/online/streams/:stream/events', ingest.liveEvents)
 
@@ -115,7 +117,7 @@ export function createApp(options = {}) {
   app.use((_req, res) => res.status(404).send('Not found'))
   app.use((error, _req, res, next) => {
     if (res.headersSent) return next(error)
-    const status = [400, 401, 413, 415, 422].includes(error.status) ? error.status : 500
+    const status = [400, 401, 404, 409, 413, 415, 422].includes(error.status) ? error.status : 500
     if (status === 500) console.error('Online data request failed:', error.code || error.name)
     res.status(status).json({ error: status === 500 ? 'Online data is temporarily unavailable. Please try again.' : error.message })
   })

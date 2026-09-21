@@ -67,6 +67,7 @@ type State = {
 
 type Action =
   | { type: 'add-files'; files: TelemetryFile[] }
+  | { type: 'upsert-file'; file: TelemetryFile }
   | { type: 'remove-file'; fileId: string }
   | { type: 'clear' }
   | { type: 'set-loading'; loading: State['loading'] }
@@ -157,6 +158,13 @@ function reducer(state: State, action: Action): State {
       for (const f of action.files) {
         if (!files.some((x) => x.id === f.id)) files.push(f)
       }
+      return { ...state, files, error: null }
+    }
+    case 'upsert-file': {
+      const index = state.files.findIndex((file) => file.id === action.file.id)
+      const files = index < 0
+        ? [...state.files, action.file]
+        : state.files.map((file, fileIndex) => fileIndex === index ? action.file : file)
       return { ...state, files, error: null }
     }
     case 'remove-file': {
