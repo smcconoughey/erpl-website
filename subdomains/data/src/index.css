@@ -711,6 +711,39 @@ input[type='text'] {
   margin-bottom: 4px;
 }
 
+.online-upload {
+  margin: 16px 0 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+
+.online-upload legend {
+  padding: 0 6px;
+  color: var(--accent);
+}
+
+.online-upload-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+}
+
+.online-upload-fields label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+}
+
+.online-upload-fields input {
+  max-width: 240px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 7px;
+}
+
 .online-actions {
   display: flex;
   justify-content: flex-end;

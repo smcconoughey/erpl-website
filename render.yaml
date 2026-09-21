@@ -23,6 +23,8 @@ services:
         sync: false
       - key: ERPL_SESSION_SECRET
         generateValue: true
+      - key: ERPL_INGEST_TOKEN
+        generateValue: true
       # Trust only the nearest hosting proxy; verify this for your deployment.
       - key: TRUST_PROXY_HOPS
         value: "1"

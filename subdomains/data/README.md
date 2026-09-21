@@ -75,11 +75,60 @@ the failure count; incomplete sequences also expire after 24 hours of inactivity
 People sharing a public IP share the attempt budget. A new network/IP has a
 separate budget. Existing authorized sessions last until their normal expiry.
 
+Signed-in members can upload one or more CSVs from the online-data dialog. Each
+upload is limited to 25 MB and is written atomically to the selected testing-day
+folder, so a partial upload never appears in the catalog. Uploading the same name
+again replaces that file.
+
 Lockout state is stored in `testdata/.auth/attempts.json`. Run one server process
 and one instance, with this folder on persistent storage. Do not run multiple
 workers against this file; multiple instances would require a shared transactional
 store. `ERPL_TESTDATA_DIR` can override the data root if your host uses another
 private disk path. Back up the CSVs separately.
+
+## Real-time telemetry and machine uploads
+
+Set `ERPL_INGEST_TOKEN` to a separate random secret of at least 32 characters.
+Data-acquisition systems use this token as an HTTP Bearer credential; they never
+receive the shared viewer password or browser session cookie.
+
+Upload a completed CSV directly from a DAQ machine:
+
+```bash
+curl --fail-with-body \
+  -X PUT \
+  -H "Authorization: Bearer $ERPL_INGEST_TOKEN" \
+  -H "Content-Type: text/csv" \
+  --data-binary @hot-fire-01.csv \
+  "https://data.erpl.space/api/ingest/csv/2026-09-21/hot-fire-01.csv"
+```
+
+Publish a live telemetry sample:
+
+```bash
+curl --fail-with-body \
+  -X POST \
+  -H "Authorization: Bearer $ERPL_INGEST_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"timestamp":"2026-09-21T01:02:03Z","values":{"pressure (psi)":725.4,"valve_open":true},"event":"ignition"}' \
+  "https://data.erpl.space/api/ingest/streams/test-stand"
+```
+
+Samples are appended as NDJSON under `testdata/.live/<stream>/<UTC-day>.ndjson`
+on the persistent disk. Signed-in dashboards can discover streams at
+`GET /api/online/streams` and subscribe to
+`GET /api/online/streams/<stream>/events`. The latter is a Server-Sent Events
+feed with `ready` and `sample` events, a 15-second keepalive, and a one-hour
+maximum connection lifetime. SSE works over ordinary HTTPS through Render and
+Cloudflare and automatically reconnects in browsers. The live archive is hidden
+from the CSV catalog and is never served as a static path.
+
+The ingest API accepts at most 256 channels per sample. Values may be finite
+numbers, booleans, null, or strings up to 512 characters. Rotate the ingest token
+immediately if it is exposed. For higher write volume, multiple server instances,
+or guaranteed delivery across outages, move the live stream to a dedicated
+message broker/time-series database; the current disk-backed design intentionally
+runs as one Render instance.
 
 ## Render deployment
 
@@ -96,16 +145,17 @@ Blueprint does not convert the old manually created static site. The main
    - Set `ERPL_DATA_PASSWORD` to your chosen shared password.
    - Set `ERPL_SESSION_SECRET` to a random secret of at least 32 characters
      (the Blueprint generates it).
+   - Set `ERPL_INGEST_TOKEN` to a different random secret of at least 32
+     characters (the Blueprint generates it).
    - Attach a persistent disk at
      `/opt/render/project/src/subdomains/data/testdata`.
    - Set `TRUST_PROXY_HOPS=1` for a single trusted proxy in front of the server.
      Verify the actual proxy path before launch; do not trust arbitrary forwarded
      headers or expose the process directly while proxy trust is enabled.
-2. Upload day folders and CSVs to that disk through the host's SSH/SCP access.
-   For example, from your machine, replace the SSH destination with the one in
-   Render's Connect menu:
-   `scp -r ./2026-09-19 USER@SSH_HOST:/opt/render/project/src/subdomains/data/testdata/`
-   Uploads go directly to server storage, not through a public upload endpoint.
+2. Upload CSVs from the authenticated online-data dialog or the token-protected
+   machine endpoint above. For bulk migration, SSH/SCP remains available through
+   the service's Render Connect menu; copy day folders under
+   `/opt/render/project/src/subdomains/data/testdata/`.
 3. Test the replacement's `onrender.com` URL: wrong password, fifth-attempt
    lockout, correct password after five minutes, day selection, and CSV plotting.
    Confirm requests from different networks get separate attempt budgets and that

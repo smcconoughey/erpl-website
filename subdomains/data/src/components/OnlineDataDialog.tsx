@@ -24,6 +24,7 @@ export function OnlineDataDialog({ onClose, onLoad }: {
   const loadedIds = new Set(files.map((file) => file.id))
   const dialogRef = useRef<HTMLDialogElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
+  const uploadRef = useRef<HTMLInputElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const [password, setPassword] = useState('')
   const [days, setDays] = useState<TestDay[] | null>(null)
@@ -35,6 +36,7 @@ export function OnlineDataDialog({ onClose, onLoad }: {
   const [attempts, setAttempts] = useState(5)
   const [lockedUntil, setLockedUntil] = useState(0)
   const [now, setNow] = useState(Date.now())
+  const [uploadDay, setUploadDay] = useState(() => new Date().toISOString().slice(0, 10))
   const controllerRef = useRef<AbortController | null>(null)
   const remaining = Math.max(0, Math.ceil((lockedUntil - now) / 1000))
   const newCount = [...selected].filter((id) => !loadedIds.has(id)).length
@@ -164,6 +166,32 @@ export function OnlineDataDialog({ onClose, onLoad }: {
     }
   }
 
+  async function uploadCsvs() {
+    const files = [...(uploadRef.current?.files || [])]
+    if (busy || !uploadDay || !files.length) return
+    const controller = new AbortController()
+    controllerRef.current = controller
+    setBusy(true)
+    setError('')
+    try {
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index]
+        setMessage(`Uploading ${index + 1}/${files.length} · ${file.name}`)
+        const query = new URLSearchParams({ day: uploadDay, name: file.name })
+        await request(`upload?${query}`, {
+          method: 'PUT', headers: { 'Content-Type': 'text/csv' }, body: file, signal: controller.signal,
+        })
+      }
+      if (uploadRef.current) uploadRef.current.value = ''
+      await openCatalog(controller.signal)
+      setMessage(`${files.length} ${files.length === 1 ? 'CSV' : 'CSVs'} uploaded.`)
+    } catch (caught) {
+      if (!controller.signal.aborted) showError(caught)
+    } finally {
+      if (!controller.signal.aborted) setBusy(false)
+    }
+  }
+
   return (
     <dialog ref={dialogRef} className="online-dialog" aria-labelledby="online-title"
       onCancel={(event) => { event.preventDefault(); onClose() }} onKeyDown={(event) => event.stopPropagation()}>
@@ -223,6 +251,19 @@ export function OnlineDataDialog({ onClose, onLoad }: {
               })}
             </div>
           )}
+          <fieldset className="online-upload" disabled={busy}>
+            <legend>Upload test data</legend>
+            <p className="hint">CSV files are stored on the private server disk and appear in the catalog immediately.</p>
+            <div className="online-upload-fields">
+              <label>Testing day
+                <input type="date" value={uploadDay} onChange={(event) => setUploadDay(event.target.value)} />
+              </label>
+              <label>CSV files
+                <input ref={uploadRef} type="file" accept=".csv,text/csv" multiple />
+              </label>
+              <button type="button" className="btn" onClick={() => void uploadCsvs()}>Upload</button>
+            </div>
+          </fieldset>
           {error && <p className="online-error" role="alert">{error}</p>}
           <div className="online-actions">
             <span className="hint">{selected.size} selected · {newCount} new</span>

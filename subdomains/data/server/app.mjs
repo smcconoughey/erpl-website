@@ -4,6 +4,7 @@ import { lstat, readdir, realpath } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createAuth } from './auth.mjs'
+import { createIngest, MAX_CSV_BYTES } from './ingest.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const safeName = (name) => typeof name === 'string' && name.length > 0 &&
@@ -27,6 +28,8 @@ export function createApp(options = {}) {
   if (!Number.isInteger(proxyHops) || proxyHops < 0) throw new Error('TRUST_PROXY_HOPS must be a nonnegative integer.')
   const auth = createAuth({ password, secret, secureCookies: production, now: options.now,
     stateFile: options.stateFile ?? join(dataDir, '.auth', 'attempts.json') })
+  const ingest = createIngest({ dataDir, token: options.ingestToken ?? process.env.ERPL_INGEST_TOKEN,
+    now: options.now, heartbeatMs: options.heartbeatMs })
   const app = express()
   app.disable('x-powered-by')
   app.set('trust proxy', proxyHops)
@@ -49,7 +52,18 @@ export function createApp(options = {}) {
     if (!req.is('application/json')) return res.status(415).json({ error: 'Expected a JSON request.' })
     next()
   }, express.json({ limit: '8kb' }), auth.login)
+  const csvBody = express.raw({ type: ['text/csv', 'application/csv', 'application/vnd.ms-excel'], limit: MAX_CSV_BYTES })
+  const requireCsv = (req, res, next) => req.is(['text/csv', 'application/csv', 'application/vnd.ms-excel'])
+    ? next() : res.status(415).json({ error: 'Expected a CSV request body.' })
+  const requireJson = (req, res, next) => req.is('application/json')
+    ? next() : res.status(415).json({ error: 'Expected a JSON request.' })
+  app.put('/api/ingest/csv/:day/:name', ingest.requireToken, requireCsv, csvBody, ingest.machineUpload)
+  app.post('/api/ingest/streams/:stream', ingest.requireToken, requireJson,
+    express.json({ limit: '256kb' }), ingest.ingestSample)
   app.use('/api/online', auth.requireSession)
+  app.put('/api/online/upload', requireCsv, csvBody, ingest.browserUpload)
+  app.get('/api/online/streams', ingest.listStreams)
+  app.get('/api/online/streams/:stream/events', ingest.liveEvents)
 
   async function resolveDay(day) {
     if (!safeName(day)) return null
@@ -101,9 +115,9 @@ export function createApp(options = {}) {
   app.use((_req, res) => res.status(404).send('Not found'))
   app.use((error, _req, res, next) => {
     if (res.headersSent) return next(error)
-    const status = error.status === 400 || error.status === 413 ? error.status : 500
+    const status = [400, 401, 413, 415, 422].includes(error.status) ? error.status : 500
     if (status === 500) console.error('Online data request failed:', error.code || error.name)
-    res.status(status).json({ error: status === 500 ? 'Online data is temporarily unavailable. Please try again.' : 'Invalid request.' })
+    res.status(status).json({ error: status === 500 ? 'Online data is temporarily unavailable. Please try again.' : error.message })
   })
   return app
 }
