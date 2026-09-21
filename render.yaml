@@ -9,7 +9,9 @@ services:
     plan: starter
     branch: main
     autoDeployTrigger: commit
-    buildCommand: cd subdomains/data && npm ci && npm run build
+    # NODE_ENV=production is also present during builds, so explicitly retain
+    # Vite and TypeScript from devDependencies for the frontend compilation.
+    buildCommand: cd subdomains/data && npm ci --include=dev && npm run build
     startCommand: cd subdomains/data && npm start
     healthCheckPath: /healthz
     envVars:

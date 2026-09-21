@@ -90,7 +90,7 @@ Blueprint does not convert the old manually created static site. The main
 `erpl.space` service is separate.
 
 1. Provision the replacement web service with the Blueprint, or use these settings:
-   - Build: `cd subdomains/data && npm ci && npm run build`
+   - Build: `cd subdomains/data && npm ci --include=dev && npm run build`
    - Start: `cd subdomains/data && npm start`
    - Node: `22.12.0`; `NODE_ENV=production`
    - Set `ERPL_DATA_PASSWORD` to your chosen shared password.
