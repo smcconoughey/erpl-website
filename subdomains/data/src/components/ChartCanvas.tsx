@@ -6,6 +6,8 @@ import {
   nearestIndex,
   niceTicks,
   padRange,
+  integrateInterval,
+  perSecondQuantity,
   sampleAt,
   visibleBounds,
   windowRange,
@@ -392,8 +394,15 @@ export function ChartCanvas({
             const slope = dt === 0 ? NaN : (yb - ya) / dt
             const mx = (toX(ta) + toX(tb)) / 2
             const my = (axis.toY(ya) + axis.toY(yb)) / 2
+            const quantity = perSecondQuantity(s.unit)
             ctx.fillStyle = s.color
-            ctx.fillText(`${fmtNum(slope, 2)}${s.unit ? ` ${s.unit}/s` : '/s'}`, mx + 4, my - 4)
+            ctx.fillText(
+              quantity
+                ? `∫ ${fmtNum(integrateInterval(s.t, s.y, ta, tb, s.step), 2)} ${quantity}`
+                : `${fmtNum(slope, 2)}${s.unit ? ` ${s.unit}/s` : '/s'}`,
+              mx + 4,
+              my - 4,
+            )
             ctx.globalAlpha = 1
           }
         }

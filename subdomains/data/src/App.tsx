@@ -194,7 +194,7 @@ function EmptyState({
             <b>Zoom</b> drag a time window · double-click fits
           </li>
           <li>
-            <b>Measure</b> click multiple points · inspector shows slope / ΔY / ΔX
+            <b>Measure</b> click multiple points · inspector shows slope / ΔY / ΔX · ∫ for */s
           </li>
           <li>
             <b>Axes</b> series sharing a unit share an axis · ⧉ splits onto its own scale
