@@ -148,7 +148,10 @@ function venturiFlow(file: TelemetryFile, config: VenturiConfig, label: string, 
   }
   for (let i = 0; i < file.rowCount; i++) {
     const deltaP = pressurePa(inlet.values[i], inlet.unit) - pressurePa(throat.values[i], throat.unit)
-    if (Number.isFinite(deltaP) && deltaP >= 0) values[i] = cda * Math.sqrt(2 * density * deltaP)
+    if (!Number.isFinite(deltaP)) continue
+    // Reverse ΔP is no forward flow. Keep the sample at 0 so a wider firing window
+    // still spans the selected bounds instead of dropping those points.
+    values[i] = cda * Math.sqrt(2 * density * Math.max(0, deltaP))
   }
   return values
 }
