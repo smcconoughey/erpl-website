@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { fmtNum, fmtTime, sampleAt } from '../lib/math'
+import { fmtNum, fmtTime, integrateInterval, perSecondQuantity, sampleAt } from '../lib/math'
 import { useTelemetry } from '../store'
 import { DataConfig } from './DataConfig'
 import { EngineAnalysis } from './EngineAnalysis'
@@ -47,7 +47,17 @@ export function Inspector() {
       a: number
       b: number
       dt: number
-      rows: { name: string; unit: string; color: string; y0: number; y1: number; dy: number; slope: number }[]
+      rows: {
+        name: string
+        unit: string
+        color: string
+        y0: number
+        y1: number
+        dy: number
+        slope: number
+        integral: number | null
+        integralUnit: string | null
+      }[]
     }[] = []
     for (let i = 0; i < cursors.length - 1; i++) {
       const a = cursors[i]
@@ -63,6 +73,7 @@ export function Inspector() {
           const y0 = sampleAt(s.t, s.y, a, s.step)
           const y1 = sampleAt(s.t, s.y, b, s.step)
           const dy = y1 - y0
+          const integralUnit = perSecondQuantity(s.unit)
           return {
             name: s.name,
             unit: s.unit,
@@ -71,6 +82,8 @@ export function Inspector() {
             y1,
             dy,
             slope: dt === 0 ? NaN : dy / dt,
+            integral: integralUnit ? integrateInterval(s.t, s.y, a, b, s.step) : null,
+            integralUnit,
           }
         }),
       })
@@ -78,14 +91,21 @@ export function Inspector() {
     return segs
   }, [cursors, series])
 
-  const overall =
-    cursors.length >= 3
-      ? {
-          a: cursors[0],
-          b: cursors[cursors.length - 1],
-          dt: cursors[cursors.length - 1] - cursors[0],
-        }
-      : null
+  const overall = useMemo(() => {
+    if (cursors.length < 3) return null
+    const a = cursors[0]
+    const b = cursors[cursors.length - 1]
+    return {
+      a,
+      b,
+      dt: b - a,
+      integrals: series.flatMap((s) => {
+        const integralUnit = perSecondQuantity(s.unit)
+        if (!integralUnit) return []
+        return [{ name: s.name, color: s.color, integralUnit, integral: integrateInterval(s.t, s.y, a, b, s.step) }]
+      }),
+    }
+  }, [cursors, series])
 
   return (
     <aside className="inspector">
@@ -107,7 +127,8 @@ export function Inspector() {
         </div>
         <p className="hint">
           Select Measure, then click the plot to drop cursors. Drag to move, right-click to remove.
-          Each segment reports ΔX, ΔY, and slope for every visible axis.
+          Each segment reports ΔX, ΔY, and slope for every visible channel. Channels in
+          units of something/s also report the integral between the cursors.
         </p>
         {cursors.length === 0 ? (
           <div className="empty-lite">No cursors</div>
@@ -156,6 +177,14 @@ export function Inspector() {
                     {fmtNum(row.slope, 3)} {row.unit ? `${row.unit}/s` : '/s'}
                   </b>
                 </div>
+                {row.integralUnit ? (
+                  <div className="kv">
+                    <span>∫</span>
+                    <b>
+                      {fmtNum(row.integral ?? NaN, 3)} {row.integralUnit}
+                    </b>
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
@@ -170,6 +199,14 @@ export function Inspector() {
               <span>ΔX</span>
               <b>{fmtNum(overall.dt, 4)} s</b>
             </div>
+            {overall.integrals.map((row) => (
+              <div key={row.name} className="kv">
+                <span style={{ color: row.color }}>∫ {row.name}</span>
+                <b>
+                  {fmtNum(row.integral, 3)} {row.integralUnit}
+                </b>
+              </div>
+            ))}
           </div>
         ) : null}
       </section>

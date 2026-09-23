@@ -17,6 +17,54 @@ export function nearestIndex(t: Float64Array, x: number): number {
   return x - t[i - 1] <= t[i] - x ? i - 1 : i
 }
 
+/** Quantity in a `something/s` unit, or null when the channel is not a per-second rate. */
+export function perSecondQuantity(unit: string): string | null {
+  const match = unit.trim().match(/^(.+?)\s*\/\s*s$/i)
+  const quantity = match?.[1].trim() ?? ''
+  return quantity ? quantity : null
+}
+
+/** Integrate y over [t0, t1] in seconds. Step series hold the left sample; others use trapezoids. Gaps stay out of the area. */
+export function integrateInterval(
+  t: Float64Array,
+  y: Float64Array,
+  t0: number,
+  t1: number,
+  step: boolean,
+): number {
+  const n = t.length
+  if (n < 2 || !(t1 > t0)) return NaN
+  const start = Math.max(t0, t[0])
+  const end = Math.min(t1, t[n - 1])
+  if (!(end > start)) return NaN
+
+  let area = 0
+  let any = false
+  let i = lowerBound(t, start)
+  if (i > 0) i -= 1
+  for (; i < n - 1 && t[i] < end; i++) {
+    const leftT = t[i]
+    const rightT = t[i + 1]
+    const segStart = Math.max(leftT, start)
+    const segEnd = Math.min(rightT, end)
+    if (!(segEnd > segStart)) continue
+    const yLeft = y[i]
+    const yRight = y[i + 1]
+    if (step) {
+      if (!Number.isFinite(yLeft)) continue
+      area += yLeft * (segEnd - segStart)
+      any = true
+      continue
+    }
+    if (!Number.isFinite(yLeft) || !Number.isFinite(yRight)) continue
+    const span = rightT - leftT
+    const at = (time: number) => (span === 0 ? yLeft : yLeft + ((time - leftT) / span) * (yRight - yLeft))
+    area += ((at(segStart) + at(segEnd)) / 2) * (segEnd - segStart)
+    any = true
+  }
+  return any ? area : NaN
+}
+
 export function sampleAt(
   t: Float64Array,
   y: Float64Array,
