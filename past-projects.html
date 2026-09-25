@@ -13,6 +13,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/logo/favicon.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theme-toggle.css">
+    <link rel="stylesheet" href="tension-demo.css" id="tensionStylesheet" media="not all">
+    <script src="theme.js"></script>
 </head>
 
 <body class="archive-page">
@@ -21,7 +24,10 @@
             <a href="index.html" class="logo">
                 <img src="assets/logo/ERPL Logo Vectorized_flame (1).png" alt="ERPL" class="logo-img">
             </a>
-            <a href="index.html#projects-full" class="archive-back">Current program</a>
+            <div class="archive-actions">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" aria-pressed="false" title="Switch to light mode">◐ <span>LIGHT</span></button>
+                <a href="index.html#projects-full" class="archive-back">Current program</a>
+            </div>
         </div>
     </header>
 
