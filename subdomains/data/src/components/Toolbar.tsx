@@ -39,6 +39,7 @@ export function Toolbar({ onOpenFolder, onOpenFiles, onOpenOnline, onOpenLive, o
         <button type="button" className="btn accent" disabled={Boolean(loading)} onClick={onOpenOnline}>
           Open Online ERPL Data
         </button>
+        <a className="btn" href="/library">Library</a>
         <span className="live-toolbar">
           <button type="button" className={`btn live-btn${live ? ' on' : ''}`} onClick={onOpenLive}>
             <span className="live-dot" /> Live

@@ -222,6 +222,73 @@ test('authenticated browser uploads are persisted and immediately appear in the 
   })).status, 404)
 })
 
+test('team library securely uploads, catalogs, previews, and annotates nested documents', async (t) => {
+  const { base, login } = await fixture(t)
+  assert.equal((await fetch(`${base}/api/library/catalog`)).status, 401)
+  assert.equal((await fetch(`${base}/api/library/document?path=Topics%2Fengine.md`, {
+    method: 'PUT', headers: { 'Content-Type': 'text/markdown' }, body: '# Engine',
+  })).status, 401)
+
+  const loggedIn = await login()
+  assert.match(loggedIn.headers.get('set-cookie'), /Path=\/api(?:;|$)/)
+  const cookie = cookieOf(loggedIn)
+  const headers = { Cookie: cookie }
+  const upload = await fetch(`${base}/api/library/document?${new URLSearchParams({
+    path: 'Topics/Propulsion/Engine.md', category: 'Propulsion', notes: 'Reviewed by the test team',
+  })}`, { method: 'PUT', headers: { ...headers, 'Content-Type': 'text/markdown' }, body: '# Engine\n\n[[Injector]]' })
+  assert.equal(upload.status, 201)
+  assert.deepEqual((await upload.json()).document, { path: 'Topics/Propulsion/Engine.md', name: 'Engine.md', bytes: 22 })
+
+  let catalog = await (await fetch(`${base}/api/library/catalog`, { headers })).json()
+  assert.equal(catalog.documents.length, 1)
+  assert.deepEqual({
+    path: catalog.documents[0].path, title: catalog.documents[0].title, folder: catalog.documents[0].folder,
+    category: catalog.documents[0].category, notes: catalog.documents[0].notes, kind: catalog.documents[0].kind,
+  }, {
+    path: 'Topics/Propulsion/Engine.md', title: 'Engine', folder: 'Topics/Propulsion',
+    category: 'Propulsion', notes: 'Reviewed by the test team', kind: 'markdown',
+  })
+  const file = await fetch(`${base}/api/library/file?path=Topics%2FPropulsion%2FEngine.md`, { headers })
+  assert.equal(file.status, 200)
+  assert.match(file.headers.get('content-type'), /^text\/markdown/)
+  assert.equal(await file.text(), '# Engine\n\n[[Injector]]')
+
+  const updated = await fetch(`${base}/api/library/document`, {
+    method: 'PATCH', headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: 'Topics/Propulsion/Engine.md', title: 'Engine systems', category: 'Systems', notes: 'Approved' }),
+  })
+  assert.equal(updated.status, 200)
+  catalog = await (await fetch(`${base}/api/library/catalog`, { headers })).json()
+  assert.equal(catalog.documents[0].title, 'Engine systems')
+  assert.equal(catalog.documents[0].category, 'Systems')
+  assert.equal(catalog.documents[0].notes, 'Approved')
+})
+
+test('library rejects hidden paths, traversal, empty files, oversized metadata, and symlinks', async (t) => {
+  const { base, login, dataDir, directory } = await fixture(t)
+  const headers = { Cookie: cookieOf(await login()), 'Content-Type': 'text/plain' }
+  for (const path of ['../secret.txt', '.obsidian/config.json', 'Topics/.hidden', 'Topics\\secret.txt', '/../../secret.txt']) {
+    assert.equal((await fetch(`${base}/api/library/document?${new URLSearchParams({ path })}`, {
+      method: 'PUT', headers, body: 'private',
+    })).status, 400)
+  }
+  assert.equal((await fetch(`${base}/api/library/document?path=empty.txt`, {
+    method: 'PUT', headers, body: '',
+  })).status, 400)
+  await mkdir(join(dataDir, '.library', 'files'), { recursive: true })
+  await writeFile(join(directory, 'outside.txt'), 'outside')
+  await symlink(join(directory, 'outside.txt'), join(dataDir, '.library', 'files', 'linked.txt'))
+  assert.equal((await fetch(`${base}/api/library/file?path=linked.txt`, { headers })).status, 404)
+  assert.ok(!JSON.stringify(await (await fetch(`${base}/api/library/catalog`, { headers })).json()).includes('linked.txt'))
+})
+
+test('the library SPA route falls back to the built frontend without exposing stored documents', async (t) => {
+  const { base } = await fixture(t)
+  assert.match(await (await fetch(`${base}/library`)).text(), /Datanator/)
+  assert.match(await (await fetch(`${base}/library/Topics`)).text(), /Datanator/)
+  assert.equal((await fetch(`${base}/.library/files/secret.pdf`)).status, 404)
+})
+
 test('machine token accepts CSV uploads and publishes persisted telemetry over SSE', async (t) => {
   const { base, login, dataDir } = await fixture(t)
   const machineHeaders = { Authorization: `Bearer ${ingestToken}` }

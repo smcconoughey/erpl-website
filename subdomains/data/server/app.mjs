@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { createAuth } from './auth.mjs'
 import { createCeaSolver, validateCeaRequest } from './cea.mjs'
 import { createIngest, MAX_CSV_BYTES } from './ingest.mjs'
+import { createLibrary, MAX_LIBRARY_BYTES } from './library.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const safeName = (name) => typeof name === 'string' && name.length > 0 &&
@@ -36,6 +37,7 @@ export function createApp(options = {}) {
     stateFile: options.stateFile ?? join(dataDir, '.auth', 'attempts.json') })
   const ingest = createIngest({ dataDir, token: options.ingestToken ?? process.env.ERPL_INGEST_TOKEN,
     now: options.now, heartbeatMs: options.heartbeatMs })
+  const library = createLibrary({ dataDir, now: options.now })
   const solveCea = options.solveCea ?? createCeaSolver({ root,
     pythonPath: options.pythonPath, runnerPath: options.ceaRunnerPath })
   let ceaHealth
@@ -65,7 +67,12 @@ export function createApp(options = {}) {
     next()
   })
   app.get('/api/online/status', auth.status)
+  app.get('/api/library/status', auth.status)
   app.post('/api/online/login', (req, res, next) => {
+    if (!req.is('application/json')) return res.status(415).json({ error: 'Expected a JSON request.' })
+    next()
+  }, express.json({ limit: '8kb' }), auth.login)
+  app.post('/api/library/login', (req, res, next) => {
     if (!req.is('application/json')) return res.status(415).json({ error: 'Expected a JSON request.' })
     next()
   }, express.json({ limit: '8kb' }), auth.login)
@@ -87,6 +94,11 @@ export function createApp(options = {}) {
     const input = validateCeaRequest(req.body)
     res.json({ result: await solveCea(input) })
   })
+  app.use('/api/library', auth.requireSession)
+  app.get('/api/library/catalog', library.catalog)
+  app.get('/api/library/file', library.file)
+  app.put('/api/library/document', express.raw({ type: '*/*', limit: MAX_LIBRARY_BYTES }), library.upload)
+  app.patch('/api/library/document', requireJson, express.json({ limit: '8kb' }), library.update)
 
   async function resolveDay(day) {
     if (!safeName(day)) return null
@@ -135,6 +147,7 @@ export function createApp(options = {}) {
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found.' }))
   // Never serve the repository, testdata directory, or server source as static files.
   app.use(express.static(distDir, { dotfiles: 'deny', index: 'index.html' }))
+  app.get(['/library', '/library/*splat'], (_req, res) => res.sendFile(join(distDir, 'index.html')))
   app.use((_req, res) => res.status(404).send('Not found'))
   app.use((error, _req, res, next) => {
     if (res.headersSent) return next(error)

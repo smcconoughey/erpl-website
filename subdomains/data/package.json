@@ -12,13 +12,16 @@
     "prebuild": "node server/install-cea.mjs",
     "build": "tsc && vite build",
     "start": "node --env-file-if-exists=.env server/index.mjs",
+    "upload:library": "node --env-file-if-exists=.env server/upload-library.mjs",
     "test": "node --test server/*.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "express": "^5.2.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

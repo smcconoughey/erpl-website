@@ -10,8 +10,10 @@ import { sourcesFromDataTransfer, sourcesFromFileList } from './lib/files'
 import { uid } from './lib/math'
 import { useLiveTelemetry } from './live'
 import { TelemetryProvider, useLoadFiles, useTelemetry } from './store'
+import { LibraryApp } from './LibraryApp'
 
 export function App() {
+  if (window.location.pathname.startsWith('/library')) return <LibraryApp />
   return (
     <TelemetryProvider>
       <Shell />

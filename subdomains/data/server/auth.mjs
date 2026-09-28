@@ -14,7 +14,8 @@ export function createAuth({ password, secret, stateFile, secureCookies, now = D
   const sessionKey = createHmac('sha256', secret).update(passwordHash).digest()
   const sign = (value) => createHmac('sha256', sessionKey).update(value).digest('base64url')
   const attempts = new Map(existsSync(stateFile) ? JSON.parse(readFileSync(stateFile, 'utf8')) : [])
-  const cookieOptions = { httpOnly: true, secure: secureCookies, sameSite: 'strict', path: '/api/online' }
+  // The same team session unlocks telemetry and the document library.
+  const cookieOptions = { httpOnly: true, secure: secureCookies, sameSite: 'strict', path: '/api' }
 
   function save() {
     for (const [key, entry] of attempts) {

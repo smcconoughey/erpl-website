@@ -6,6 +6,35 @@ zoom views, and measure slopes between cursors.
 
 This app is published at `https://data.erpl.space/`.
 
+## Engineering Brain
+
+`https://data.erpl.space/library` is the team's protected document vault. It
+uses the same one-hour shared-password session as online telemetry. Members can
+browse a nested folder tree, search document metadata, filter by category,
+preview Markdown, text, PDF, images, audio, and video, follow Obsidian-style
+`[[wiki links]]`, download originals, and add shared notes or categories.
+
+The **Add to library** ingestion dialog accepts individual files or complete
+folders while preserving relative paths. Files are limited to 100 MB each and
+are written atomically. The browser upload route is available only to signed-in
+members; no public write endpoint or cross-origin access is enabled.
+
+Library originals and metadata live under `testdata/.library/` on the persistent
+disk and are not served by Express's static middleware. To sync an existing vault
+from a trusted machine, set the source path, production URL, and shared password:
+
+```bash
+LIBRARY_SOURCE="/path/to/Engineering Brain" \
+ERPL_LIBRARY_URL="https://data.erpl.space" \
+ERPL_DATA_PASSWORD="..." \
+npm run upload:library
+```
+
+The bulk sync intentionally ignores `.venv`, `.retrieval`, `.obsidian`, `.git`,
+`node_modules`, and `.DS_Store`; those are local runtime/configuration artifacts,
+not team documents. Existing files with the same path and byte size are skipped,
+so the command can safely resume after an interrupted upload.
+
 ## Local development
 
 ```bash
@@ -240,8 +269,9 @@ npm run build
 
 The server integration tests cover unauthenticated access, lockout timing and
 restart persistence, session expiry/tampering, proxy header spoofing, traversal,
-symlinks, production configuration, and successful CSV downloads. Test data is
-generated in temporary directories and removed when each test finishes.
+symlinks, production configuration, successful CSV downloads, and protected
+library upload/catalog/preview/annotation behavior. Test data is generated in
+temporary directories and removed when each test finishes.
 
 ## Plotting
 
