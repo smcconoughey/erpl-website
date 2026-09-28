@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { createHash, timingSafeEqual } from 'node:crypto'
 import { createReadStream } from 'node:fs'
 import { lstat, mkdir, readFile, readdir, realpath, rename, writeFile } from 'node:fs/promises'
 import { basename, dirname, extname, isAbsolute, join, posix, relative, resolve, sep } from 'node:path'
@@ -48,11 +48,21 @@ function contentType(path, saved = '') {
   return types[extname(path).toLowerCase()] || 'application/octet-stream'
 }
 
-export function createLibrary({ dataDir, now = Date.now }) {
+export function createLibrary({ dataDir, token, now = Date.now }) {
   const root = resolve(dataDir, '.library')
   const filesRoot = join(root, 'files')
   const indexFile = join(root, 'index.json')
   let mutation = Promise.resolve()
+  const tokenHash = token ? createHash('sha256').update(token).digest() : null
+
+  function requireToken(req, res, next) {
+    if (!tokenHash) return res.status(503).json({ error: 'Library machine sync has not been configured.' })
+    const authorization = req.headers.authorization || ''
+    const presented = authorization.startsWith('Bearer ') ? authorization.slice(7) : ''
+    const presentedHash = createHash('sha256').update(presented).digest()
+    if (!presented || !timingSafeEqual(presentedHash, tokenHash)) return res.status(401).json({ error: 'Invalid library sync token.' })
+    next()
+  }
 
   async function readIndex() {
     try {
@@ -184,5 +194,5 @@ export function createLibrary({ dataDir, now = Date.now }) {
     stream.pipe(res)
   }
 
-  return { catalog, upload, update, file }
+  return { requireToken, catalog, upload, update, file }
 }

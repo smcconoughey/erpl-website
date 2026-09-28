@@ -25,6 +25,8 @@ services:
         generateValue: true
       - key: ERPL_INGEST_TOKEN
         generateValue: true
+      - key: ERPL_LIBRARY_SYNC_TOKEN
+        generateValue: true
       # Trust only the nearest hosting proxy; verify this for your deployment.
       - key: TRUST_PROXY_HOPS
         value: "1"

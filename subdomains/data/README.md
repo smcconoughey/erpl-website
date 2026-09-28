@@ -26,7 +26,7 @@ from a trusted machine, set the source path, production URL, and shared password
 ```bash
 LIBRARY_SOURCE="/path/to/Engineering Brain" \
 ERPL_LIBRARY_URL="https://data.erpl.space" \
-ERPL_DATA_PASSWORD="..." \
+ERPL_LIBRARY_SYNC_TOKEN="..." \
 npm run upload:library
 ```
 
@@ -34,6 +34,10 @@ The bulk sync intentionally ignores `.venv`, `.retrieval`, `.obsidian`, `.git`,
 `node_modules`, and `.DS_Store`; those are local runtime/configuration artifacts,
 not team documents. Existing files with the same path and byte size are skipped,
 so the command can safely resume after an interrupted upload.
+
+The optional `ERPL_LIBRARY_SYNC_TOKEN` is a distinct machine credential accepted
+only by `PUT /api/ingest/library`; it does not unlock browsing, telemetry, or
+other library actions. Interactive sync can use `ERPL_DATA_PASSWORD` instead.
 
 ## Local development
 

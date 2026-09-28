@@ -10,6 +10,7 @@ import { LOCKOUT_MS } from './auth.mjs'
 const password = 'test-only-shared-password'
 const secret = 'test-only-session-secret-at-least-32-characters'
 const ingestToken = 'test-only-machine-ingest-token-at-least-32-characters'
+const librarySyncToken = 'test-only-library-sync-token-at-least-32-characters'
 const csv = 'elapsed_s,pressure (psi)\n0,10\n1,20\n2,15\n3,12\n'
 
 async function fixture(t, options = {}) {
@@ -24,7 +25,7 @@ async function fixture(t, options = {}) {
   await writeFile(join(dataDir, day, '.hidden.csv'), 'hidden')
   await writeFile(join(distDir, 'index.html'), '<h1>Datanator</h1>')
   let time = Date.now()
-  const settings = { dataDir, distDir, password, secret, ingestToken, now: () => time, ...options }
+  const settings = { dataDir, distDir, password, secret, ingestToken, librarySyncToken, now: () => time, ...options }
   const servers = []
   const start = async () => {
     const server = createApp(settings).listen(0, '127.0.0.1')
@@ -280,6 +281,25 @@ test('library rejects hidden paths, traversal, empty files, oversized metadata, 
   await symlink(join(directory, 'outside.txt'), join(dataDir, '.library', 'files', 'linked.txt'))
   assert.equal((await fetch(`${base}/api/library/file?path=linked.txt`, { headers })).status, 404)
   assert.ok(!JSON.stringify(await (await fetch(`${base}/api/library/catalog`, { headers })).json()).includes('linked.txt'))
+})
+
+test('machine library sync uses a dedicated bearer token without a browser session', async (t) => {
+  const { base } = await fixture(t)
+  const url = `${base}/api/ingest/library?${new URLSearchParams({ path: 'Sources/guide.txt', category: 'Sources' })}`
+  assert.equal((await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'text/plain' }, body: 'guide' })).status, 401)
+  assert.equal((await fetch(url, {
+    method: 'PUT', headers: { 'Content-Type': 'text/plain', Authorization: 'Bearer wrong' }, body: 'guide',
+  })).status, 401)
+  const uploaded = await fetch(url, {
+    method: 'PUT', headers: { 'Content-Type': 'text/plain', Authorization: `Bearer ${librarySyncToken}` }, body: 'guide',
+  })
+  assert.equal(uploaded.status, 201)
+  const catalog = await fetch(`${base}/api/ingest/library/catalog`, {
+    headers: { Authorization: `Bearer ${librarySyncToken}` },
+  })
+  assert.equal(catalog.status, 200)
+  assert.equal((await catalog.json()).documents[0].path, 'Sources/guide.txt')
+  assert.equal((await fetch(`${base}/api/library/catalog`)).status, 401)
 })
 
 test('the library SPA route falls back to the built frontend without exposing stored documents', async (t) => {

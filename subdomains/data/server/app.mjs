@@ -37,7 +37,8 @@ export function createApp(options = {}) {
     stateFile: options.stateFile ?? join(dataDir, '.auth', 'attempts.json') })
   const ingest = createIngest({ dataDir, token: options.ingestToken ?? process.env.ERPL_INGEST_TOKEN,
     now: options.now, heartbeatMs: options.heartbeatMs })
-  const library = createLibrary({ dataDir, now: options.now })
+  const library = createLibrary({ dataDir, now: options.now,
+    token: options.librarySyncToken ?? process.env.ERPL_LIBRARY_SYNC_TOKEN })
   const solveCea = options.solveCea ?? createCeaSolver({ root,
     pythonPath: options.pythonPath, runnerPath: options.ceaRunnerPath })
   let ceaHealth
@@ -84,6 +85,9 @@ export function createApp(options = {}) {
   app.put('/api/ingest/csv/:day/:name', ingest.requireToken, requireCsv, csvBody, ingest.machineUpload)
   app.post('/api/ingest/streams/:stream', ingest.requireToken, requireJson,
     express.json({ limit: '256kb' }), ingest.ingestSample)
+  app.get('/api/ingest/library/catalog', library.requireToken, library.catalog)
+  app.put('/api/ingest/library', library.requireToken,
+    express.raw({ type: '*/*', limit: MAX_LIBRARY_BYTES }), library.upload)
   app.use('/api/online', auth.requireSession)
   app.put('/api/online/upload', requireCsv, csvBody, ingest.browserUpload)
   app.patch('/api/online/file', requireJson, express.json({ limit: '8kb' }), ingest.renameCsv)
