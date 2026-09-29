@@ -831,6 +831,17 @@ a.btn {
 .library-upload-modal > label { margin-top: 14px; }
 .library-upload-pickers { display: flex; align-items: center; gap: 8px; padding: 15px; border: 1px dashed #34465a; background: #0b1017; }
 .library-upload-pickers span { margin-left: auto; color: var(--muted); font-size: 11px; }
+.library-upload-topics { display: grid; gap: 10px; margin-top: 15px; padding: 13px; border: 1px solid #2b3c4d; background: #0b1017; }
+.library-upload-topics > div:first-child { display: grid; gap: 4px; }
+.library-upload-topics strong { color: #dce7f2; font-size: 12px; }
+.library-upload-topics span, .library-upload-topics small { color: #8e9ba9; font-size: 11px; }
+.library-upload-topic-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 10px; max-height: 175px; overflow: auto; }
+.library-upload-topic-list label { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 5px; color: #c7d3df; cursor: pointer; }
+.library-upload-topic-list label:hover { background: #172435; }
+.library-upload-topic-list input { width: auto; margin: 0; accent-color: #55aaff; }
+.library-upload-new-category { display: flex; gap: 8px; }
+.library-upload-new-category input { min-width: 0; flex: 1; }
+.library-upload-new-category button { white-space: nowrap; }
 .library-upload-progress { margin-top: 14px; color: #7dbaf5; font-size: 11px; }
 
 @media (max-width: 1050px) {
@@ -856,6 +867,8 @@ a.btn {
   .library-document-side { display: none; }
   .library-upload-pickers { align-items: stretch; flex-wrap: wrap; }
   .library-upload-pickers span { width: 100%; margin: 4px 0 0; }
+  .library-upload-topic-list { grid-template-columns: 1fr; }
+  .library-upload-new-category { flex-wrap: wrap; }
   .graph-status { display: none; }
   .graph-mobile-hint { display: block; position: absolute; bottom: 39px; left: 15px; z-index: 3; color: #858f9a; font-size: 10px; }
   .graph-legend { max-width: calc(100% - 25px); flex-wrap: wrap; }

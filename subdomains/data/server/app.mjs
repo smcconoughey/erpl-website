@@ -136,6 +136,7 @@ export function createApp(options = {}) {
   app.get('/api/library/catalog', library.catalog)
   app.get('/api/library/search', library.search)
   app.get('/api/library/file', library.file)
+  app.post('/api/library/topic', requireJson, express.json({ limit: '8kb' }), library.createTopic)
   app.put('/api/library/document', express.raw({ type: '*/*', limit: MAX_LIBRARY_BYTES }), library.upload)
   app.patch('/api/library/document', requireJson, express.json({ limit: '8kb' }), library.update)
 

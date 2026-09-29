@@ -192,7 +192,7 @@ export function LibraryApp() {
         <main className="library-reader"><DocumentReader document={selected} documents={documents} page={selectedPage}
           onNavigate={(path) => openDocument(path)} onUpdated={() => void load().catch((caught) => setError(caught.message))} /></main>
       </div> : null}
-      {uploadOpen ? <UploadDialog onClose={() => setUploadOpen(false)} onUploaded={async () => { await load(); setUploadOpen(false) }} /> : null}
+      {uploadOpen ? <UploadDialog topics={graph.topics} categories={[...new Set(documents.map((document) => document.category))].sort()} onClose={() => setUploadOpen(false)} onCreated={load} onUploaded={async () => { await load(); setUploadOpen(false) }} /> : null}
     </div>
   )
 }
@@ -295,9 +295,13 @@ function DocumentReader({ document, documents, page, onNavigate, onUpdated }: {
   </>
 }
 
-function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded: () => void }) {
+function UploadDialog({ topics, categories, onClose, onCreated, onUploaded }: {
+  topics: LibraryDocument[]; categories: string[]; onClose: () => void; onCreated: () => Promise<void>; onUploaded: () => void
+}) {
   const [files, setFiles] = useState<File[]>([])
   const [category, setCategory] = useState('Inbox')
+  const [newCategory, setNewCategory] = useState('')
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([])
   const [notes, setNotes] = useState('')
   const [busy, setBusy] = useState(false)
   const [progress, setProgress] = useState('')
@@ -305,6 +309,17 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
   const filesRef = useRef<HTMLInputElement>(null)
   const folderRef = useRef<HTMLInputElement>(null)
   useEffect(() => { folderRef.current?.setAttribute('webkitdirectory', ''); folderRef.current?.setAttribute('directory', '') }, [])
+  const createCategory = async () => {
+    setBusy(true); setError('')
+    try {
+      const response = await request('topic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: newCategory }) })
+      const data = await response.json() as { topic: { path: string; title: string } }
+      setSelectedTopics((paths) => [...new Set([...paths, data.topic.path])])
+      setCategory(data.topic.title)
+      setNewCategory('')
+      await onCreated()
+    } catch (caught) { setError((caught as Error).message) } finally { setBusy(false) }
+  }
   const upload = async () => {
     setBusy(true); setError('')
     try {
@@ -313,6 +328,7 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
         const relativePath = (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name
         setProgress(`Uploading ${index + 1} of ${files.length} · ${relativePath}`)
         const query = new URLSearchParams({ path: relativePath, category, ...(notes ? { notes } : {}) })
+        if (file.name.toLowerCase().endsWith('.pdf')) selectedTopics.forEach((topic) => query.append('topics', topic))
         await request(`document?${query}`, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file })
       }
       await onUploaded()
@@ -327,7 +343,16 @@ function UploadDialog({ onClose, onUploaded }: { onClose: () => void; onUploaded
         <button type="button" className="btn" onClick={() => folderRef.current?.click()} disabled={busy}>Choose folder</button>
         <span>{files.length ? `${files.length} selected · ${formatBytes(files.reduce((sum, file) => sum + file.size, 0))}` : 'Up to 100 MB per file'}</span>
       </div>
-      <label>Category<input value={category} onChange={(event) => setCategory(event.target.value)} maxLength={80} /></label>
+      <label>Library category<input value={category} onChange={(event) => setCategory(event.target.value)} maxLength={80} list="library-categories" /></label>
+      <datalist id="library-categories">{categories.map((name) => <option key={name} value={name} />)}</datalist>
+      <div className="library-upload-topics">
+        <div><strong>Connect PDFs to topic nodes</strong><span>Select every topic this upload belongs to. Other file types will not be linked on the graph.</span></div>
+        <div className="library-upload-topic-list">{topics.map((topic) => <label key={topic.path}>
+          <input type="checkbox" checked={selectedTopics.includes(topic.path)} disabled={busy} onChange={(event) => setSelectedTopics((paths) => event.target.checked ? [...paths, topic.path] : paths.filter((path) => path !== topic.path))} />{topic.title}
+        </label>)}</div>
+        <div className="library-upload-new-category"><input aria-label="New category name" value={newCategory} onChange={(event) => setNewCategory(event.target.value)} maxLength={80} placeholder="New category / topic name" disabled={busy} /><button type="button" className="btn" onClick={() => void createCategory()} disabled={busy || !newCategory.trim()}>＋ Create category</button></div>
+        <small>Creating a category adds a topic node immediately and selects it for these PDFs.</small>
+      </div>
       <label>Notes applied to this upload<textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={4} maxLength={4000} placeholder="Source, context, owner, or review notes…" /></label>
       {progress ? <div className="library-upload-progress">{progress}</div> : null}
       {error ? <div className="library-form-error">{error}</div> : null}

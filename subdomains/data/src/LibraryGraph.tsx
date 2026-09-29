@@ -186,7 +186,8 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
         const isHovered = hovered?.id === node.id
         const isSelected = selectedPath === node.id
         const isMatch = !queryActive || matchedPaths.has(node.id)
-        const radius = Math.max(node.radius, 3.2 / camera.scale) + (isHovered || isSelected ? 2.5 / camera.scale : 0)
+        const topic = node.document.path.startsWith('Topics/')
+        const radius = Math.max(node.radius, (topic && width < 700 ? 7 : 3.2) / camera.scale) + (isHovered || isSelected ? 2.5 / camera.scale : 0)
         context.globalAlpha = isMatch ? 1 : .16
         context.beginPath()
         context.arc(node.x, node.y, radius, 0, Math.PI * 2)
@@ -202,7 +203,6 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.lineWidth = 1.3 / camera.scale
           context.stroke()
         }
-        const topic = node.document.path.startsWith('Topics/')
         const important = topic && width >= 700
         const labelZoom = width < 700 ? .62 : .75
         if (showLabels && (camera.scale > labelZoom || important || isHovered || isSelected || (queryActive && isMatch))) {
@@ -239,7 +239,8 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
     for (const node of nodesRef.current) {
       if (node.x === undefined || node.y === undefined || (localPaths && !localPaths.has(node.id))) continue
       const candidate = Math.hypot(node.x - x, node.y - y)
-      if (candidate <= node.radius + 8 / cameraRef.current.scale && candidate < distance) {
+      const hitRadius = Math.max(node.radius, (node.document.path.startsWith('Topics/') ? 15 : 9) / cameraRef.current.scale)
+      if (candidate <= hitRadius && candidate < distance) {
         closest = node; distance = candidate
       }
     }

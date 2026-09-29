@@ -231,13 +231,30 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
     const path = cleanPath(req.query.path)
     if (!path) return res.status(400).json({ error: 'Choose a valid relative document path.' })
     if (!Buffer.isBuffer(req.body) || req.body.length === 0) return res.status(400).json({ error: 'Choose a non-empty file to upload.' })
+    const topics = req.query.topics === undefined ? [] : Array.isArray(req.query.topics) ? req.query.topics : [req.query.topics]
+    if (topics.length > 20 || topics.some((topic) => typeof topic !== 'string' || !/^Topics\/.+\.md$/i.test(topic) || cleanPath(topic) !== topic || topic.toLowerCase() === 'topics/topic directory.md')) {
+      return res.status(400).json({ error: 'Choose up to 20 valid topic nodes.' })
+    }
+    if (topics.length && extname(path).toLowerCase() !== '.pdf') return res.status(400).json({ error: 'Topic connections are available for PDFs.' })
     const target = resolve(filesRoot, ...path.split('/'))
     if (!inside(filesRoot, target)) return res.status(400).json({ error: 'Choose a valid relative document path.' })
     const document = await serialized(async () => {
+      const topicFiles = await Promise.all([...new Set(topics)].map((topic) => resolveFile(topic)))
+      if (topicFiles.some((file) => !file)) return null
       await mkdir(dirname(target), { recursive: true, mode: 0o700 })
       const temporary = `${target}.${process.pid}.tmp`
       await writeFile(temporary, req.body, { mode: 0o600 })
       await rename(temporary, target)
+      const link = `[[${/[\]|#%]/.test(path) ? encodeURIComponent(path) : path}]]`
+      for (const topic of topicFiles) {
+        const body = await readFile(topic.target, 'utf8')
+        if (body.includes(link)) continue
+        const section = body.includes('## Added sources') ? '' : '\n## Added sources\n'
+        const updated = `${body.replace(/\s*$/, '')}${section}\n- ${link}\n`
+        const topicTemporary = `${topic.target}.${process.pid}.tmp`
+        await writeFile(topicTemporary, updated, { mode: 0o600 })
+        await rename(topicTemporary, topic.target)
+      }
       const index = await readIndex()
       const saved = index[path] || {}
       const timestamp = new Date(now()).toISOString()
@@ -250,7 +267,26 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
       await saveIndex(index)
       return { path, name: basename(path), bytes: req.body.length }
     })
+    if (!document) return res.status(400).json({ error: 'One or more selected topics no longer exist.' })
     res.status(201).json({ document })
+  }
+
+  async function createTopic(req, res) {
+    const title = typeof req.body?.title === 'string' ? req.body.title.trim().replace(/\s+/g, ' ') : ''
+    if (!title || title.length > 80 || title.toLowerCase() === 'topic directory' || /^[.]|[.]$|[/\\\[\]|<>:"?*\u0000-\u001f]/u.test(title)) {
+      return res.status(400).json({ error: 'Use a category name of 1–80 characters without file-path characters.' })
+    }
+    const path = `Topics/${title}.md`
+    const result = await serialized(async () => {
+      const existing = await walk()
+      if (existing.some((file) => file.path.toLowerCase() === path.toLowerCase())) return false
+      const target = resolve(filesRoot, 'Topics', `${title}.md`)
+      await mkdir(dirname(target), { recursive: true, mode: 0o700 })
+      await writeFile(target, `# ${title}\n`, { flag: 'wx', mode: 0o600 })
+      return true
+    })
+    if (!result) return res.status(409).json({ error: 'That category already exists.' })
+    res.status(201).json({ topic: { path, title } })
   }
 
   async function update(req, res) {
@@ -351,5 +387,5 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
     res.json({ path: found.path, start, limit, ...result })
   }
 
-  return { requireToken, catalog, upload, uploadSearchIndex, search, update, file, brainDocument, brainText }
+  return { requireToken, catalog, upload, createTopic, uploadSearchIndex, search, update, file, brainDocument, brainText }
 }

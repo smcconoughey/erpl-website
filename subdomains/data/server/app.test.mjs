@@ -281,6 +281,33 @@ test('team library securely uploads, catalogs, previews, and annotates nested do
   assert.equal(updatedEngine.notes, 'Approved')
 })
 
+test('new categories become topic nodes and PDF uploads link to selected topics', async (t) => {
+  const { base, login } = await fixture(t)
+  const topicUrl = `${base}/api/library/topic`
+  const topicBody = { title: 'Propulsion tests' }
+  assert.equal((await fetch(topicUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(topicBody) })).status, 401)
+  const headers = { Cookie: cookieOf(await login()) }
+  const created = await fetch(topicUrl, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify(topicBody) })
+  assert.equal(created.status, 201)
+  assert.deepEqual((await created.json()).topic, { path: 'Topics/Propulsion tests.md', title: 'Propulsion tests' })
+  assert.equal((await fetch(topicUrl, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify(topicBody) })).status, 409)
+  const uploadUrl = `${base}/api/library/document?${new URLSearchParams({ path: 'Sources/PDFs/Test report.pdf', category: 'Propulsion tests', topics: 'Topics/Propulsion tests.md' })}`
+  const upload = () => fetch(uploadUrl, { method: 'PUT', headers: { ...headers, 'Content-Type': 'application/pdf' }, body: Buffer.from('%PDF-1.4\ntest') })
+  assert.equal((await upload()).status, 201)
+  assert.equal((await upload()).status, 201)
+  const catalog = await (await fetch(`${base}/api/library/catalog`, { headers })).json()
+  const topic = catalog.documents.find((document) => document.path === 'Topics/Propulsion tests.md')
+  assert.deepEqual(topic.links, ['Sources/PDFs/Test report.pdf'])
+  assert.equal(topic.searchText.match(/\[\[Sources\/PDFs\/Test report\.pdf\]\]/g)?.length, 1)
+  assert.equal(catalog.documents.find((document) => document.path === 'Sources/PDFs/Test report.pdf').category, 'Propulsion tests')
+  assert.equal((await fetch(`${base}/api/library/document?${new URLSearchParams({ path: 'Sources/PDFs/Other.pdf', topics: 'Topics/Missing.md' })}`, {
+    method: 'PUT', headers: { ...headers, 'Content-Type': 'application/pdf' }, body: Buffer.from('%PDF-1.4\nother'),
+  })).status, 400)
+  assert.equal((await fetch(`${base}/api/library/document?${new URLSearchParams({ path: 'Sources/notes.md', topics: 'Topics/Propulsion tests.md' })}`, {
+    method: 'PUT', headers: { ...headers, 'Content-Type': 'text/markdown' }, body: '# Notes',
+  })).status, 400)
+})
+
 test('read-only brain link provides catalog, search, document and paginated PDF text without a session', async (t) => {
   const { base, dataDir } = await fixture(t, { brainLinkToken })
   const link = `${base}/api/brain/${brainLinkToken}`

@@ -19,7 +19,11 @@ or categories.
 The **Add to library** ingestion dialog accepts individual files or complete
 folders while preserving relative paths. Files are limited to 100 MB each and
 are written atomically. The browser upload route is available only to signed-in
-members. There is no unauthenticated write endpoint.
+members. Select one or more topic nodes to connect uploaded PDFs on the graph;
+those links are appended to the corresponding topic notes. **Create category**
+adds a new topic note/node and selects it for the upload. The separate library
+category field is searchable metadata and does not create graph links. There is
+no unauthenticated write endpoint.
 
 ### Read-only agent link
 
