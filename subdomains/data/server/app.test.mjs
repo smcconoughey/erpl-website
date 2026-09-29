@@ -328,6 +328,12 @@ test('read-only brain link provides catalog, search, document and paginated PDF 
   const discovery = await (await fetch(link)).json()
   assert.equal(discovery.readOnly, true)
   assert.match(discovery.endpoints.catalog, /\/catalog$/)
+  const crossOrigin = await fetch(`${link}/catalog`, { headers: { Origin: 'https://agent.example', 'Sec-Fetch-Site': 'cross-site' } })
+  assert.equal(crossOrigin.status, 200)
+  assert.equal(crossOrigin.headers.get('access-control-allow-origin'), '*')
+  assert.equal((await fetch(`${link}/catalog`, {
+    method: 'POST', headers: { Origin: 'https://agent.example', 'Sec-Fetch-Site': 'cross-site' },
+  })).status, 403)
   const catalogResponse = await fetch(`${link}/catalog`)
   assert.equal(catalogResponse.status, 200)
   assert.equal(catalogResponse.headers.get('access-control-allow-origin'), '*')

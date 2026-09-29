@@ -64,8 +64,10 @@ export function createApp(options = {}) {
   })
   app.use('/api', (req, res, next) => {
     res.set('Cache-Control', 'no-store')
-    // Same-origin JSON requests only; never enable CORS on these endpoints.
-    if (req.headers['sec-fetch-site'] === 'cross-site') {
+    // Only the capability-protected, read-only brain GET routes allow
+    // cross-origin access. Uploads, edits, and telemetry remain same-origin.
+    const brainRead = req.method === 'GET' && req.originalUrl.startsWith('/api/brain/')
+    if (req.headers['sec-fetch-site'] === 'cross-site' && !brainRead) {
       return res.status(403).json({ error: 'Open online data from the ERPL data viewer.' })
     }
     next()
