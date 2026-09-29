@@ -64,6 +64,7 @@ a.btn {
 }
 
 .library-graph-stage {
+  position: relative;
   min-width: 0;
   min-height: 0;
 }
@@ -138,6 +139,34 @@ a.btn {
 .library-pdf-toolbar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .library-pdf-overlay .library-reader { min-height: 0; overflow: auto; }
 .library-pdf-overlay .library-preview iframe { height: calc(100vh - 265px); }
+
+.library-topic-panel {
+  position: absolute;
+  top: 51px;
+  bottom: 20px;
+  left: 18px;
+  z-index: 6;
+  width: min(350px, calc(100% - 36px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #34516a;
+  border-radius: 6px;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .55);
+  background: rgba(16, 23, 32, .97);
+}
+.library-topic-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 15px 16px 0; }
+.library-topic-panel-head button { border: 0; background: transparent; color: #a9b8c8; font-size: 22px; line-height: 1; }
+.library-topic-panel h2 { margin: 6px 16px 0; font-size: 18px; line-height: 1.2; }
+.library-topic-panel p { margin: 6px 16px 12px; color: #92a0af; font-size: 11px; }
+.library-topic-open { margin: 0 16px 13px; align-self: flex-start; }
+.library-topic-list { min-height: 0; overflow-y: auto; border-top: 1px solid #2b3c4d; }
+.library-topic-list > button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 0; border-bottom: 1px solid #243342; background: transparent; text-align: left; }
+.library-topic-list > button:hover { background: #1d3145; }
+.library-topic-list > button > span:last-child { min-width: 0; display: grid; gap: 2px; }
+.library-topic-list strong,
+.library-topic-list small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.library-topic-list small { color: #8898a8; font-size: 10px; }
 
 .library-header {
   display: grid;
@@ -836,6 +865,7 @@ a.btn {
   .library-graph-app .library-search-wrap { grid-column: 1 / -1; grid-row: 2; }
   .library-graph-app .library-graph-stage > .library-graph { height: 100%; min-height: 0; }
   .library-graph-app .library-pdf-overlay { top: 106px; }
+  .library-topic-panel { top: 47px; bottom: auto; left: 12px; max-height: min(63vh, 540px); width: calc(100% - 24px); }
 }
 
 .hidden {

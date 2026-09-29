@@ -5,7 +5,7 @@ export type PdfGraphEdge = { source: string; target: string; kind: 'citation' | 
 export function buildPdfGraph(documents: LibraryDocument[]) {
   const pdfs = documents.filter((document) => document.kind === 'pdf')
   const pdfPaths = new Set(pdfs.map((document) => document.path))
-  const topics = documents.filter((document) => document.kind === 'markdown' && document.path.startsWith('Topics/'))
+  const topics = documents.filter((document) => document.kind === 'markdown' && document.path.startsWith('Topics/') && document.path.toLowerCase() !== 'topics/topic directory.md')
   const topicPaths = new Set(topics.map((document) => document.path))
   const records = new Map<string, string[]>()
   const citations = new Map<string, Set<string>>()
@@ -16,7 +16,7 @@ export function buildPdfGraph(documents: LibraryDocument[]) {
   }
 
   const addTopic = (topic: string, path: string) => {
-    if (!pdfPaths.has(path)) return
+    if (!topicPaths.has(topic) || !pdfPaths.has(path)) return
     if (!citations.has(topic)) citations.set(topic, new Set())
     citations.get(topic)!.add(path)
   }

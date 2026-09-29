@@ -299,7 +299,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
         const node = hitNode(point.x, point.y)
         event.currentTarget.setPointerCapture(event.pointerId)
         interactionRef.current = { type: node ? 'node' : 'pan', node: node || undefined, startX: point.screenX, startY: point.screenY, lastX: point.screenX, lastY: point.screenY, moved: false }
-        if (node) { node.fx = node.x; node.fy = node.y; simulationRef.current?.alphaTarget(.12).restart() }
+        if (node) { node.fx = node.x; node.fy = node.y }
       }}
       onPointerMove={(event) => {
         const point = graphPoint(event)
@@ -312,6 +312,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
             cameraRef.current.x += dx; cameraRef.current.y += dy
           } else if (interaction.node) {
             interaction.node.fx = point.x; interaction.node.fy = point.y
+            if (interaction.moved) simulationRef.current?.alphaTarget(.12).restart()
           }
           drawRef.current(); return
         }

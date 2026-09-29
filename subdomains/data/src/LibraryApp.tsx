@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { LibraryGraph } from './LibraryGraph'
+import { buildPdfGraph } from './pdfGraph'
 
 export type LibraryDocument = {
   id: string
@@ -52,6 +53,7 @@ export function LibraryApp() {
   const [searching, setSearching] = useState(false)
   const [searchIndexed, setSearchIndexed] = useState<boolean | null>(null)
   const [graphSelectedPath, setGraphSelectedPath] = useState('')
+  const [activeTopicPath, setActiveTopicPath] = useState('')
   const [selectedPage, setSelectedPage] = useState<number>()
   const [uploadOpen, setUploadOpen] = useState(false)
   const [error, setError] = useState('')
@@ -106,6 +108,13 @@ export function LibraryApp() {
   }, [authenticated, search])
 
   const selected = documents.find((document) => document.path === selectedPath) || null
+  const graph = useMemo(() => buildPdfGraph(documents), [documents])
+  const activeTopic = graph.topics.find((document) => document.path === activeTopicPath)
+  const topicConnections = useMemo(() => {
+    const paths = new Set(graph.edges.flatMap((edge) => edge.source === activeTopicPath ? [edge.target] : edge.target === activeTopicPath ? [edge.source] : []))
+    return graph.nodes.filter((document) => paths.has(document.path)).sort((a, b) =>
+      (a.kind === 'pdf' ? 1 : 0) - (b.kind === 'pdf' ? 1 : 0) || a.title.localeCompare(b.title, undefined, { numeric: true }))
+  }, [graph, activeTopicPath])
   const passagesByPath = useMemo(() => {
     const result = new Map<string, SearchResult[]>()
     searchResults.forEach((hit) => result.set(hit.path, [...result.get(hit.path) || [], hit]))
@@ -164,7 +173,20 @@ export function LibraryApp() {
       </header>
       {error ? <div className="banner">{error}</div> : null}
       <main className="library-graph-stage"><LibraryGraph documents={documents} matchedPaths={matchedPaths} query={search}
-        selectedPath={graphSelectedPath} onSelect={setGraphSelectedPath} onOpen={(path) => openDocument(path)} /></main>
+        selectedPath={graphSelectedPath} onSelect={(path) => { setGraphSelectedPath(path); if (path.startsWith('Topics/')) setActiveTopicPath(path) }}
+        onOpen={(path) => { if (path.startsWith('Topics/')) { setGraphSelectedPath(path); setActiveTopicPath(path) } else openDocument(path) }} />
+        {activeTopic ? <aside className="library-topic-panel" role="dialog" aria-label={`${activeTopic.title} connected documents`}>
+          <div className="library-topic-panel-head"><span className="kicker">Topic connections</span><button type="button" aria-label="Close topic panel" onClick={() => { setActiveTopicPath(''); setGraphSelectedPath('') }}>×</button></div>
+          <h2>{activeTopic.title}</h2>
+          <p>{topicConnections.length} connected document{topicConnections.length === 1 ? '' : 's'}</p>
+          <button type="button" className="btn compact library-topic-open" onClick={() => openDocument(activeTopic.path)}>Open topic note</button>
+          <div className="library-topic-list">
+            {topicConnections.map((document) => <button type="button" key={document.path} onClick={() => document.path.startsWith('Topics/') ? (setActiveTopicPath(document.path), setGraphSelectedPath(document.path)) : openDocument(document.path)}>
+              <DocumentIcon kind={document.kind} /><span><strong>{document.title}</strong><small>{document.kind === 'pdf' ? 'PDF source' : 'Related topic'}</small></span>
+            </button>)}
+          </div>
+        </aside> : null}
+      </main>
       {readerOpen && selected ? <div className="library-pdf-overlay">
         <div className="library-pdf-toolbar"><button type="button" className="btn" onClick={() => setReaderOpen(false)}>← Back to graph</button><span>{selected.title}</span></div>
         <main className="library-reader"><DocumentReader document={selected} documents={documents} page={selectedPage}
