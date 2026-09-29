@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { createAuth } from './auth.mjs'
 import { createCeaSolver, validateCeaRequest } from './cea.mjs'
 import { createIngest, MAX_CSV_BYTES } from './ingest.mjs'
-import { createLibrary, MAX_LIBRARY_BYTES } from './library.mjs'
+import { createLibrary, MAX_LIBRARY_BYTES, MAX_SEARCH_INDEX_BYTES } from './library.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const safeName = (name) => typeof name === 'string' && name.length > 0 &&
@@ -86,8 +86,12 @@ export function createApp(options = {}) {
   app.post('/api/ingest/streams/:stream', ingest.requireToken, requireJson,
     express.json({ limit: '256kb' }), ingest.ingestSample)
   app.get('/api/ingest/library/catalog', library.requireToken, library.catalog)
+  app.get('/api/ingest/library/search', library.requireToken, library.search)
   app.put('/api/ingest/library', library.requireToken,
     express.raw({ type: '*/*', limit: MAX_LIBRARY_BYTES }), library.upload)
+  app.put('/api/ingest/library/search-index', library.requireToken,
+    express.raw({ type: ['application/vnd.sqlite3', 'application/octet-stream'], limit: MAX_SEARCH_INDEX_BYTES }),
+    library.uploadSearchIndex)
   app.use('/api/online', auth.requireSession)
   app.put('/api/online/upload', requireCsv, csvBody, ingest.browserUpload)
   app.patch('/api/online/file', requireJson, express.json({ limit: '8kb' }), ingest.renameCsv)
@@ -100,6 +104,7 @@ export function createApp(options = {}) {
   })
   app.use('/api/library', auth.requireSession)
   app.get('/api/library/catalog', library.catalog)
+  app.get('/api/library/search', library.search)
   app.get('/api/library/file', library.file)
   app.put('/api/library/document', express.raw({ type: '*/*', limit: MAX_LIBRARY_BYTES }), library.upload)
   app.patch('/api/library/document', requireJson, express.json({ limit: '8kb' }), library.update)

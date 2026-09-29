@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { LibraryGraph } from './LibraryGraph'
 
-type LibraryDocument = {
+export type LibraryDocument = {
   id: string
   path: string
   name: string
@@ -15,7 +16,11 @@ type LibraryDocument = {
   size: number
   uploadedAt: string
   updatedAt: string
+  searchText: string
+  links: string[]
 }
+
+type SearchResult = { path: string; page: number; kind: string; excerpt: string; score: number }
 
 type ApiError = Error & { status?: number; attemptsRemaining?: number; retryAfter?: number }
 
@@ -43,8 +48,14 @@ export function LibraryApp() {
   const [totalBytes, setTotalBytes] = useState(0)
   const [selectedPath, setSelectedPath] = useState(() => decodeURIComponent(location.hash.slice(1)))
   const [search, setSearch] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searching, setSearching] = useState(false)
+  const [searchIndexed, setSearchIndexed] = useState<boolean | null>(null)
   const [category, setCategory] = useState('All')
   const [folder, setFolder] = useState('')
+  const [view, setView] = useState<'browse' | 'graph'>('browse')
+  const [graphSelectedPath, setGraphSelectedPath] = useState('')
+  const [selectedPage, setSelectedPage] = useState<number>()
   const [uploadOpen, setUploadOpen] = useState(false)
   const [error, setError] = useState('')
 
@@ -68,6 +79,26 @@ export function LibraryApp() {
     if (selectedPath) history.replaceState(null, '', `/library#${encodeURIComponent(selectedPath)}`)
   }, [selectedPath])
 
+  useEffect(() => {
+    const query = search.trim()
+    if (query.length < 2 || authenticated !== true) {
+      setSearchResults([]); setSearching(false)
+      return
+    }
+    const controller = new AbortController()
+    const timer = window.setTimeout(() => {
+      setSearching(true)
+      request(`search?${new URLSearchParams({ q: query })}`, { signal: controller.signal })
+        .then((response) => response.json())
+        .then((data: { indexed: boolean; results: SearchResult[] }) => {
+          setSearchResults(data.results || []); setSearchIndexed(data.indexed)
+        })
+        .catch((caught) => { if (caught.name !== 'AbortError') setSearchResults([]) })
+        .finally(() => { if (!controller.signal.aborted) setSearching(false) })
+    }, 220)
+    return () => { window.clearTimeout(timer); controller.abort() }
+  }, [authenticated, search])
+
   const selected = documents.find((document) => document.path === selectedPath) || null
   const categories = useMemo(() => ['All', ...new Set(documents.map((document) => document.category).filter(Boolean))], [documents])
   const folders = useMemo(() => {
@@ -78,13 +109,28 @@ export function LibraryApp() {
     })
     return [...values].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
   }, [documents])
+  const passagesByPath = useMemo(() => {
+    const result = new Map<string, SearchResult[]>()
+    searchResults.forEach((hit) => result.set(hit.path, [...result.get(hit.path) || [], hit]))
+    return result
+  }, [searchResults])
+  const matchedPaths = useMemo(() => {
+    const terms = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
+    const paths = new Set(searchResults.map((result) => result.path))
+    if (!terms.length) documents.forEach((document) => paths.add(document.path))
+    else documents.forEach((document) => {
+      const haystack = `${document.title} ${document.path} ${document.category} ${document.notes} ${document.searchText || ''}`.toLowerCase()
+      if (terms.every((term) => haystack.includes(term))) paths.add(document.path)
+    })
+    return paths
+  }, [documents, search, searchResults])
   const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase()
+    const query = search.trim()
     return documents.filter((document) =>
       (category === 'All' || document.category === category) &&
       (!folder || document.path.startsWith(`${folder}/`)) &&
-      (!query || `${document.title} ${document.path} ${document.category} ${document.notes}`.toLowerCase().includes(query)))
-  }, [documents, search, category, folder])
+      (!query || matchedPaths.has(document.path)))
+  }, [documents, search, category, folder, matchedPaths])
 
   if (authenticated !== true) {
     return <LibraryLogin loading={authenticated === null} error={error} onAuthenticated={() => void load().catch((caught) => setError(caught.message))} />
@@ -99,7 +145,7 @@ export function LibraryApp() {
         </a>
         <label className="library-search">
           <span>⌕</span>
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search titles, paths, categories, and notes" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search notes and 9,000 PDF passages" />
           {search ? <button type="button" onClick={() => setSearch('')} aria-label="Clear search">×</button> : null}
         </label>
         <div className="library-header-actions">
@@ -108,22 +154,28 @@ export function LibraryApp() {
         </div>
       </header>
       {error ? <div className="banner">{error}</div> : null}
-      <div className="library-workspace">
+      <div className={`library-workspace${view === 'graph' ? ' graph-mode' : ''}`}>
         <aside className="library-nav">
           <div className="library-nav-head"><span className="kicker">Vault</span><span>{documents.length} docs</span></div>
-          <button type="button" className={`library-nav-row${folder === '' ? ' active' : ''}`} onClick={() => setFolder('')}>
+          <button type="button" className={`library-nav-row${view === 'browse' && folder === '' ? ' active' : ''}`} onClick={() => { setView('browse'); setFolder('') }}>
             <span>◇</span><strong>All documents</strong><em>{documents.length}</em>
+          </button>
+          <button type="button" className={`library-nav-row${view === 'graph' ? ' active' : ''}`} onClick={() => setView('graph')}>
+            <span className="graph-nav-icon">⌘</span><strong>Graph view</strong><em>{documents.filter((item) => item.kind === 'markdown').length}</em>
           </button>
           <div className="library-section-label">Folders</div>
           <div className="library-folder-list">
             {folders.map((name) => <button type="button" key={name} className={`library-nav-row${folder === name ? ' active' : ''}`}
-              style={{ paddingLeft: `${12 + (name.split('/').length - 1) * 13}px` }} onClick={() => setFolder(name)}>
+              style={{ paddingLeft: `${12 + (name.split('/').length - 1) * 13}px` }} onClick={() => { setView('browse'); setFolder(name) }}>
               <span>▱</span><strong>{name.split('/').at(-1)}</strong>
             </button>)}
           </div>
           <div className="library-nav-foot"><span>{formatBytes(totalBytes)} stored</span><span>Protected team library</span></div>
         </aside>
 
+        {view === 'graph' ? <LibraryGraph documents={documents} matchedPaths={matchedPaths} query={search}
+          selectedPath={graphSelectedPath} onSelect={(path) => { setGraphSelectedPath(path); setSelectedPath(path); setSelectedPage(undefined) }}
+          onOpen={(path) => { setSelectedPath(path); setSelectedPage(undefined); setView('browse') }} /> : <>
         <section className="library-list-pane">
           <div className="library-list-head">
             <div><span className="kicker">Browse</span><h1>{folder || 'All documents'}</h1></div>
@@ -131,13 +183,15 @@ export function LibraryApp() {
               {categories.map((name) => <option key={name}>{name}</option>)}
             </select>
           </div>
-          <div className="library-results-meta">{filtered.length} result{filtered.length === 1 ? '' : 's'}{search ? ` for “${search}”` : ''}</div>
+          <div className="library-results-meta">{searching ? 'Searching full text…' : `${filtered.length} result${filtered.length === 1 ? '' : 's'}${search ? ` for “${search}”` : ''}${searchResults.length ? ` · ${searchResults.length} PDF passage hits` : ''}${search && searchIndexed === false ? ' · PDF index unavailable' : ''}`}</div>
           <div className="library-document-list">
             {filtered.map((document) => <button type="button" key={document.path}
               className={`library-document-row${selected?.path === document.path ? ' active' : ''}`}
-              onClick={() => setSelectedPath(document.path)}>
+              onClick={() => { setSelectedPath(document.path); setSelectedPage(passagesByPath.get(document.path)?.[0]?.page) }}>
               <DocumentIcon kind={document.kind} />
-              <span className="library-document-main"><strong>{document.title}</strong><small>{document.path}</small></span>
+              <span className="library-document-main"><strong>{document.title}</strong><small>{document.path}</small>
+                {passagesByPath.get(document.path)?.[0] ? <SearchExcerpt hit={passagesByPath.get(document.path)![0]} count={passagesByPath.get(document.path)!.length} /> : null}
+              </span>
               <span className="library-document-side"><em>{document.category}</em><small>{formatBytes(document.size)}</small></span>
             </button>)}
             {!filtered.length ? <div className="library-empty"><strong>No documents found</strong><span>Try another search, folder, or category.</span></div> : null}
@@ -145,10 +199,10 @@ export function LibraryApp() {
         </section>
 
         <main className="library-reader">
-          {selected ? <DocumentReader document={selected} documents={documents} onNavigate={setSelectedPath}
+          {selected ? <DocumentReader document={selected} documents={documents} page={selectedPage} onNavigate={(path) => { setSelectedPath(path); setSelectedPage(undefined) }}
             onUpdated={() => void load().catch((caught) => setError(caught.message))} /> :
             <div className="library-empty reader"><strong>Select a document</strong><span>Choose a note, reference, or attachment from the library.</span></div>}
-        </main>
+        </main></>}
       </div>
       {uploadOpen ? <UploadDialog onClose={() => setUploadOpen(false)} onUploaded={async () => { await load(); setUploadOpen(false) }} /> : null}
     </div>
@@ -180,8 +234,16 @@ function LibraryLogin({ loading, error, onAuthenticated }: { loading: boolean; e
   </div>
 }
 
-function DocumentReader({ document, documents, onNavigate, onUpdated }: {
-  document: LibraryDocument; documents: LibraryDocument[]; onNavigate: (path: string) => void; onUpdated: () => void
+function SearchExcerpt({ hit, count }: { hit: SearchResult; count: number }) {
+  const parts = hit.excerpt.split(/(<mark>.*?<\/mark>)/gi)
+  return <span className="library-search-hit">
+    <span>{parts.map((part, index) => /^<mark>/i.test(part) ? <mark key={index}>{part.replace(/<\/?mark>/gi, '')}</mark> : part)}</span>
+    <em>{hit.page > 0 ? `p. ${hit.page}` : hit.kind}{count > 1 ? ` · ${count} hits` : ''}</em>
+  </span>
+}
+
+function DocumentReader({ document, documents, page, onNavigate, onUpdated }: {
+  document: LibraryDocument; documents: LibraryDocument[]; page?: number; onNavigate: (path: string) => void; onUpdated: () => void
 }) {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
@@ -235,7 +297,7 @@ function DocumentReader({ document, documents, onNavigate, onUpdated }: {
         a: ({ href, children }) => href?.startsWith('wiki:') ? <button type="button" className="wiki-link" onClick={() => resolveWiki(href)}>{children}</button> : <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>,
       }}>{markdown}</ReactMarkdown></article> : null}
       {!loading && document.kind === 'text' ? <pre className="text-preview">{content}</pre> : null}
-      {document.kind === 'pdf' ? <iframe title={document.title} src={fileUrl(document)} /> : null}
+      {document.kind === 'pdf' ? <iframe title={document.title} src={`${fileUrl(document)}${page ? `#page=${page}` : ''}`} /> : null}
       {document.kind === 'image' ? <img src={fileUrl(document)} alt={document.title} /> : null}
       {document.kind === 'audio' ? <audio controls src={fileUrl(document)} /> : null}
       {document.kind === 'video' ? <video controls src={fileUrl(document)} /> : null}

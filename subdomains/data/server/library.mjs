@@ -1,9 +1,14 @@
 import { createHash, timingSafeEqual } from 'node:crypto'
+import { spawn } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { lstat, mkdir, readFile, readdir, realpath, rename, writeFile } from 'node:fs/promises'
 import { basename, dirname, extname, isAbsolute, join, posix, relative, resolve, sep } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 export const MAX_LIBRARY_BYTES = 100 * 1024 * 1024
+export const MAX_SEARCH_INDEX_BYTES = 64 * 1024 * 1024
+const MAX_SEARCHABLE_TEXT_BYTES = 1024 * 1024
+const searchRunner = fileURLToPath(new URL('./library_search.py', import.meta.url))
 const TEXT_EXTENSIONS = new Set([
   '.md', '.txt', '.json', '.csv', '.tsv', '.yaml', '.yml', '.toml', '.xml', '.html', '.css', '.js', '.jsx',
   '.ts', '.tsx', '.py', '.c', '.h', '.cpp', '.hpp', '.rs', '.go', '.sql', '.sh', '.zsh', '.fish', '.cfg', '.ini',
@@ -52,6 +57,7 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
   const root = resolve(dataDir, '.library')
   const filesRoot = join(root, 'files')
   const indexFile = join(root, 'index.json')
+  const searchIndexFile = join(root, 'search', 'index.sqlite3')
   let mutation = Promise.resolve()
   const tokenHash = token ? createHash('sha256').update(token).digest() : null
 
@@ -128,10 +134,95 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
         title: saved.title || prettyTitle(path), folder: posix.dirname(path) === '.' ? '' : posix.dirname(path),
         category: saved.category || path.split('/')[0] || 'Library', notes: saved.notes || '', mime,
         kind: kindFor(path, mime), size: stat.size, uploadedAt: saved.uploadedAt || stat.birthtime.toISOString(),
-        updatedAt: saved.updatedAt || stat.mtime.toISOString(),
+        updatedAt: saved.updatedAt || stat.mtime.toISOString(), searchText: '', links: [],
       }
     }).sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true }))
+    const byAlias = new Map()
+    for (const document of documents) {
+      const aliases = [document.path, document.path.replace(/\.[^.]+$/, ''), basename(document.path, extname(document.path))]
+      for (const alias of aliases) {
+        const key = alias.toLowerCase()
+        if (!byAlias.has(key)) byAlias.set(key, document.path)
+        else if (byAlias.get(key) !== document.path) byAlias.set(key, null)
+      }
+    }
+    const resolveTarget = (rawTarget, sourcePath) => {
+      let target
+      try { target = decodeURIComponent(rawTarget.split('#')[0].trim()) }
+      catch { target = rawTarget.split('#')[0].trim() }
+      if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target)) return null
+      target = target.replace(/^\/+/, '')
+      const sourceFolder = posix.dirname(sourcePath) === '.' ? '' : posix.dirname(sourcePath)
+      const relativeTarget = posix.normalize(posix.join(sourceFolder, target))
+      const candidates = [target, relativeTarget]
+      for (const candidate of [...candidates]) {
+        if (!extname(candidate)) candidates.push(`${candidate}.md`)
+      }
+      for (const candidate of candidates) {
+        const resolved = byAlias.get(candidate.toLowerCase())
+        if (resolved) return resolved
+      }
+      return target.includes('/') ? null : byAlias.get(basename(target, extname(target)).toLowerCase()) || null
+    }
+    await Promise.all(documents.map(async (document) => {
+      if (!['markdown', 'text'].includes(document.kind) || document.size > MAX_SEARCHABLE_TEXT_BYTES) return
+      const found = await resolveFile(document.path)
+      if (!found) return
+      const text = await readFile(found.target, 'utf8')
+      document.searchText = text
+      const links = new Set()
+      for (const match of text.matchAll(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g)) {
+        const target = resolveTarget(match[1], document.path)
+        if (target && target !== document.path) links.add(target)
+      }
+      for (const match of text.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
+        const target = resolveTarget(match[1], document.path)
+        if (target && target !== document.path) links.add(target)
+      }
+      document.links = [...links]
+    }))
     res.json({ documents, totalBytes: documents.reduce((sum, document) => sum + document.size, 0) })
+  }
+
+  async function uploadSearchIndex(req, res) {
+    if (!Buffer.isBuffer(req.body) || req.body.length < 16 || req.body.subarray(0, 16).toString('binary') !== 'SQLite format 3\u0000') {
+      return res.status(400).json({ error: 'Expected a valid SQLite search index.' })
+    }
+    await serialized(async () => {
+      await mkdir(dirname(searchIndexFile), { recursive: true, mode: 0o700 })
+      const temporary = `${searchIndexFile}.${process.pid}.tmp`
+      await writeFile(temporary, req.body, { mode: 0o600 })
+      await rename(temporary, searchIndexFile)
+    })
+    res.status(201).json({ ok: true, bytes: req.body.length })
+  }
+
+  async function search(req, res) {
+    const query = typeof req.query.q === 'string' ? req.query.q.trim() : ''
+    if (query.length < 2 || query.length > 200) return res.status(400).json({ error: 'Search for 2 to 200 characters.' })
+    try {
+      if (!(await lstat(searchIndexFile)).isFile()) return res.json({ indexed: false, results: [] })
+    } catch (error) {
+      if (error.code === 'ENOENT') return res.json({ indexed: false, results: [] })
+      throw error
+    }
+    const pythonPath = process.env.ERPL_PYTHON_PATH || 'python3'
+    const results = await new Promise((resolveResults, reject) => {
+      const child = spawn(pythonPath, [searchRunner, searchIndexFile, query, '40'], { stdio: ['ignore', 'pipe', 'pipe'] })
+      let stdout = ''
+      let stderr = ''
+      const timeout = setTimeout(() => child.kill('SIGKILL'), 5000)
+      child.stdout.on('data', (chunk) => { if (stdout.length < 512 * 1024) stdout += chunk })
+      child.stderr.on('data', (chunk) => { if (stderr.length < 4096) stderr += chunk })
+      child.on('error', reject)
+      child.on('close', (code, signal) => {
+        clearTimeout(timeout)
+        if (code !== 0) return reject(Object.assign(new Error(signal ? 'Search timed out.' : 'Search index query failed.'), { status: 503, detail: stderr }))
+        try { resolveResults(JSON.parse(stdout)) }
+        catch { reject(Object.assign(new Error('Search index returned an invalid response.'), { status: 503 })) }
+      })
+    })
+    res.json({ indexed: true, results })
   }
 
   async function upload(req, res) {
@@ -202,5 +293,5 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
     stream.pipe(res)
   }
 
-  return { requireToken, catalog, upload, update, file }
+  return { requireToken, catalog, upload, uploadSearchIndex, search, update, file }
 }

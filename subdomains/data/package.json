@@ -13,10 +13,12 @@
     "build": "tsc && vite build",
     "start": "node --env-file-if-exists=.env server/index.mjs",
     "upload:library": "node --env-file-if-exists=.env server/upload-library.mjs",
+    "upload:library-index": "node --env-file-if-exists=.env server/upload-search-index.mjs",
     "test": "node --test server/*.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "d3-force": "^3.0.0",
     "express": "^5.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -24,6 +26,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@types/d3-force": "^3.0.10",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",

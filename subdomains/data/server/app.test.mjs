@@ -241,15 +241,24 @@ test('team library securely uploads, catalogs, previews, and annotates nested do
   })}`, { method: 'PUT', headers: { ...headers, 'Content-Type': 'text/markdown' }, body: '# Engine\n\n[[Injector]]' })
   assert.equal(upload.status, 201)
   assert.deepEqual((await upload.json()).document, { path: 'Topics/Propulsion/Engine.md', name: 'Engine.md', bytes: 22 })
+  assert.equal((await fetch(`${base}/api/library/document?${new URLSearchParams({ path: 'Topics/Propulsion/Injector.md', category: 'Propulsion' })}`, {
+    method: 'PUT', headers: { ...headers, 'Content-Type': 'text/markdown' }, body: '# Injector\n',
+  })).status, 201)
 
   let catalog = await (await fetch(`${base}/api/library/catalog`, { headers })).json()
-  assert.equal(catalog.documents.length, 1)
+  assert.equal(catalog.documents.length, 2)
+  const engine = catalog.documents.find((document) => document.path.endsWith('Engine.md'))
   assert.deepEqual({
-    path: catalog.documents[0].path, title: catalog.documents[0].title, folder: catalog.documents[0].folder,
-    category: catalog.documents[0].category, notes: catalog.documents[0].notes, kind: catalog.documents[0].kind,
+    path: engine.path, title: engine.title, folder: engine.folder,
+    category: engine.category, notes: engine.notes, kind: engine.kind,
   }, {
     path: 'Topics/Propulsion/Engine.md', title: 'Engine', folder: 'Topics/Propulsion',
     category: 'Propulsion', notes: 'Reviewed by the test team', kind: 'markdown',
+  })
+  assert.equal(engine.searchText, '# Engine\n\n[[Injector]]')
+  assert.deepEqual(engine.links, ['Topics/Propulsion/Injector.md'])
+  assert.deepEqual(await (await fetch(`${base}/api/library/search?q=chamber`, { headers })).json(), {
+    indexed: false, results: [],
   })
   const file = await fetch(`${base}/api/library/file?path=Topics%2FPropulsion%2FEngine.md`, { headers })
   assert.equal(file.status, 200)
@@ -264,9 +273,10 @@ test('team library securely uploads, catalogs, previews, and annotates nested do
   })
   assert.equal(updated.status, 200)
   catalog = await (await fetch(`${base}/api/library/catalog`, { headers })).json()
-  assert.equal(catalog.documents[0].title, 'Engine systems')
-  assert.equal(catalog.documents[0].category, 'Systems')
-  assert.equal(catalog.documents[0].notes, 'Approved')
+  const updatedEngine = catalog.documents.find((document) => document.path.endsWith('Engine.md'))
+  assert.equal(updatedEngine.title, 'Engine systems')
+  assert.equal(updatedEngine.category, 'Systems')
+  assert.equal(updatedEngine.notes, 'Approved')
 })
 
 test('library rejects hidden paths, traversal, empty files, oversized metadata, and symlinks', async (t) => {
@@ -303,6 +313,14 @@ test('machine library sync uses a dedicated bearer token without a browser sessi
   })
   assert.equal(catalog.status, 200)
   assert.equal((await catalog.json()).documents[0].path, 'Sources/guide.txt')
+  const indexUrl = `${base}/api/ingest/library/search-index`
+  assert.equal((await fetch(indexUrl, {
+    method: 'PUT', headers: { 'Content-Type': 'application/octet-stream', Authorization: `Bearer ${librarySyncToken}` }, body: 'not sqlite',
+  })).status, 400)
+  const sqliteHeader = Buffer.concat([Buffer.from('SQLite format 3\0', 'binary'), Buffer.alloc(128)])
+  assert.equal((await fetch(indexUrl, {
+    method: 'PUT', headers: { 'Content-Type': 'application/vnd.sqlite3', Authorization: `Bearer ${librarySyncToken}` }, body: sqliteHeader,
+  })).status, 201)
   assert.equal((await fetch(`${base}/api/library/catalog`)).status, 401)
 })
 

@@ -10,7 +10,8 @@ This app is published at `https://data.erpl.space/`.
 
 `https://data.erpl.space/library` is the team's protected document vault. It
 uses the same one-hour shared-password session as online telemetry. Members can
-browse a nested folder tree, search document metadata, filter by category,
+move through an Obsidian-style graph built from real note links, search note
+content and indexed PDF passages, filter by category,
 preview Markdown, text, PDF, images, audio, and video, follow Obsidian-style
 `[[wiki links]]`, download originals, and add shared notes or categories.
 
@@ -30,14 +31,25 @@ ERPL_LIBRARY_SYNC_TOKEN="..." \
 npm run upload:library
 ```
 
+The vault's retrieval database can be published separately to enable PDF
+full-text search without exposing the raw local retrieval directory:
+
+```bash
+LIBRARY_SEARCH_INDEX="/path/to/Engineering Brain/.retrieval/index.sqlite3" \
+ERPL_LIBRARY_URL="https://data.erpl.space" \
+ERPL_LIBRARY_SYNC_TOKEN="..." \
+npm run upload:library-index
+```
+
 The bulk sync intentionally ignores `.venv`, `.retrieval`, `.obsidian`, `.git`,
 `node_modules`, and `.DS_Store`; those are local runtime/configuration artifacts,
 not team documents. Existing files with the same path and byte size are skipped,
 so the command can safely resume after an interrupted upload.
 
 The optional `ERPL_LIBRARY_SYNC_TOKEN` is a distinct machine credential accepted
-only by `PUT /api/ingest/library`; it does not unlock browsing, telemetry, or
-other library actions. Interactive sync can use `ERPL_DATA_PASSWORD` instead.
+only by the library sync and verification routes; it does not unlock interactive
+browsing, telemetry, or team-library edits. Interactive sync can use
+`ERPL_DATA_PASSWORD` instead.
 
 ## Local development
 
