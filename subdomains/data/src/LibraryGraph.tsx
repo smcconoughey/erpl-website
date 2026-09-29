@@ -193,8 +193,9 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.lineWidth = 1.3 / camera.scale
           context.stroke()
         }
-        const important = node.degree >= 5
-        if (showLabels && (camera.scale > .35 || important || isHovered || isSelected || (queryActive && isMatch))) {
+        const important = width >= 700 && node.degree >= 5
+        const labelZoom = width < 700 ? .62 : .35
+        if (showLabels && (camera.scale > labelZoom || important || isHovered || isSelected || (queryActive && isMatch))) {
           const fontSize = 10 / camera.scale
           context.font = `${isHovered || isSelected ? 600 : 400} ${fontSize}px system-ui, sans-serif`
           context.textAlign = 'center'
