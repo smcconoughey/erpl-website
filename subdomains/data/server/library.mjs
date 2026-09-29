@@ -207,8 +207,10 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
       throw error
     }
     const pythonPath = process.env.ERPL_PYTHON_PATH || 'python3'
+    const availablePaths = (await walk()).map(({ path }) => path)
     const results = await new Promise((resolveResults, reject) => {
-      const child = spawn(pythonPath, [searchRunner, searchIndexFile, query, '40'], { stdio: ['ignore', 'pipe', 'pipe'] })
+      const child = spawn(pythonPath, [searchRunner, searchIndexFile, query, '40'], { stdio: ['pipe', 'pipe', 'pipe'] })
+      child.stdin.end(JSON.stringify(availablePaths))
       let stdout = ''
       let stderr = ''
       const timeout = setTimeout(() => child.kill('SIGKILL'), 5000)
