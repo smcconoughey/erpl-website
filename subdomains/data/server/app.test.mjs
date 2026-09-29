@@ -319,9 +319,9 @@ test('read-only brain link provides catalog, search, document and paginated PDF 
 
   assert.equal((await fetch(`${base}/api/brain/${'wrong'.repeat(10)}`)).status, 404)
   const passwordLink = `${base}/api/brain/${encodeURIComponent(password)}`
-  assert.equal((await fetch(passwordLink)).status, 200)
-  assert.equal((await fetch(`${passwordLink}/catalog`)).status, 200)
-  assert.equal((await fetch(`${passwordLink}/document?path=Topics%2FSafety.md`, {
+  assert.equal((await fetch(passwordLink)).status, 404)
+  assert.equal((await fetch(`${passwordLink}/catalog`)).status, 404)
+  assert.equal((await fetch(`${link}/document?path=Topics%2FSafety.md`, {
     method: 'PUT', body: '# overwritten',
   })).status, 404)
   assert.equal(await readFile(join(files, 'Topics', 'Safety.md'), 'utf8'), '# Safety\n\n[[Sources/PDFs/Manual.pdf]]')
