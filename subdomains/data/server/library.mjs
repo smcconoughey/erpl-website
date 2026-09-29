@@ -188,7 +188,15 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
     if (!found) return res.status(cleanPath(req.query.path) ? 404 : 400).json({ error: cleanPath(req.query.path) ? 'Document not found.' : 'Choose a valid document.' })
     const index = await readIndex()
     const mime = contentType(found.path, index[found.path]?.mime)
-    res.set({ 'Content-Type': mime, 'Content-Length': String(found.stat.size), 'Content-Disposition': `${req.query.download === '1' ? 'attachment' : 'inline'}; filename="${basename(found.path).replace(/["\\]/g, '')}"` })
+    res.set({
+      'Content-Type': mime,
+      'Content-Length': String(found.stat.size),
+      'Content-Disposition': `${req.query.download === '1' ? 'attachment' : 'inline'}; filename="${basename(found.path).replace(/["\\]/g, '')}"`,
+      // The app itself stays DENY. Only authenticated library files may be
+      // embedded, and only by a page on this exact origin.
+      'X-Frame-Options': 'SAMEORIGIN',
+      'Content-Security-Policy': "frame-ancestors 'self'",
+    })
     const stream = createReadStream(found.target)
     stream.on('error', next)
     stream.pipe(res)

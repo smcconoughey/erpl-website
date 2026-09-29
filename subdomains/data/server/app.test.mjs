@@ -57,7 +57,9 @@ test('catalog and bytes require authentication; only dist is public', async (t) 
   for (const path of ['/testdata/2026-09-19/hot%20fire.csv', '/testdata/.auth/attempts.json', '/.env', '/server/app.mjs']) {
     assert.equal((await fetch(base + path)).status, 404)
   }
-  assert.match(await (await fetch(base)).text(), /Datanator/)
+  const appPage = await fetch(base)
+  assert.equal(appPage.headers.get('x-frame-options'), 'DENY')
+  assert.match(await appPage.text(), /Datanator/)
   const loggedIn = await login()
   assert.equal(loggedIn.status, 200)
   assert.match(loggedIn.headers.get('set-cookie'), /HttpOnly/)
@@ -252,6 +254,8 @@ test('team library securely uploads, catalogs, previews, and annotates nested do
   const file = await fetch(`${base}/api/library/file?path=Topics%2FPropulsion%2FEngine.md`, { headers })
   assert.equal(file.status, 200)
   assert.match(file.headers.get('content-type'), /^text\/markdown/)
+  assert.equal(file.headers.get('x-frame-options'), 'SAMEORIGIN')
+  assert.equal(file.headers.get('content-security-policy'), "frame-ancestors 'self'")
   assert.equal(await file.text(), '# Engine\n\n[[Injector]]')
 
   const updated = await fetch(`${base}/api/library/document`, {
