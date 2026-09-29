@@ -23,14 +23,15 @@ type GraphNode = SimulationNodeDatum & {
 type GraphLink = SimulationLinkDatum<GraphNode> & {
   source: string | GraphNode
   target: string | GraphNode
+  kind: 'citation' | 'topic'
 }
 
 type Camera = { x: number; y: number; scale: number }
 
 const colorFor = (document: LibraryDocument) => {
+  if (document.path.startsWith('Topics/')) return '#46bce8'
   const name = document.name.toUpperCase()
   if (name.startsWith('NASA')) return '#61a9ff'
-  if (name.startsWith('ECSS') || name.startsWith('ESA')) return '#46bce8'
   if (/^(ASME|AIAA|AWS|ASTM)/.test(name)) return '#68d59a'
   return '#b8b9bd'
 }
@@ -64,7 +65,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
   const selected = documents.find((document) => document.path === selectedPath)
 
   const graph = useMemo(() => buildPdfGraph(documents), [documents])
-  const graphDocuments = graph.pdfs
+  const graphDocuments = graph.nodes
   const graphLinkCount = graph.edges.length
 
   const visiblePaths = useMemo(() => {
@@ -79,30 +80,35 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
 
   useEffect(() => {
     const degree = new Map(graphDocuments.map((document) => [document.path, 0]))
-    const links: GraphLink[] = graph.edges.map((edge) => ({ source: edge.source, target: edge.target }))
+    const links: GraphLink[] = graph.edges.map((edge) => ({ source: edge.source, target: edge.target, kind: edge.kind }))
     graph.edges.forEach((edge) => {
       degree.set(edge.source, (degree.get(edge.source) || 0) + 1)
       degree.set(edge.target, (degree.get(edge.target) || 0) + 1)
     })
     const nodes: GraphNode[] = graphDocuments.map((document, index) => {
-      const angle = index * 2.399963229728653
-      const radius = 68 * Math.sqrt(index + 1)
+      const topic = document.path.startsWith('Topics/')
+      const topicIndex = index
+      const pdfIndex = index - graph.topics.length
+      const angle = topic ? topicIndex * Math.PI * 2 / Math.max(1, graph.topics.length) : pdfIndex * 2.399963229728653
+      const radius = topic ? 700 : 85 * Math.sqrt(pdfIndex + 1)
       const connections = degree.get(document.path) || 0
       return {
         id: document.path,
         document,
         degree: connections,
-        radius: 4 + Math.min(7, Math.sqrt(connections) * 1.35),
+        radius: topic ? 16 + Math.min(8, Math.sqrt(connections) * 1.1) : 4 + Math.min(7, Math.sqrt(connections) * 1.35),
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
+        fx: topic ? Math.cos(angle) * radius : undefined,
+        fy: topic ? Math.sin(angle) * radius : undefined,
       }
     })
     nodesRef.current = nodes
     linksRef.current = links
     const simulation = forceSimulation(nodes)
-      .force('link', forceLink<GraphNode, GraphLink>(links).id((node) => node.id).distance(285).strength(0.22))
-      .force('charge', forceManyBody<GraphNode>().strength((node) => -480 - Math.min(node.degree, 18) * 15).distanceMax(1800))
-      .force('collide', forceCollide<GraphNode>().radius((node) => node.radius + 52).strength(0.9))
+      .force('link', forceLink<GraphNode, GraphLink>(links).id((node) => node.id).distance((link) => link.kind === 'topic' ? 620 : 390).strength((link) => link.kind === 'topic' ? 0.06 : 0.1))
+      .force('charge', forceManyBody<GraphNode>().strength((node) => node.document.path.startsWith('Topics/') ? -1700 : -650 - Math.min(node.degree, 8) * 25).distanceMax(2600))
+      .force('collide', forceCollide<GraphNode>().radius((node) => node.radius + (node.document.path.startsWith('Topics/') ? 130 : 68)).strength(0.95))
       .force('center', forceCenter(0, 0).strength(0.015))
       .force('x', forceX<GraphNode>(0).strength((node) => node.degree ? 0.004 : 0.08))
       .force('y', forceY<GraphNode>(0).strength((node) => node.degree ? 0.004 : 0.08))
@@ -111,6 +117,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
       .on('tick', () => drawRef.current())
     simulation.stop()
     simulation.tick(300)
+    nodes.filter((node) => node.document.path.startsWith('Topics/')).forEach((node) => { node.fx = null; node.fy = null })
     simulationRef.current = simulation
     drawRef.current()
     return () => { simulation.stop(); simulationRef.current = null }
@@ -167,7 +174,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
         context.beginPath()
         context.moveTo(source.x, source.y)
         context.lineTo(target.x, target.y)
-        context.strokeStyle = adjacent ? 'rgba(119, 190, 238, .8)' : selectedAdjacent ? 'rgba(89, 154, 205, .58)' : searchAdjacent ? 'rgba(102, 170, 220, .5)' : 'rgba(104, 108, 114, .22)'
+        context.strokeStyle = adjacent ? 'rgba(119, 190, 238, .8)' : selectedAdjacent ? 'rgba(89, 154, 205, .58)' : searchAdjacent ? 'rgba(102, 170, 220, .5)' : link.kind === 'topic' ? 'rgba(70, 188, 232, .3)' : 'rgba(104, 108, 114, .25)'
         context.lineWidth = (adjacent ? 1.6 : selectedAdjacent ? 1.1 : .75) / camera.scale
         context.stroke()
       }
@@ -193,17 +200,18 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.lineWidth = 1.3 / camera.scale
           context.stroke()
         }
-        const important = width >= 700 && node.degree >= 5
-        const labelZoom = width < 700 ? .62 : .35
+        const topic = node.document.path.startsWith('Topics/')
+        const important = topic
+        const labelZoom = width < 700 ? .62 : .75
         if (showLabels && (camera.scale > labelZoom || important || isHovered || isSelected || (queryActive && isMatch))) {
-          const fontSize = 10 / camera.scale
-          context.font = `${isHovered || isSelected ? 600 : 400} ${fontSize}px system-ui, sans-serif`
+          const fontSize = (topic ? 12 : 10) / camera.scale
+          context.font = `${topic || isHovered || isSelected ? 600 : 400} ${fontSize}px system-ui, sans-serif`
           context.textAlign = 'center'
           context.textBaseline = 'top'
-          context.fillStyle = isSelected ? '#fff2c7' : '#d7d8db'
+          context.fillStyle = isSelected ? '#fff2c7' : topic ? '#c9edfc' : '#d7d8db'
           context.shadowColor = '#171717'
           context.shadowBlur = 4 / camera.scale
-          context.fillText(node.document.title, node.x, node.y + radius + 4 / camera.scale, 155 / camera.scale)
+          context.fillText(node.document.title, node.x, node.y + radius + 4 / camera.scale, (topic ? 205 : 155) / camera.scale)
           context.shadowBlur = 0
         }
         context.globalAlpha = 1
@@ -281,8 +289,8 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
   }, [])
 
   return <section className="library-graph" ref={shellRef}>
-    <div className="graph-titlebar"><span>PDF graph</span><button type="button" aria-label="Graph menu" onClick={() => setSettingsOpen((value) => !value)}>•••</button></div>
-    <canvas ref={canvasRef} aria-label={`Knowledge graph with ${graphDocuments.length} PDF documents`}
+    <div className="graph-titlebar"><span>Graph view</span><button type="button" aria-label="Graph menu" onClick={() => setSettingsOpen((value) => !value)}>•••</button></div>
+    <canvas ref={canvasRef} aria-label={`Knowledge graph with ${graph.topics.length} topics and ${graph.pdfs.length} PDF documents`}
       onPointerDown={(event) => {
         const point = graphPoint(event)
         const node = hitNode(point.x, point.y)
@@ -341,14 +349,14 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
       <button type="button" className="btn compact" onClick={() => { simulationRef.current?.alpha(.9).restart(); setSettingsOpen(false) }}>Reheat layout</button>
     </div> : null}
     <div className="graph-legend">
-      <span><i className="system" /> NASA</span><span><i className="topic" /> ECSS / ESA</span><span><i className="feedback" /> Engineering standards</span><span><i className="source" /> Other PDFs</span>
+      <span><i className="topic" /> Topics</span><span><i className="system" /> NASA PDFs</span><span><i className="feedback" /> Standards PDFs</span><span><i className="source" /> Other PDFs</span>
     </div>
-    <div className="graph-status">{graphDocuments.length} PDFs · {graphLinkCount} topic links · pinch or scroll to zoom · drag to pan</div>
+    <div className="graph-status">{graph.topics.length} topics · {graph.pdfs.length} PDFs · {graphLinkCount} links · pinch or scroll to zoom · drag to pan</div>
     {(hoveredPath || selected) ? <div className="graph-node-card">
-      <span className="kicker">{hoveredPath ? 'PDF source' : 'Selected PDF'}</span>
+      <span className="kicker">{(hoveredPath || selectedPath).startsWith('Topics/') ? 'Topic' : 'PDF source'}</span>
       <strong>{documents.find((document) => document.path === hoveredPath)?.title || selected?.title}</strong>
       <small>{hoveredPath || selected?.path}</small>
-      {selected && !hoveredPath ? <button type="button" className="btn compact" onClick={() => onOpen(selected.path)}>Open PDF</button> : null}
+      {selected && !hoveredPath ? <button type="button" className="btn compact" onClick={() => onOpen(selected.path)}>Open {selected.kind === 'pdf' ? 'PDF' : 'topic'}</button> : null}
     </div> : null}
   </section>
 }
