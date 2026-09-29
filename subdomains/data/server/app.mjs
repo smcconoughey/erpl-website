@@ -139,6 +139,9 @@ export function createApp(options = {}) {
   app.get('/api/library/search', library.search)
   app.get('/api/library/file', library.file)
   app.post('/api/library/topic', requireJson, express.json({ limit: '8kb' }), library.createTopic)
+  app.put('/api/library/search-index',
+    express.raw({ type: ['application/vnd.sqlite3', 'application/octet-stream'], limit: MAX_SEARCH_INDEX_BYTES }),
+    library.uploadSearchIndex)
   app.put('/api/library/document', express.raw({ type: '*/*', limit: MAX_LIBRARY_BYTES }), library.upload)
   app.patch('/api/library/document', requireJson, express.json({ limit: '8kb' }), library.update)
 

@@ -63,6 +63,10 @@ ERPL_LIBRARY_SYNC_TOKEN="..." \
 npm run upload:library-index
 ```
 
+Signed-in team members can also set `ERPL_DATA_PASSWORD` instead of
+`ERPL_LIBRARY_SYNC_TOKEN` for this index upload. The index route remains
+write-protected; the `/api/brain/` link cannot publish an index.
+
 The bulk sync intentionally ignores `.venv`, `.retrieval`, `.obsidian`, `.git`,
 `node_modules`, and `.DS_Store`; those are local runtime/configuration artifacts,
 not team documents. Existing files with the same path and byte size are skipped,

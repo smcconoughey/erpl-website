@@ -387,7 +387,7 @@ test('library rejects hidden paths, traversal, empty files, oversized metadata, 
 })
 
 test('machine library sync uses a dedicated bearer token without a browser session', async (t) => {
-  const { base } = await fixture(t)
+  const { base, login } = await fixture(t)
   const url = `${base}/api/ingest/library?${new URLSearchParams({ path: 'Sources/guide.txt', category: 'Sources' })}`
   assert.equal((await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'text/plain' }, body: 'guide' })).status, 401)
   assert.equal((await fetch(url, {
@@ -409,6 +409,17 @@ test('machine library sync uses a dedicated bearer token without a browser sessi
   const sqliteHeader = Buffer.concat([Buffer.from('SQLite format 3\0', 'binary'), Buffer.alloc(128)])
   assert.equal((await fetch(indexUrl, {
     method: 'PUT', headers: { 'Content-Type': 'application/vnd.sqlite3', Authorization: `Bearer ${librarySyncToken}` }, body: sqliteHeader,
+  })).status, 201)
+  const browserIndexUrl = `${base}/api/library/search-index`
+  assert.equal((await fetch(browserIndexUrl, {
+    method: 'PUT', headers: { 'Content-Type': 'application/vnd.sqlite3' }, body: sqliteHeader,
+  })).status, 401)
+  const sessionHeaders = { Cookie: cookieOf(await login()), 'Content-Type': 'application/vnd.sqlite3' }
+  assert.equal((await fetch(browserIndexUrl, {
+    method: 'PUT', headers: sessionHeaders, body: 'not sqlite',
+  })).status, 400)
+  assert.equal((await fetch(browserIndexUrl, {
+    method: 'PUT', headers: sessionHeaders, body: sqliteHeader,
   })).status, 201)
   assert.equal((await fetch(`${base}/api/library/catalog`)).status, 401)
 })
