@@ -104,12 +104,15 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
       .force('charge', forceManyBody<GraphNode>().strength((node) => -480 - Math.min(node.degree, 18) * 15).distanceMax(1800))
       .force('collide', forceCollide<GraphNode>().radius((node) => node.radius + 52).strength(0.9))
       .force('center', forceCenter(0, 0).strength(0.015))
-      .force('x', forceX<GraphNode>(0).strength(0.004))
-      .force('y', forceY<GraphNode>(0).strength(0.004))
+      .force('x', forceX<GraphNode>(0).strength((node) => node.degree ? 0.004 : 0.08))
+      .force('y', forceY<GraphNode>(0).strength((node) => node.degree ? 0.004 : 0.08))
       .alphaDecay(0.022)
       .velocityDecay(0.34)
       .on('tick', () => drawRef.current())
+    simulation.stop()
+    simulation.tick(300)
     simulationRef.current = simulation
+    drawRef.current()
     return () => { simulation.stop(); simulationRef.current = null }
   }, [graph])
 
@@ -174,7 +177,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
         const isHovered = hovered?.id === node.id
         const isSelected = selectedPath === node.id
         const isMatch = !queryActive || matchedPaths.has(node.id)
-        const radius = node.radius + (isHovered || isSelected ? 2.5 : 0)
+        const radius = Math.max(node.radius, 3.2 / camera.scale) + (isHovered || isSelected ? 2.5 / camera.scale : 0)
         context.globalAlpha = isMatch ? 1 : .16
         context.beginPath()
         context.arc(node.x, node.y, radius, 0, Math.PI * 2)
@@ -192,14 +195,14 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
         }
         const important = node.degree >= 5
         if (showLabels && (camera.scale > .35 || important || isHovered || isSelected || (queryActive && isMatch))) {
-          const fontSize = Math.max(8.5, 11 / Math.sqrt(camera.scale))
+          const fontSize = 10 / camera.scale
           context.font = `${isHovered || isSelected ? 600 : 400} ${fontSize}px system-ui, sans-serif`
           context.textAlign = 'center'
           context.textBaseline = 'top'
           context.fillStyle = isSelected ? '#fff2c7' : '#d7d8db'
           context.shadowColor = '#171717'
           context.shadowBlur = 4 / camera.scale
-          context.fillText(node.document.title, node.x, node.y + radius + 4 / camera.scale, 180)
+          context.fillText(node.document.title, node.x, node.y + radius + 4 / camera.scale, 155 / camera.scale)
           context.shadowBlur = 0
         }
         context.globalAlpha = 1
@@ -254,10 +257,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
     drawRef.current()
   }
 
-  useEffect(() => {
-    const timers = [900, 2600].map((delay) => window.setTimeout(fit, delay))
-    return () => timers.forEach(window.clearTimeout)
-  }, [graphDocuments])
+  useEffect(() => { const timer = window.setTimeout(fit, 50); return () => window.clearTimeout(timer) }, [graphDocuments])
 
   useEffect(() => {
     const canvas = canvasRef.current
