@@ -274,7 +274,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
   useEffect(() => { const timer = window.setTimeout(fit, 900); return () => window.clearTimeout(timer) }, [graphDocuments])
 
   return <section className="library-graph" ref={shellRef}>
-    <div className="graph-titlebar"><span>Graph view</span><button type="button" aria-label="Graph menu">•••</button></div>
+    <div className="graph-titlebar"><span>Graph view</span><button type="button" aria-label="Graph menu" onClick={() => setSettingsOpen((value) => !value)}>•••</button></div>
     <canvas ref={canvasRef} aria-label={`Knowledge graph with ${graphDocuments.length} notes`}
       onPointerDown={(event) => {
         const point = graphPoint(event)

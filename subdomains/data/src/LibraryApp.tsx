@@ -268,8 +268,9 @@ function DocumentReader({ document, documents, page, onNavigate, onUpdated }: {
     } catch (caught) { setError((caught as Error).message) }
   }
   const resolveWiki = (target: string) => {
-    const clean = decodeURIComponent(target.replace(/^wiki:/, '')).toLowerCase()
-    const found = documents.find((item) => item.title.toLowerCase() === clean || item.name.replace(/\.[^.]+$/, '').toLowerCase() === clean || item.path.toLowerCase() === clean)
+    const clean = decodeURIComponent(target.replace(/^wiki:/, '')).split('#')[0].toLowerCase()
+    const found = documents.find((item) => item.path.toLowerCase() === clean || item.path.replace(/\.[^.]+$/, '').toLowerCase() === clean)
+      || documents.find((item) => item.kind === 'markdown' && (item.title.toLowerCase() === clean || item.name.replace(/\.[^.]+$/, '').toLowerCase() === clean))
     if (found) onNavigate(found.path)
   }
   const markdown = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n/, '')
