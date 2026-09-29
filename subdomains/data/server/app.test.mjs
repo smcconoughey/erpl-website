@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { once } from 'node:events'
 import { mkdtemp, mkdir, readFile, rm, writeFile, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -11,6 +12,7 @@ const password = 'test-only-shared-password'
 const secret = 'test-only-session-secret-at-least-32-characters'
 const ingestToken = 'test-only-machine-ingest-token-at-least-32-characters'
 const librarySyncToken = 'test-only-library-sync-token-at-least-32-characters'
+const brainLinkToken = 'test-only-brain-link-token-at-least-32-characters'
 const csv = 'elapsed_s,pressure (psi)\n0,10\n1,20\n2,15\n3,12\n'
 
 async function fixture(t, options = {}) {
@@ -277,6 +279,53 @@ test('team library securely uploads, catalogs, previews, and annotates nested do
   assert.equal(updatedEngine.title, 'Engine systems')
   assert.equal(updatedEngine.category, 'Systems')
   assert.equal(updatedEngine.notes, 'Approved')
+})
+
+test('read-only brain link provides catalog, search, document and paginated PDF text without a session', async (t) => {
+  const { base, dataDir } = await fixture(t, { brainLinkToken })
+  const link = `${base}/api/brain/${brainLinkToken}`
+  const files = join(dataDir, '.library', 'files')
+  await mkdir(join(files, 'Topics'), { recursive: true })
+  await mkdir(join(files, 'Sources', 'PDFs'), { recursive: true })
+  await writeFile(join(files, 'Topics', 'Safety.md'), '# Safety\n\n[[Sources/PDFs/Manual.pdf]]')
+  await writeFile(join(files, 'Sources', 'PDFs', 'Manual.pdf'), '%PDF-test')
+
+  assert.equal((await fetch(`${base}/api/brain/${'wrong'.repeat(10)}`)).status, 404)
+  const discovery = await (await fetch(link)).json()
+  assert.equal(discovery.readOnly, true)
+  assert.match(discovery.endpoints.catalog, /\/catalog$/)
+  const catalogResponse = await fetch(`${link}/catalog`)
+  assert.equal(catalogResponse.status, 200)
+  assert.equal(catalogResponse.headers.get('access-control-allow-origin'), '*')
+  const catalog = await catalogResponse.json()
+  assert.equal(catalog.documents.length, 2)
+  assert.deepEqual(catalog.documents.find((item) => item.kind === 'markdown').links, ['Sources/PDFs/Manual.pdf'])
+  assert.deepEqual(await (await fetch(`${link}/search?q=safety`)).json(), { indexed: false, results: [] })
+  const note = await (await fetch(`${link}/document?path=Topics%2FSafety.md`)).json()
+  assert.match(note.content, /# Safety/)
+  assert.equal(note.document.kind, 'markdown')
+  const pdf = await (await fetch(`${link}/document?path=Sources%2FPDFs%2FManual.pdf`)).json()
+  assert.equal(pdf.document.kind, 'pdf')
+  assert.match(pdf.document.textPages, /\/text\?/)
+  assert.equal(await (await fetch(`${link}/file?path=Sources%2FPDFs%2FManual.pdf`)).text(), '%PDF-test')
+  assert.deepEqual(await (await fetch(`${link}/text?path=Sources%2FPDFs%2FManual.pdf`)).json(), {
+    path: 'Sources/PDFs/Manual.pdf', indexed: false, totalPages: 0, pages: [],
+  })
+  assert.equal((await fetch(`${link}/text?path=..%2Fnotes.txt`)).status, 400)
+  assert.equal((await fetch(`${link}/text?path=Sources%2FPDFs%2FManual.pdf&limit=11`)).status, 400)
+  assert.equal((await fetch(`${link}/document?path=missing.md`)).status, 404)
+  assert.equal((await fetch(`${link}/document`, { method: 'PUT', body: 'bad' })).status, 404)
+  assert.equal((await fetch(`${base}/api/library/catalog`)).status, 401)
+
+  const indexPath = join(dataDir, '.library', 'search', 'index.sqlite3')
+  await mkdir(join(dataDir, '.library', 'search'), { recursive: true })
+  const script = 'import sqlite3,sys\ndb=sqlite3.connect(sys.argv[1])\ndb.execute("CREATE VIRTUAL TABLE passages USING fts5(path UNINDEXED,page UNINDEXED,kind UNINDEXED,body)")\ndb.executemany("INSERT INTO passages VALUES(?,?,?,?)",[("Sources/PDFs/Manual.pdf",1,"pdf","Pressure test procedures"),("Sources/PDFs/Manual.pdf",2,"pdf","Inspection criteria")])\ndb.commit()'
+  const created = spawnSync('python3', ['-c', script, indexPath], { encoding: 'utf8' })
+  assert.equal(created.status, 0, created.stderr)
+  const pages = await (await fetch(`${link}/text?path=Sources%2FPDFs%2FManual.pdf&start=2&limit=1`)).json()
+  assert.equal(pages.indexed, true)
+  assert.equal(pages.totalPages, 2)
+  assert.deepEqual(pages.pages, [{ page: 2, text: 'Inspection criteria' }])
 })
 
 test('library rejects hidden paths, traversal, empty files, oversized metadata, and symlinks', async (t) => {

@@ -9,16 +9,30 @@ This app is published at `https://data.erpl.space/`.
 ## Engineering Brain
 
 `https://data.erpl.space/library` is the team's protected document vault. It
-uses the same one-hour shared-password session as online telemetry. Members can
-move through an Obsidian-style graph built from real note links, search note
-content and indexed PDF passages, filter by category,
-preview Markdown, text, PDF, images, audio, and video, follow Obsidian-style
-`[[wiki links]]`, download originals, and add shared notes or categories.
+uses the same one-hour shared-password session as online telemetry. Its
+full-canvas graph shows topic notes as hubs and their linked PDF sources;
+unrelated Markdown files are not graph nodes. Members can search all notes and
+indexed PDF passages from the top bar, pinch or scroll to zoom, preview files,
+follow Obsidian-style `[[wiki links]]`, download originals, and add shared notes
+or categories.
 
 The **Add to library** ingestion dialog accepts individual files or complete
 folders while preserving relative paths. Files are limited to 100 MB each and
 are written atomically. The browser upload route is available only to signed-in
-members; no public write endpoint or cross-origin access is enabled.
+members. There is no unauthenticated write endpoint.
+
+### Read-only agent link
+
+Set `ERPL_BRAIN_LINK_TOKEN` to a random value of at least 32 characters in the
+data server's environment. Give agents the single discovery URL
+`https://data.erpl.space/api/brain/<token>`; it requires no login or request
+headers and advertises the catalog, full-text search, document, paginated PDF
+text, and original-file URLs. The catalog includes resolved wiki links and note
+content. PDF text comes from the hosted search index and may omit scanned pages;
+agents should check the original PDF for technical claims. These read-only routes
+allow cross-origin GET requests. Treat the URL as a secret: anyone with it can
+read the entire hosted library, including team notes and standards PDFs. The
+ordinary `/api/library` routes remain session-protected.
 
 Library originals and metadata live under `testdata/.library/` on the persistent
 disk and are not served by Express's static middleware. To sync an existing vault

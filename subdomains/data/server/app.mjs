@@ -1,5 +1,5 @@
 import express from 'express'
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import { lstat, readdir, realpath } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -25,9 +25,12 @@ export function createApp(options = {}) {
   const production = options.production ?? process.env.NODE_ENV === 'production'
   const password = options.password ?? process.env.ERPL_DATA_PASSWORD
   const secret = options.secret ?? process.env.ERPL_SESSION_SECRET ?? (production ? '' : randomBytes(32).toString('hex'))
+  const brainLinkToken = options.brainLinkToken ?? process.env.ERPL_BRAIN_LINK_TOKEN ?? ''
   if (production && (!password || secret.length < 32)) {
     throw new Error('Set ERPL_DATA_PASSWORD and ERPL_SESSION_SECRET (at least 32 characters) before starting in production.')
   }
+  if (brainLinkToken && brainLinkToken.length < 32) throw new Error('ERPL_BRAIN_LINK_TOKEN must contain at least 32 characters.')
+  const brainLinkHash = brainLinkToken ? createHash('sha256').update(brainLinkToken).digest() : null
   const dataDir = resolve(options.dataDir ?? process.env.ERPL_TESTDATA_DIR ?? join(root, 'testdata'))
   const distDir = resolve(options.distDir ?? join(root, 'dist'))
   if (inside(distDir, dataDir) || inside(dataDir, distDir)) throw new Error('testdata and dist must be separate directories.')
@@ -69,6 +72,33 @@ export function createApp(options = {}) {
   })
   app.get('/api/online/status', auth.status)
   app.get('/api/library/status', auth.status)
+  const requireBrainLink = (req, res, next) => {
+    const key = req.params.key
+    const hash = createHash('sha256').update(typeof key === 'string' ? key : '').digest()
+    if (!brainLinkHash || !key || !timingSafeEqual(hash, brainLinkHash)) return res.status(404).json({ error: 'Brain link not found.' })
+    res.set('Access-Control-Allow-Origin', '*')
+    next()
+  }
+  app.get('/api/brain/:key', requireBrainLink, (req, res) => {
+    const base = req.path
+    res.json({
+      name: 'ERPL Engineering Brain', version: 1, readOnly: true,
+      description: 'Search and read the ERPL engineering library. Topic notes link to PDF sources; verify engineering claims against original pages.',
+      endpoints: {
+        catalog: `${base}/catalog`,
+        search: `${base}/search?q=pressure`,
+        document: `${base}/document?path=Topics%2FPressure%20systems%20and%20facility%20safety.md`,
+        pdfText: `${base}/text?path=Sources%2FPDFs%2FASME-PCC-2-2018.pdf&start=1&limit=5`,
+        file: `${base}/file?path=Sources%2FPDFs%2FASME-PCC-2-2018.pdf`,
+      },
+      notes: 'No login or headers are needed. Keep this link private; anyone with it can read the library. The PDF text endpoint is paginated and only covers indexed pages. Uploads and edits are not available here.',
+    })
+  })
+  app.get('/api/brain/:key/catalog', requireBrainLink, library.catalog)
+  app.get('/api/brain/:key/search', requireBrainLink, library.search)
+  app.get('/api/brain/:key/document', requireBrainLink, library.brainDocument)
+  app.get('/api/brain/:key/text', requireBrainLink, library.brainText)
+  app.get('/api/brain/:key/file', requireBrainLink, library.file)
   app.post('/api/online/login', (req, res, next) => {
     if (!req.is('application/json')) return res.status(415).json({ error: 'Expected a JSON request.' })
     next()

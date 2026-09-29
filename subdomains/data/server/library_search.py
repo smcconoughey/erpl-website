@@ -5,6 +5,21 @@ import sys
 
 
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "pages":
+        database, path, raw_start, raw_limit = sys.argv[2:6]
+        start = max(int(raw_start), 1)
+        limit = min(max(int(raw_limit), 1), 10)
+        connection = sqlite3.connect(f"file:{database}?mode=ro", uri=True)
+        total = connection.execute(
+            'SELECT MAX(page) FROM passages WHERE path=? AND kind="pdf"', (path,)
+        ).fetchone()[0]
+        rows = connection.execute(
+            'SELECT page, body FROM passages WHERE path=? AND kind="pdf" AND page>=? ORDER BY page LIMIT ?',
+            (path, start, limit),
+        ).fetchall()
+        print(json.dumps({"indexed": total is not None, "totalPages": total or 0,
+                          "pages": [{"page": page, "text": body} for page, body in rows]}))
+        return
     database, raw_query, raw_limit = sys.argv[1:4]
     allowed_paths = json.load(sys.stdin)
     if not isinstance(allowed_paths, list) or not allowed_paths:

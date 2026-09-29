@@ -295,5 +295,61 @@ export function createLibrary({ dataDir, token, now = Date.now }) {
     stream.pipe(res)
   }
 
-  return { requireToken, catalog, upload, uploadSearchIndex, search, update, file }
+  async function brainDocument(req, res) {
+    const found = await resolveFile(req.query.path)
+    if (!found) return res.status(cleanPath(req.query.path) ? 404 : 400).json({ error: 'Document not found or path is invalid.' })
+    const index = await readIndex()
+    const saved = index[found.path] || {}
+    const mime = contentType(found.path, saved.mime)
+    const kind = kindFor(found.path, mime)
+    const base = req.path.slice(0, -'/document'.length)
+    const pathQuery = new URLSearchParams({ path: found.path })
+    const document = {
+      path: found.path, title: saved.title || prettyTitle(found.path), category: saved.category || found.path.split('/')[0],
+      notes: saved.notes || '', kind, mime, size: found.stat.size,
+      file: `${base}/file?${pathQuery}`,
+      ...(kind === 'pdf' ? { textPages: `${base}/text?${pathQuery}&start=1&limit=5` } : {}),
+    }
+    if (kind === 'markdown' || kind === 'text') {
+      if (found.stat.size > MAX_SEARCHABLE_TEXT_BYTES) return res.status(413).json({ error: 'This text file is too large for a single JSON response; use the file link.' })
+      return res.json({ document, content: await readFile(found.target, 'utf8') })
+    }
+    res.json({ document })
+  }
+
+  async function brainText(req, res) {
+    const found = await resolveFile(req.query.path)
+    if (!found) return res.status(cleanPath(req.query.path) ? 404 : 400).json({ error: 'Document not found or path is invalid.' })
+    if (extname(found.path).toLowerCase() !== '.pdf') return res.status(415).json({ error: 'Page text is available for PDFs; use document for notes.' })
+    const start = Number(req.query.start ?? 1)
+    const limit = Number(req.query.limit ?? 5)
+    if (!Number.isInteger(start) || start < 1 || start > 100000 || !Number.isInteger(limit) || limit < 1 || limit > 10) {
+      return res.status(400).json({ error: 'Use start from 1 to 100000 and limit from 1 to 10.' })
+    }
+    try {
+      if (!(await lstat(searchIndexFile)).isFile()) return res.json({ path: found.path, indexed: false, totalPages: 0, pages: [] })
+    } catch (error) {
+      if (error.code === 'ENOENT') return res.json({ path: found.path, indexed: false, totalPages: 0, pages: [] })
+      throw error
+    }
+    const pythonPath = process.env.ERPL_PYTHON_PATH || 'python3'
+    const result = await new Promise((resolveResult, reject) => {
+      const child = spawn(pythonPath, [searchRunner, 'pages', searchIndexFile, found.path, String(start), String(limit)], { stdio: ['ignore', 'pipe', 'pipe'] })
+      let stdout = ''
+      let stderr = ''
+      const timeout = setTimeout(() => child.kill('SIGKILL'), 5000)
+      child.stdout.on('data', (chunk) => { if (stdout.length < 2 * 1024 * 1024) stdout += chunk })
+      child.stderr.on('data', (chunk) => { if (stderr.length < 4096) stderr += chunk })
+      child.on('error', reject)
+      child.on('close', (code, signal) => {
+        clearTimeout(timeout)
+        if (code !== 0) return reject(Object.assign(new Error(signal ? 'Page text request timed out.' : 'Page text lookup failed.'), { status: 503, detail: stderr }))
+        try { resolveResult(JSON.parse(stdout)) }
+        catch { reject(Object.assign(new Error('Page text lookup returned an invalid response.'), { status: 503 })) }
+      })
+    })
+    res.json({ path: found.path, start, limit, ...result })
+  }
+
+  return { requireToken, catalog, upload, uploadSearchIndex, search, update, file, brainDocument, brainText }
 }
