@@ -38,6 +38,11 @@ allow cross-origin GET requests. Treat the URL as a secret: anyone with it can
 read the entire hosted library, including team notes and standards PDFs. The
 ordinary `/api/library` routes remain session-protected.
 
+For convenience, the shared library password also works in place of `<token>`.
+The `/api/brain/` routes remain read-only, but the shared password itself is
+**not** a read-only credential: it can also sign in to the separate upload/edit
+interface. Prefer the dedicated brain token when sharing access with agents.
+
 Library originals and metadata live under `testdata/.library/` on the persistent
 disk and are not served by Express's static middleware. To sync an existing vault
 from a trusted machine, set the source path, production URL, and shared password:

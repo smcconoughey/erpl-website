@@ -31,6 +31,7 @@ export function createApp(options = {}) {
   }
   if (brainLinkToken && brainLinkToken.length < 32) throw new Error('ERPL_BRAIN_LINK_TOKEN must contain at least 32 characters.')
   const brainLinkHash = brainLinkToken ? createHash('sha256').update(brainLinkToken).digest() : null
+  const libraryPasswordHash = password ? createHash('sha256').update(password).digest() : null
   const dataDir = resolve(options.dataDir ?? process.env.ERPL_TESTDATA_DIR ?? join(root, 'testdata'))
   const distDir = resolve(options.distDir ?? join(root, 'dist'))
   if (inside(distDir, dataDir) || inside(dataDir, distDir)) throw new Error('testdata and dist must be separate directories.')
@@ -75,7 +76,9 @@ export function createApp(options = {}) {
   const requireBrainLink = (req, res, next) => {
     const key = req.params.key
     const hash = createHash('sha256').update(typeof key === 'string' ? key : '').digest()
-    if (!brainLinkHash || !key || !timingSafeEqual(hash, brainLinkHash)) return res.status(404).json({ error: 'Brain link not found.' })
+    const matchesPassword = libraryPasswordHash ? timingSafeEqual(hash, libraryPasswordHash) : false
+    const matchesBrainLink = brainLinkHash ? timingSafeEqual(hash, brainLinkHash) : false
+    if (!key || (!matchesPassword && !matchesBrainLink)) return res.status(404).json({ error: 'Brain link not found.' })
     res.set('Access-Control-Allow-Origin', '*')
     next()
   }
@@ -91,7 +94,7 @@ export function createApp(options = {}) {
         pdfText: `${base}/text?path=Sources%2FPDFs%2FASME-PCC-2-2018.pdf&start=1&limit=5`,
         file: `${base}/file?path=Sources%2FPDFs%2FASME-PCC-2-2018.pdf`,
       },
-      notes: 'No login or headers are needed. Keep this link private; anyone with it can read the library. The PDF text endpoint is paginated and only covers indexed pages. Uploads and edits are not available here.',
+      notes: 'No login or headers are needed. Keep this link private; anyone with it can read the library. The PDF text endpoint is paginated and only covers indexed pages. This API is read-only; if the link uses the shared library password, that password can still sign in to the separate upload/edit interface.',
     })
   })
   app.get('/api/brain/:key/catalog', requireBrainLink, library.catalog)
