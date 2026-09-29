@@ -11,6 +11,7 @@ import {
   type SimulationNodeDatum,
 } from 'd3-force'
 import type { LibraryDocument } from './LibraryApp'
+import { buildPdfGraph } from './pdfGraph'
 
 type GraphNode = SimulationNodeDatum & {
   id: string
@@ -27,11 +28,11 @@ type GraphLink = SimulationLinkDatum<GraphNode> & {
 type Camera = { x: number; y: number; scale: number }
 
 const colorFor = (document: LibraryDocument) => {
-  if (document.path.startsWith('Topics/')) return '#46bce8'
-  if (document.path.startsWith('Sources/Records/')) return '#b8b9bd'
-  if (document.path.startsWith('Feedback/')) return '#68d59a'
-  if (document.path.startsWith('System/')) return '#61a9ff'
-  return '#a9afb8'
+  const name = document.name.toUpperCase()
+  if (name.startsWith('NASA')) return '#61a9ff'
+  if (name.startsWith('ECSS') || name.startsWith('ESA')) return '#46bce8'
+  if (/^(ASME|AIAA|AWS|ASTM)/.test(name)) return '#68d59a'
+  return '#b8b9bd'
 }
 
 const nodeOf = (value: string | GraphNode) => typeof value === 'string' ? null : value
@@ -62,50 +63,36 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
   const [hoveredPath, setHoveredPath] = useState('')
   const selected = documents.find((document) => document.path === selectedPath)
 
-  const graphDocuments = useMemo(() => documents.filter((document) => document.kind === 'markdown'), [documents])
-  const graphLinkCount = useMemo(() => {
-    const paths = new Set(graphDocuments.map((document) => document.path))
-    const links = new Set<string>()
-    graphDocuments.forEach((document) => document.links.forEach((target) => {
-      if (paths.has(target) && target !== document.path) links.add([document.path, target].sort().join('\u0000'))
-    }))
-    return links.size
-  }, [graphDocuments])
+  const graph = useMemo(() => buildPdfGraph(documents), [documents])
+  const graphDocuments = graph.pdfs
+  const graphLinkCount = graph.edges.length
 
   const visiblePaths = useMemo(() => {
     if (!localOnly || !selectedPath) return null
     const paths = new Set([selectedPath])
-    const selectedDocument = graphDocuments.find((document) => document.path === selectedPath)
-    selectedDocument?.links.forEach((path) => paths.add(path))
-    graphDocuments.forEach((document) => {
-      if (document.links.includes(selectedPath)) paths.add(document.path)
+    graph.edges.forEach((edge) => {
+      if (edge.source === selectedPath) paths.add(edge.target)
+      if (edge.target === selectedPath) paths.add(edge.source)
     })
     return paths
-  }, [graphDocuments, localOnly, selectedPath])
+  }, [graph, localOnly, selectedPath])
 
   useEffect(() => {
-    const graphPaths = new Set(graphDocuments.map((document) => document.path))
     const degree = new Map(graphDocuments.map((document) => [document.path, 0]))
-    const links: GraphLink[] = []
-    const linkKeys = new Set<string>()
-    graphDocuments.forEach((document) => document.links.forEach((target) => {
-      if (!graphPaths.has(target) || target === document.path) return
-      const key = [document.path, target].sort().join('\u0000')
-      if (linkKeys.has(key)) return
-      linkKeys.add(key)
-      links.push({ source: document.path, target })
-      degree.set(document.path, (degree.get(document.path) || 0) + 1)
-      degree.set(target, (degree.get(target) || 0) + 1)
-    }))
+    const links: GraphLink[] = graph.edges.map((edge) => ({ source: edge.source, target: edge.target }))
+    graph.edges.forEach((edge) => {
+      degree.set(edge.source, (degree.get(edge.source) || 0) + 1)
+      degree.set(edge.target, (degree.get(edge.target) || 0) + 1)
+    })
     const nodes: GraphNode[] = graphDocuments.map((document, index) => {
       const angle = index * 2.399963229728653
-      const radius = 38 * Math.sqrt(index + 1)
+      const radius = 68 * Math.sqrt(index + 1)
       const connections = degree.get(document.path) || 0
       return {
         id: document.path,
         document,
         degree: connections,
-        radius: 3.4 + Math.min(8, Math.sqrt(connections) * 1.45) + (document.path.startsWith('Topics/') ? 1.4 : 0),
+        radius: 4 + Math.min(7, Math.sqrt(connections) * 1.35),
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
       }
@@ -113,22 +100,18 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
     nodesRef.current = nodes
     linksRef.current = links
     const simulation = forceSimulation(nodes)
-      .force('link', forceLink<GraphNode, GraphLink>(links).id((node) => node.id).distance((link) => {
-        const source = nodeOf(link.source)
-        const target = nodeOf(link.target)
-        return source?.document.path.startsWith('Topics/') || target?.document.path.startsWith('Topics/') ? 160 : 120
-      }).strength(0.3))
-      .force('charge', forceManyBody<GraphNode>().strength((node) => -170 - Math.min(node.degree, 18) * 11).distanceMax(900))
-      .force('collide', forceCollide<GraphNode>().radius((node) => node.radius + 24).strength(0.8))
-      .force('center', forceCenter(0, 0).strength(0.03))
-      .force('x', forceX<GraphNode>(0).strength(0.012))
-      .force('y', forceY<GraphNode>(0).strength(0.012))
+      .force('link', forceLink<GraphNode, GraphLink>(links).id((node) => node.id).distance(285).strength(0.22))
+      .force('charge', forceManyBody<GraphNode>().strength((node) => -480 - Math.min(node.degree, 18) * 15).distanceMax(1800))
+      .force('collide', forceCollide<GraphNode>().radius((node) => node.radius + 52).strength(0.9))
+      .force('center', forceCenter(0, 0).strength(0.015))
+      .force('x', forceX<GraphNode>(0).strength(0.004))
+      .force('y', forceY<GraphNode>(0).strength(0.004))
       .alphaDecay(0.022)
       .velocityDecay(0.34)
       .on('tick', () => drawRef.current())
     simulationRef.current = simulation
     return () => { simulation.stop(); simulationRef.current = null }
-  }, [graphDocuments])
+  }, [graph])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -207,8 +190,8 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.lineWidth = 1.3 / camera.scale
           context.stroke()
         }
-        const important = node.degree >= 8 || node.document.path.startsWith('Topics/')
-        if (showLabels && (camera.scale > 1.15 || important || isHovered || isSelected || (queryActive && isMatch))) {
+        const important = node.degree >= 5
+        if (showLabels && (camera.scale > .35 || important || isHovered || isSelected || (queryActive && isMatch))) {
           const fontSize = Math.max(8.5, 11 / Math.sqrt(camera.scale))
           context.font = `${isHovered || isSelected ? 600 : 400} ${fontSize}px system-ui, sans-serif`
           context.textAlign = 'center'
@@ -216,7 +199,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.fillStyle = isSelected ? '#fff2c7' : '#d7d8db'
           context.shadowColor = '#171717'
           context.shadowBlur = 4 / camera.scale
-          context.fillText(node.document.title, node.x, node.y + radius + 4 / camera.scale)
+          context.fillText(node.document.title, node.x, node.y + radius + 4 / camera.scale, 180)
           context.shadowBlur = 0
         }
         context.globalAlpha = 1
@@ -226,7 +209,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
     drawRef.current()
   }, [matchedPaths, query, selectedPath, showLabels, visiblePaths])
 
-  const graphPoint = (event: React.PointerEvent<HTMLCanvasElement> | React.WheelEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
+  const graphPoint = (event: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
     const screenX = event.clientX - rect.left
     const screenY = event.clientY - rect.top
@@ -256,7 +239,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
     const minX = Math.min(...xs); const maxX = Math.max(...xs)
     const minY = Math.min(...ys); const maxY = Math.max(...ys)
     const { width, height } = sizeRef.current
-    const scale = Math.max(.2, Math.min(2.2, .84 * Math.min(width / Math.max(200, maxX - minX), height / Math.max(160, maxY - minY))))
+    const scale = Math.max(.08, Math.min(2.2, .9 * Math.min(width / Math.max(200, maxX - minX), height / Math.max(160, maxY - minY))))
     cameraRef.current = { x: width / 2 - ((minX + maxX) / 2) * scale, y: height / 2 - ((minY + maxY) / 2) * scale, scale }
     drawRef.current()
   }
@@ -264,18 +247,41 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
   const zoom = (factor: number) => {
     const { width, height } = sizeRef.current
     const camera = cameraRef.current
-    const next = Math.max(.2, Math.min(4, camera.scale * factor))
+    const next = Math.max(.08, Math.min(6, camera.scale * factor))
     const graphX = (width / 2 - camera.x) / camera.scale
     const graphY = (height / 2 - camera.y) / camera.scale
     cameraRef.current = { x: width / 2 - graphX * next, y: height / 2 - graphY * next, scale: next }
     drawRef.current()
   }
 
-  useEffect(() => { const timer = window.setTimeout(fit, 900); return () => window.clearTimeout(timer) }, [graphDocuments])
+  useEffect(() => {
+    const timers = [900, 2600].map((delay) => window.setTimeout(fit, delay))
+    return () => timers.forEach(window.clearTimeout)
+  }, [graphDocuments])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault()
+      const rect = canvas.getBoundingClientRect()
+      const screenX = event.clientX - rect.left
+      const screenY = event.clientY - rect.top
+      const camera = cameraRef.current
+      const graphX = (screenX - camera.x) / camera.scale
+      const graphY = (screenY - camera.y) / camera.scale
+      const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rect.height : 1)
+      const next = Math.max(.08, Math.min(6, camera.scale * Math.exp(-delta * (event.ctrlKey ? .012 : .0015))))
+      cameraRef.current = { x: screenX - graphX * next, y: screenY - graphY * next, scale: next }
+      drawRef.current()
+    }
+    canvas.addEventListener('wheel', onWheel, { passive: false })
+    return () => canvas.removeEventListener('wheel', onWheel)
+  }, [])
 
   return <section className="library-graph" ref={shellRef}>
-    <div className="graph-titlebar"><span>Graph view</span><button type="button" aria-label="Graph menu" onClick={() => setSettingsOpen((value) => !value)}>•••</button></div>
-    <canvas ref={canvasRef} aria-label={`Knowledge graph with ${graphDocuments.length} notes`}
+    <div className="graph-titlebar"><span>PDF graph</span><button type="button" aria-label="Graph menu" onClick={() => setSettingsOpen((value) => !value)}>•••</button></div>
+    <canvas ref={canvasRef} aria-label={`Knowledge graph with ${graphDocuments.length} PDF documents`}
       onPointerDown={(event) => {
         const point = graphPoint(event)
         const node = hitNode(point.x, point.y)
@@ -320,14 +326,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
         const node = hitNode(point.x, point.y)
         if (node) onOpen(node.id)
       }}
-      onWheel={(event) => {
-        event.preventDefault()
-        const point = graphPoint(event)
-        const camera = cameraRef.current
-        const next = Math.max(.2, Math.min(4, camera.scale * Math.exp(-event.deltaY * .0012)))
-        cameraRef.current = { x: point.screenX - point.x * next, y: point.screenY - point.y * next, scale: next }
-        drawRef.current()
-      }} />
+      />
     <div className="graph-controls">
       <button type="button" onClick={() => setSettingsOpen((value) => !value)} aria-label="Graph settings">⚙</button>
       <button type="button" onClick={() => zoom(1.25)} aria-label="Zoom in">＋</button>
@@ -341,14 +340,14 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
       <button type="button" className="btn compact" onClick={() => { simulationRef.current?.alpha(.9).restart(); setSettingsOpen(false) }}>Reheat layout</button>
     </div> : null}
     <div className="graph-legend">
-      <span><i className="topic" /> Topics</span><span><i className="source" /> Sources</span><span><i className="feedback" /> Feedback</span><span><i className="system" /> System</span>
+      <span><i className="system" /> NASA</span><span><i className="topic" /> ECSS / ESA</span><span><i className="feedback" /> Engineering standards</span><span><i className="source" /> Other PDFs</span>
     </div>
-    <div className="graph-status">{graphDocuments.length} nodes · {graphLinkCount} links · scroll to zoom · drag to pan</div>
+    <div className="graph-status">{graphDocuments.length} PDFs · {graphLinkCount} topic links · pinch or scroll to zoom · drag to pan</div>
     {(hoveredPath || selected) ? <div className="graph-node-card">
-      <span className="kicker">{hoveredPath ? 'Linked note' : 'Selected note'}</span>
+      <span className="kicker">{hoveredPath ? 'PDF source' : 'Selected PDF'}</span>
       <strong>{documents.find((document) => document.path === hoveredPath)?.title || selected?.title}</strong>
       <small>{hoveredPath || selected?.path}</small>
-      {selected && !hoveredPath ? <button type="button" className="btn compact" onClick={() => onOpen(selected.path)}>Open note</button> : null}
+      {selected && !hoveredPath ? <button type="button" className="btn compact" onClick={() => onOpen(selected.path)}>Open PDF</button> : null}
     </div> : null}
   </section>
 }

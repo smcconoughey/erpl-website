@@ -45,15 +45,12 @@ const formatBytes = (bytes: number) => {
 export function LibraryApp() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null)
   const [documents, setDocuments] = useState<LibraryDocument[]>([])
-  const [totalBytes, setTotalBytes] = useState(0)
   const [selectedPath, setSelectedPath] = useState(() => decodeURIComponent(location.hash.slice(1)))
+  const [readerOpen, setReaderOpen] = useState(() => Boolean(location.hash.slice(1)))
   const [search, setSearch] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [searchIndexed, setSearchIndexed] = useState<boolean | null>(null)
-  const [category, setCategory] = useState('All')
-  const [folder, setFolder] = useState('')
-  const [view, setView] = useState<'browse' | 'graph'>('browse')
   const [graphSelectedPath, setGraphSelectedPath] = useState('')
   const [selectedPage, setSelectedPage] = useState<number>()
   const [uploadOpen, setUploadOpen] = useState(false)
@@ -61,11 +58,9 @@ export function LibraryApp() {
 
   const load = async () => {
     const response = await request('catalog')
-    const data = await response.json() as { documents: LibraryDocument[]; totalBytes: number }
+    const data = await response.json() as { documents: LibraryDocument[] }
     setDocuments(data.documents)
-    setTotalBytes(data.totalBytes)
     setAuthenticated(true)
-    if (!selectedPath && data.documents.length) setSelectedPath(data.documents.find((item) => item.name.toLowerCase() === 'home.md')?.path || data.documents[0].path)
   }
 
   useEffect(() => {
@@ -76,8 +71,19 @@ export function LibraryApp() {
   }, [])
 
   useEffect(() => {
-    if (selectedPath) history.replaceState(null, '', `/library#${encodeURIComponent(selectedPath)}`)
-  }, [selectedPath])
+    history.replaceState(null, '', readerOpen && selectedPath ? `/library#${encodeURIComponent(selectedPath)}` : '/library')
+  }, [readerOpen, selectedPath])
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (readerOpen) setReaderOpen(false)
+        else setSearch('')
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [readerOpen])
 
   useEffect(() => {
     const query = search.trim()
@@ -100,15 +106,6 @@ export function LibraryApp() {
   }, [authenticated, search])
 
   const selected = documents.find((document) => document.path === selectedPath) || null
-  const categories = useMemo(() => ['All', ...new Set(documents.map((document) => document.category).filter(Boolean))], [documents])
-  const folders = useMemo(() => {
-    const values = new Set<string>()
-    documents.forEach((document) => {
-      const parts = document.folder.split('/').filter(Boolean)
-      for (let index = 1; index <= parts.length; index += 1) values.add(parts.slice(0, index).join('/'))
-    })
-    return [...values].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-  }, [documents])
   const passagesByPath = useMemo(() => {
     const result = new Map<string, SearchResult[]>()
     searchResults.forEach((hit) => result.set(hit.path, [...result.get(hit.path) || [], hit]))
@@ -124,86 +121,55 @@ export function LibraryApp() {
     })
     return paths
   }, [documents, search, searchResults])
-  const filtered = useMemo(() => {
-    const query = search.trim()
-    return documents.filter((document) =>
-      (category === 'All' || document.category === category) &&
-      (!folder || document.path.startsWith(`${folder}/`)) &&
-      (!query || matchedPaths.has(document.path)))
-  }, [documents, search, category, folder, matchedPaths])
+  const filtered = useMemo(() => documents.filter((document) => matchedPaths.has(document.path)).sort((a, b) =>
+    (passagesByPath.get(b.path)?.[0]?.score || 0) - (passagesByPath.get(a.path)?.[0]?.score || 0) || a.title.localeCompare(b.title)
+  ), [documents, matchedPaths, passagesByPath])
+  const openDocument = (path: string, page?: number) => {
+    setSelectedPath(path); setGraphSelectedPath(path); setSelectedPage(page); setReaderOpen(true)
+  }
 
   if (authenticated !== true) {
     return <LibraryLogin loading={authenticated === null} error={error} onAuthenticated={() => void load().catch((caught) => setError(caught.message))} />
   }
 
   return (
-    <div className="library-app">
+    <div className="library-app library-graph-app">
       <header className="library-header">
         <a className="library-brand" href="/library">
           <img src={`${import.meta.env.BASE_URL}erpl-mark.png`} alt="ERPL" />
           <span><strong>Engineering Brain</strong><small>ERPL knowledge library</small></span>
         </a>
-        <label className="library-search">
-          <span>⌕</span>
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search notes and 9,000 PDF passages" />
-          {search ? <button type="button" onClick={() => setSearch('')} aria-label="Clear search">×</button> : null}
-        </label>
+        <div className="library-search-wrap">
+          <label className="library-search">
+            <span>⌕</span>
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search documents and PDF passages" aria-label="Search library" />
+            {search ? <button type="button" onClick={() => setSearch('')} aria-label="Clear search">×</button> : null}
+          </label>
+          {search.trim() ? <div className="library-search-results">
+            <div className="library-search-results-head">{searching ? 'Searching full text…' : `${filtered.length} matching document${filtered.length === 1 ? '' : 's'}${searchResults.length ? ` · ${searchResults.length} passage hits` : ''}${searchIndexed === false ? ' · PDF index unavailable' : ''}`}</div>
+            <div className="library-search-results-list">
+              {filtered.slice(0, 60).map((document) => <button type="button" key={document.path} onClick={() => { openDocument(document.path, passagesByPath.get(document.path)?.[0]?.page); setSearch('') }}>
+                <DocumentIcon kind={document.kind} /><span><strong>{document.title}</strong><small>{document.path}</small>
+                  {passagesByPath.get(document.path)?.[0] ? <SearchExcerpt hit={passagesByPath.get(document.path)![0]} count={passagesByPath.get(document.path)!.length} /> : null}
+                </span>
+              </button>)}
+              {!filtered.length && !searching ? <p>No matching documents. Try another term.</p> : null}
+            </div>
+          </div> : null}
+        </div>
         <div className="library-header-actions">
           <a className="btn" href="/">Telemetry</a>
           <button type="button" className="btn accent" onClick={() => setUploadOpen(true)}>＋ Add to library</button>
         </div>
       </header>
       {error ? <div className="banner">{error}</div> : null}
-      <div className={`library-workspace${view === 'graph' ? ' graph-mode' : ''}`}>
-        <aside className="library-nav">
-          <div className="library-nav-head"><span className="kicker">Vault</span><span>{documents.length} docs</span></div>
-          <button type="button" className={`library-nav-row${view === 'browse' && folder === '' ? ' active' : ''}`} onClick={() => { setView('browse'); setFolder('') }}>
-            <span>◇</span><strong>All documents</strong><em>{documents.length}</em>
-          </button>
-          <button type="button" className={`library-nav-row${view === 'graph' ? ' active' : ''}`} onClick={() => setView('graph')}>
-            <span className="graph-nav-icon">⌘</span><strong>Graph view</strong><em>{documents.filter((item) => item.kind === 'markdown').length}</em>
-          </button>
-          <div className="library-section-label">Folders</div>
-          <div className="library-folder-list">
-            {folders.map((name) => <button type="button" key={name} className={`library-nav-row${folder === name ? ' active' : ''}`}
-              style={{ paddingLeft: `${12 + (name.split('/').length - 1) * 13}px` }} onClick={() => { setView('browse'); setFolder(name) }}>
-              <span>▱</span><strong>{name.split('/').at(-1)}</strong>
-            </button>)}
-          </div>
-          <div className="library-nav-foot"><span>{formatBytes(totalBytes)} stored</span><span>Protected team library</span></div>
-        </aside>
-
-        {view === 'graph' ? <LibraryGraph documents={documents} matchedPaths={matchedPaths} query={search}
-          selectedPath={graphSelectedPath} onSelect={(path) => { setGraphSelectedPath(path); setSelectedPath(path); setSelectedPage(undefined) }}
-          onOpen={(path) => { setSelectedPath(path); setSelectedPage(undefined); setView('browse') }} /> : <>
-        <section className="library-list-pane">
-          <div className="library-list-head">
-            <div><span className="kicker">Browse</span><h1>{folder || 'All documents'}</h1></div>
-            <select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Filter by category">
-              {categories.map((name) => <option key={name}>{name}</option>)}
-            </select>
-          </div>
-          <div className="library-results-meta">{searching ? 'Searching full text…' : `${filtered.length} result${filtered.length === 1 ? '' : 's'}${search ? ` for “${search}”` : ''}${searchResults.length ? ` · ${searchResults.length} PDF passage hits` : ''}${search && searchIndexed === false ? ' · PDF index unavailable' : ''}`}</div>
-          <div className="library-document-list">
-            {filtered.map((document) => <button type="button" key={document.path}
-              className={`library-document-row${selected?.path === document.path ? ' active' : ''}`}
-              onClick={() => { setSelectedPath(document.path); setSelectedPage(passagesByPath.get(document.path)?.[0]?.page) }}>
-              <DocumentIcon kind={document.kind} />
-              <span className="library-document-main"><strong>{document.title}</strong><small>{document.path}</small>
-                {passagesByPath.get(document.path)?.[0] ? <SearchExcerpt hit={passagesByPath.get(document.path)![0]} count={passagesByPath.get(document.path)!.length} /> : null}
-              </span>
-              <span className="library-document-side"><em>{document.category}</em><small>{formatBytes(document.size)}</small></span>
-            </button>)}
-            {!filtered.length ? <div className="library-empty"><strong>No documents found</strong><span>Try another search, folder, or category.</span></div> : null}
-          </div>
-        </section>
-
-        <main className="library-reader">
-          {selected ? <DocumentReader document={selected} documents={documents} page={selectedPage} onNavigate={(path) => { setSelectedPath(path); setSelectedPage(undefined) }}
-            onUpdated={() => void load().catch((caught) => setError(caught.message))} /> :
-            <div className="library-empty reader"><strong>Select a document</strong><span>Choose a note, reference, or attachment from the library.</span></div>}
-        </main></>}
-      </div>
+      <main className="library-graph-stage"><LibraryGraph documents={documents} matchedPaths={matchedPaths} query={search}
+        selectedPath={graphSelectedPath} onSelect={setGraphSelectedPath} onOpen={(path) => openDocument(path)} /></main>
+      {readerOpen && selected ? <div className="library-pdf-overlay">
+        <div className="library-pdf-toolbar"><button type="button" className="btn" onClick={() => setReaderOpen(false)}>← Back to graph</button><span>{selected.title}</span></div>
+        <main className="library-reader"><DocumentReader document={selected} documents={documents} page={selectedPage}
+          onNavigate={(path) => openDocument(path)} onUpdated={() => void load().catch((caught) => setError(caught.message))} /></main>
+      </div> : null}
       {uploadOpen ? <UploadDialog onClose={() => setUploadOpen(false)} onUploaded={async () => { await load(); setUploadOpen(false) }} /> : null}
     </div>
   )
