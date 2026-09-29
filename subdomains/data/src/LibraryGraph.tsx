@@ -39,6 +39,22 @@ const colorFor = (document: LibraryDocument) => {
 
 const nodeOf = (value: string | GraphNode) => typeof value === 'string' ? null : value
 
+const graphLabel = (document: LibraryDocument) => document.path.startsWith('Topics/')
+  ? document.title
+  : document.title.split(/\s+[-–—]\s+/, 1)[0]
+
+const fitLabel = (context: CanvasRenderingContext2D, label: string, maxWidth: number) => {
+  if (context.measureText(label).width <= maxWidth) return label
+  let low = 0
+  let high = label.length
+  while (low < high) {
+    const mid = Math.ceil((low + high) / 2)
+    if (context.measureText(`${label.slice(0, mid).trimEnd()}…`).width <= maxWidth) low = mid
+    else high = mid - 1
+  }
+  return `${label.slice(0, low).trimEnd()}…`
+}
+
 export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onSelect, onOpen }: {
   documents: LibraryDocument[]
   matchedPaths: Set<string>
@@ -214,7 +230,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.shadowColor = '#171717'
           context.shadowBlur = 4 / camera.scale
           const labelY = node.labelAbove ? node.y - radius - fontSize - 4 / camera.scale : node.y + radius + 4 / camera.scale
-          context.fillText(node.document.title, node.x, labelY, (topic ? 205 : 155) / camera.scale)
+          context.fillText(fitLabel(context, graphLabel(node.document), (topic ? 205 : 155) / camera.scale), node.x, labelY)
           context.shadowBlur = 0
         }
         context.globalAlpha = 1
