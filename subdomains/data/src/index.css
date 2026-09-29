@@ -666,6 +666,8 @@ a.btn {
   font-size: 9px;
 }
 
+.graph-mobile-hint { display: none; }
+
 .graph-node-card {
   width: min(290px, calc(100% - 100px));
   left: 15px;
@@ -826,6 +828,7 @@ a.btn {
   .library-upload-pickers { align-items: stretch; flex-wrap: wrap; }
   .library-upload-pickers span { width: 100%; margin: 4px 0 0; }
   .graph-status { display: none; }
+  .graph-mobile-hint { display: block; position: absolute; bottom: 39px; left: 15px; z-index: 3; color: #858f9a; font-size: 10px; }
   .graph-legend { max-width: calc(100% - 25px); flex-wrap: wrap; }
 
   .library-graph-app { height: 100dvh; min-height: 0; grid-template-rows: auto minmax(0, 1fr); }

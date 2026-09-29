@@ -18,6 +18,7 @@ type GraphNode = SimulationNodeDatum & {
   document: LibraryDocument
   degree: number
   radius: number
+  labelAbove: boolean
 }
 
 type GraphLink = SimulationLinkDatum<GraphNode> & {
@@ -97,6 +98,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
         document,
         degree: connections,
         radius: topic ? 16 + Math.min(8, Math.sqrt(connections) * 1.1) : 4 + Math.min(7, Math.sqrt(connections) * 1.35),
+        labelAbove: topic && index % 2 === 0,
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
         fx: topic ? Math.cos(angle) * radius : undefined,
@@ -201,7 +203,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.stroke()
         }
         const topic = node.document.path.startsWith('Topics/')
-        const important = topic
+        const important = topic && width >= 700
         const labelZoom = width < 700 ? .62 : .75
         if (showLabels && (camera.scale > labelZoom || important || isHovered || isSelected || (queryActive && isMatch))) {
           const fontSize = (topic ? 12 : 10) / camera.scale
@@ -211,7 +213,8 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
           context.fillStyle = isSelected ? '#fff2c7' : topic ? '#c9edfc' : '#d7d8db'
           context.shadowColor = '#171717'
           context.shadowBlur = 4 / camera.scale
-          context.fillText(node.document.title, node.x, node.y + radius + 4 / camera.scale, (topic ? 205 : 155) / camera.scale)
+          const labelY = node.labelAbove ? node.y - radius - fontSize - 4 / camera.scale : node.y + radius + 4 / camera.scale
+          context.fillText(node.document.title, node.x, labelY, (topic ? 205 : 155) / camera.scale)
           context.shadowBlur = 0
         }
         context.globalAlpha = 1
@@ -352,6 +355,7 @@ export function LibraryGraph({ documents, matchedPaths, query, selectedPath, onS
       <span><i className="topic" /> Topics</span><span><i className="system" /> NASA PDFs</span><span><i className="feedback" /> Standards PDFs</span><span><i className="source" /> Other PDFs</span>
     </div>
     <div className="graph-status">{graph.topics.length} topics · {graph.pdfs.length} PDFs · {graphLinkCount} links · pinch or scroll to zoom · drag to pan</div>
+    <div className="graph-mobile-hint">Pinch to zoom · tap a blue topic to read its name</div>
     {(hoveredPath || selected) ? <div className="graph-node-card">
       <span className="kicker">{(hoveredPath || selectedPath).startsWith('Topics/') ? 'Topic' : 'PDF source'}</span>
       <strong>{documents.find((document) => document.path === hoveredPath)?.title || selected?.title}</strong>
