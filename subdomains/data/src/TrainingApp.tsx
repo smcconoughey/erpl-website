@@ -138,7 +138,7 @@ export function TrainingApp() {
     return result
   }
   const safeParents = folders.filter((folder) => folder.id !== selectedId && !ancestors(folder.id).some((ancestor) => ancestor.id === selectedId))
-  const children = (id: string | null) => nodes.filter((node) => node.parentId === id).sort((a, b) => Number(b.kind === 'folder') - Number(a.kind === 'folder') || a.title.localeCompare(b.title))
+  const children = (id: string | null) => nodes.filter((node) => node.parentId === id).sort((a, b) => Number(b.id === 'getting-started') - Number(a.id === 'getting-started') || Number(b.kind === 'folder') - Number(a.kind === 'folder') || a.title.localeCompare(b.title))
   const matching = nodes.filter((node) => node.title.toLowerCase().includes(search.toLowerCase()) || node.owner?.toLowerCase().includes(search.toLowerCase()))
   const tree = (id: string | null, depth = 0): React.ReactNode => children(id).map((node) => <div key={node.id}>
     <div className={`tr-tree-row ${node.id === selectedId ? 'active' : ''}`} style={{ paddingLeft: 12 + depth * 15 }}>
