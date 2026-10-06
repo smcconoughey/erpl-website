@@ -9,9 +9,10 @@ const digest = (value) => createHash('sha256').update(value).digest()
 
 // One server process owns this file. Keep it on the persistent testdata disk so
 // restarts, page reloads, and cleared cookies cannot reset a lockout.
-export function createAuth({ password, secret, stateFile, secureCookies, now = Date.now }) {
+export function createAuth({ password, secret, stateFile, secureCookies, cookieName = COOKIE, now = Date.now }) {
   const passwordHash = digest(password || '')
-  const sessionKey = createHmac('sha256', secret).update(passwordHash).digest()
+  const sessionKey = createHmac('sha256', secret).update(passwordHash)
+    .update(cookieName === COOKIE ? '' : cookieName).digest()
   const sign = (value) => createHmac('sha256', sessionKey).update(value).digest('base64url')
   const attempts = new Map(existsSync(stateFile) ? JSON.parse(readFileSync(stateFile, 'utf8')) : [])
   // The same team session unlocks telemetry and the document library.
@@ -71,13 +72,13 @@ export function createAuth({ password, secret, stateFile, secureCookies, now = D
     attempts.delete(key)
     save()
     const payload = `${now() + SESSION_MS}.${randomBytes(24).toString('base64url')}`
-    res.cookie(COOKIE, `${payload}.${sign(payload)}`, { ...cookieOptions, maxAge: SESSION_MS })
+    res.cookie(cookieName, `${payload}.${sign(payload)}`, { ...cookieOptions, maxAge: SESSION_MS })
     return res.json({ ok: true })
   }
 
   function hasSession(req) {
     const token = (req.headers.cookie || '').split(';').map((part) => part.trim())
-      .find((part) => part.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1) || ''
+      .find((part) => part.startsWith(`${cookieName}=`))?.slice(cookieName.length + 1) || ''
     const [expires, nonce, signature, extra] = token.split('.')
     const expected = sign(`${expires}.${nonce}`)
     return Boolean(password && extra === undefined && nonce && signature && /^[A-Za-z0-9_-]{43}$/.test(signature) &&
@@ -87,11 +88,16 @@ export function createAuth({ password, secret, stateFile, secureCookies, now = D
 
   function requireSession(req, res, next) {
     if (!hasSession(req)) {
-      res.clearCookie(COOKIE, cookieOptions)
+      res.clearCookie(cookieName, cookieOptions)
       return res.status(401).json({ error: 'Please enter the shared password to access online data.' })
     }
     next()
   }
 
-  return { status, login, requireSession }
+  function logout(_req, res) {
+    res.clearCookie(cookieName, cookieOptions)
+    res.json({ ok: true })
+  }
+
+  return { status, login, requireSession, logout }
 }

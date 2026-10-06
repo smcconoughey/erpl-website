@@ -11,8 +11,10 @@ import { uid } from './lib/math'
 import { useLiveTelemetry } from './live'
 import { TelemetryProvider, useLoadFiles, useTelemetry } from './store'
 import { LibraryApp } from './LibraryApp'
+import { TrainingApp } from './TrainingApp'
 
 export function App() {
+  if (window.location.pathname === '/training' || window.location.pathname.startsWith('/training/')) return <TrainingApp />
   if (window.location.pathname.startsWith('/library')) return <LibraryApp />
   return (
     <TelemetryProvider>

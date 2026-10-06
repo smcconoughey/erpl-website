@@ -339,3 +339,60 @@ of cursors draws a chord on every visible series. The inspector lists:
 
 Drag a cursor to move it. Right-click a cursor to remove it. Escape clears
 cursors and returns to pan.
+
+## Safety & training workspace
+
+Open `/training` on the **erpl-public-data** deployment. The workspace has its own
+server-checked password (`training` by default, or `ERPL_TRAINING_PASSWORD`) and
+signed HttpOnly session; this password does not unlock telemetry or Engineering
+Brain. Five incorrect passwords trigger the existing persistent five-minute
+lockout. Access expires after one hour; **Lock workspace** clears the browser's
+training session.
+
+The left document tree supports nested folders, page creation, search by title or
+owner, and moving or renaming items through **Edit document / Edit folder**. Use
+Markdown for readable procedures and training notes. Save **Owner**, document
+**Status**, and **Next review** alongside content; approval additionally requires a
+reviewer and review date. Editing or replacing an approved document returns it to
+draft unless a fresh review is explicitly recorded. Review metadata is entered
+by shared-password users and is not identity verification or personnel
+qualification. Signed source evidence should remain attached to the records.
+
+Upload `.md` and `.xlsx` files to the currently selected folder. Markdown is
+editable in the browser with a preview. Excel workbooks show plain cell text in
+sheet tabs; formulas are not executed and may show cached results. The preview
+is limited to 100 rows, 40 columns, and the first 30 sheets. Download a workbook,
+edit it in Excel, and **Replace workbook** to publish a new revision. The original
+workbook, formulas, formatting, and earlier revision bytes remain downloadable.
+Files are limited to 10 MB, Markdown to 1 MB, and expanded XLSX content to 30 MB.
+Macro-enabled and encrypted workbooks are not supported.
+
+Blank Excel templates cover training records, authorization registers,
+activity requirements, FMEA (including an empty scoring-method sheet), and
+inspection findings. They contain headers only, not fictional people, scores,
+completed controls, or approvals. Starter Markdown pages are explicitly marked
+**Template**, including Red team, Charge manufacturing, TCON, respiratory
+protection records, procedure structure, FMEA index, and evidence collection.
+The homepage counts actual document statuses and review dates; it does not
+interpret uploaded workbooks or claim audit readiness.
+
+Content is stored beneath `ERPL_TESTDATA_DIR/.training/` on the existing persistent
+disk, separate from telemetry and the library. `workspace.json` holds the tree,
+Markdown, review metadata, and previous revisions; generated UUID-named XLSX
+files preserve each uploaded revision. Include this entire directory in disk
+backups. No training files are served from public static paths or the read-only
+Engineering Brain capability. Saves are serialized and use atomic rename;
+version checks reject overwriting someone else's newer edit. Keep the existing
+single-process / single-instance persistent-disk deployment.
+
+Organization references: [Confluence content tree and retained page versions](https://support.atlassian.com/confluence-cloud/docs/create-edit-and-publish-a-page/),
+[MIT EHS activity-based training records](https://ehs.mit.edu/about/ehs-management-system/),
+and [MIT's EHS representative notebook](https://ehs.mit.edu/lab-research-program/ehs-rep-notebook/).
+These inform the document structure; they are not ERPL or ERAU requirements.
+
+Verification: `npm test` covers existing telemetry/library behavior plus training
+session isolation, blank starter records, persistent edits and revisions,
+approval validation, stale updates, folder moves, concurrent writes, Excel
+uploads/replacement/preview/download, archive bounds, and private storage.
+`npm run build` compiles the UI. GitHub Actions runs these on PRs targeting
+`erpl-public-data` and pushes to its deployment branch.
