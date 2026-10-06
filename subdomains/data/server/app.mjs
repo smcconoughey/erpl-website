@@ -4,6 +4,7 @@ import { lstat, readdir, realpath } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createAuth } from './auth.mjs'
+import { mountTraining } from './training.mjs'
 import { createCeaSolver, validateCeaRequest } from './cea.mjs'
 import { createIngest, MAX_CSV_BYTES } from './ingest.mjs'
 import { createLibrary, MAX_LIBRARY_BYTES, MAX_SEARCH_INDEX_BYTES } from './library.mjs'
@@ -189,10 +190,12 @@ export function createApp(options = {}) {
       throw error
     }
   })
+  mountTraining(app, { dataDir, secret, production, now: options.now,
+    password: options.trainingPassword ?? process.env.ERPL_TRAINING_PASSWORD ?? 'training' })
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found.' }))
   // Never serve the repository, testdata directory, or server source as static files.
   app.use(express.static(distDir, { dotfiles: 'deny', index: 'index.html' }))
-  app.get(['/library', '/library/*splat'], (_req, res) => res.sendFile(join(distDir, 'index.html')))
+  app.get(['/library', '/library/*splat', '/training', '/training/*splat'], (_req, res) => res.sendFile(join(distDir, 'index.html')))
   app.use((_req, res) => res.status(404).send('Not found'))
   app.use((error, _req, res, next) => {
     if (res.headersSent) return next(error)

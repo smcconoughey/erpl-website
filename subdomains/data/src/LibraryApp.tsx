@@ -168,6 +168,7 @@ export function LibraryApp() {
         </div>
         <div className="library-header-actions">
           <a className="btn" href="/">Telemetry</a>
+          <a className="btn" href="/training">Training</a>
           <button type="button" className="btn accent" onClick={() => setUploadOpen(true)}>＋ Add to library</button>
         </div>
       </header>
