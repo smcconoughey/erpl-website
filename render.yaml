@@ -11,7 +11,8 @@ services:
     autoDeployTrigger: commit
     # NODE_ENV=production is also present during builds, so explicitly retain
     # Vite and TypeScript from devDependencies for the frontend compilation.
-    buildCommand: cd subdomains/data && npm ci --include=dev && npm run build
+    # Remove dist first to prevent Render's build cache from serving stale bundles.
+    buildCommand: cd subdomains/data && rm -rf dist && npm ci --include=dev && npm run build
     startCommand: cd subdomains/data && npm start
     healthCheckPath: /healthz
     envVars:
