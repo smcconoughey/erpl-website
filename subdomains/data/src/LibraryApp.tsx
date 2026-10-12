@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { LibraryGraph } from './LibraryGraph'
 import { buildPdfGraph } from './pdfGraph'
@@ -283,9 +283,11 @@ function DocumentReader({ document, documents, page, onNavigate, onUpdated }: {
     {error ? <div className="library-form-error reader-error">{error}</div> : null}
     <div className="library-preview">
       {loading ? <div className="library-empty reader"><span>Loading preview…</span></div> : null}
-      {!loading && document.kind === 'markdown' ? <article className="markdown-body"><ReactMarkdown remarkPlugins={[remarkGfm]} components={{
-        a: ({ href, children }) => href?.startsWith('wiki:') ? <button type="button" className="wiki-link" onClick={() => resolveWiki(href)}>{children}</button> : <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>,
-      }}>{markdown}</ReactMarkdown></article> : null}
+      {!loading && document.kind === 'markdown' ? <article className="markdown-body"><ReactMarkdown remarkPlugins={[remarkGfm]}
+        urlTransform={(url) => url.startsWith('wiki:') ? url : defaultUrlTransform(url)}
+        components={{
+          a: ({ href, children }) => href?.startsWith('wiki:') ? <button type="button" className="wiki-link" onClick={() => resolveWiki(href)}>{children}</button> : <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>,
+        }}>{markdown}</ReactMarkdown></article> : null}
       {!loading && document.kind === 'text' ? <pre className="text-preview">{content}</pre> : null}
       {document.kind === 'pdf' ? <iframe title={document.title} src={`${fileUrl(document)}${page ? `#page=${page}` : ''}`} /> : null}
       {document.kind === 'image' ? <img src={fileUrl(document)} alt={document.title} /> : null}
