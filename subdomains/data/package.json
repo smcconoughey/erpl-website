@@ -21,10 +21,13 @@
     "d3-force": "^3.0.0",
     "exceljs": "^4.4.0",
     "express": "^5.2.1",
+    "katex": "^0.16.47",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@types/d3-force": "^3.0.10",
