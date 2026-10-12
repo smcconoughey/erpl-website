@@ -10,7 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.python
 *.local
+.env
+.env.*
+!.env.example
+testdata/*
+!testdata/README.md
 
 # Editor directories and files
 .vscode/*

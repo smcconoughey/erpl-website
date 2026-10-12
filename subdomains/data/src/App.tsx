@@ -1,14 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
 import { Inspector } from './components/Inspector'
+import { LiveDialog, LiveInfoDialog } from './components/LiveDialog'
 import { Minimap } from './components/Minimap'
+import { OnlineDataDialog } from './components/OnlineDataDialog'
 import { Plots } from './components/Plots'
 import { Sidebar } from './components/Sidebar'
 import { Toolbar } from './components/Toolbar'
 import { sourcesFromDataTransfer, sourcesFromFileList } from './lib/files'
 import { uid } from './lib/math'
+import { useLiveTelemetry } from './live'
 import { TelemetryProvider, useLoadFiles, useTelemetry } from './store'
+import { LibraryApp } from './LibraryApp'
+import { TrainingApp } from './TrainingApp'
 
 export function App() {
+  if (window.location.pathname === '/training' || window.location.pathname.startsWith('/training/')) return <TrainingApp />
+  if (window.location.pathname.startsWith('/library')) return <LibraryApp />
   return (
     <TelemetryProvider>
       <Shell />
@@ -20,6 +27,11 @@ function Shell() {
   const { files, error, dispatch, loading } = useTelemetry()
   const load = useLoadFiles()
   const [dragging, setDragging] = useState(false)
+  const [onlineMode, setOnlineMode] = useState<'open' | 'manage' | null>(null)
+  const [onlineRevision, setOnlineRevision] = useState(0)
+  const [liveOpen, setLiveOpen] = useState(false)
+  const [liveInfoOpen, setLiveInfoOpen] = useState(false)
+  const live = useLiveTelemetry()
   const folderRef = useRef<HTMLInputElement>(null)
   const filesRef = useRef<HTMLInputElement>(null)
 
@@ -45,8 +57,8 @@ function Shell() {
     return () => window.removeEventListener('keydown', onKey)
   }, [dispatch])
 
-  const ingestBuffers = async (items: { name: string; folder: string; buffer: ArrayBuffer }[]) => {
-    await load(items.map((item) => ({ ...item, id: uid('file') })))
+  const ingestBuffers = async (items: { id?: string; name: string; folder: string; buffer: ArrayBuffer }[]) => {
+    await load(items.map((item) => ({ ...item, id: item.id ?? uid('file') })))
   }
 
   const ingestSources = async (sources: { file: File; folder: string; name: string }[]) => {
@@ -85,25 +97,38 @@ function Shell() {
       <Toolbar
         onOpenFolder={() => folderRef.current?.click()}
         onOpenFiles={() => filesRef.current?.click()}
+        onOpenOnline={() => setOnlineMode('open')}
+        onOpenLive={() => setLiveOpen(true)}
+        onOpenLiveInfo={() => setLiveInfoOpen(true)}
+        live={live.status !== 'idle'}
       />
-      {error ? <div className="banner">{error}</div> : null}
-      {files.length === 0 ? (
-        <EmptyState
-          loading={Boolean(loading)}
-          onOpenFolder={() => folderRef.current?.click()}
-          onOpenFiles={() => filesRef.current?.click()}
-        />
-      ) : (
-        <div className="workspace">
-          <Sidebar />
-          <main className="stage">
+      <div className={`banner${error ? '' : ' empty'}`}>{error}</div>
+      <div className="workspace">
+        <Sidebar serverRevision={onlineRevision} onOpenServer={() => setOnlineMode('manage')} onLoadServer={ingestBuffers} />
+        <main className="stage">
+          {files.length === 0 ? (
+            <EmptyState
+              loading={Boolean(loading)}
+              onOpenFolder={() => folderRef.current?.click()}
+              onOpenFiles={() => filesRef.current?.click()}
+              onOpenOnline={() => setOnlineMode('open')}
+            />
+          ) : <>
             <Plots />
             <Minimap />
-          </main>
-          <Inspector />
-        </div>
-      )}
+          </>}
+        </main>
+        <Inspector />
+      </div>
       {dragging ? <div className="drop-overlay">Drop CSV files or folders</div> : null}
+      {onlineMode && <OnlineDataDialog autoLoad={onlineMode === 'open'} onClose={() => {
+        setOnlineMode(null)
+        setOnlineRevision((revision) => revision + 1)
+      }} onLoad={ingestBuffers} />}
+      {liveOpen && <LiveDialog live={live} onClose={() => setLiveOpen(false)}
+        onNeedUnlock={() => { setLiveOpen(false); setOnlineMode('manage') }}
+        onInfo={() => { setLiveOpen(false); setLiveInfoOpen(true) }} />}
+      {liveInfoOpen && <LiveInfoDialog onClose={() => setLiveInfoOpen(false)} />}
       <input
         ref={folderRef}
         type="file"
@@ -134,10 +159,12 @@ function EmptyState({
   loading,
   onOpenFolder,
   onOpenFiles,
+  onOpenOnline,
 }: {
   loading: boolean
   onOpenFolder: () => void
   onOpenFiles: () => void
+  onOpenOnline: () => void
 }) {
   return (
     <div className="empty">
@@ -156,6 +183,12 @@ function EmptyState({
           <button type="button" className="btn" disabled={loading} onClick={onOpenFiles}>
             Open files
           </button>
+          <div className="online-action">
+            <button type="button" className="btn accent" disabled={loading} onClick={onOpenOnline}>
+              Open Online ERPL Data
+            </button>
+            <span className="hint">Shared password required</span>
+          </div>
         </div>
         <ul className="legend-help">
           <li>
@@ -165,7 +198,7 @@ function EmptyState({
             <b>Zoom</b> drag a time window · double-click fits
           </li>
           <li>
-            <b>Measure</b> click multiple points · inspector shows slope / ΔY / ΔX
+            <b>Measure</b> click multiple points · inspector shows slope / ΔY / ΔX · ∫ for */s
           </li>
           <li>
             <b>Axes</b> series sharing a unit share an axis · ⧉ splits onto its own scale

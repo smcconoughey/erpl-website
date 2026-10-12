@@ -1,0 +1,27 @@
+name: Data workspace checks
+on:
+  pull_request:
+    branches: [erpl-public-data]
+    paths: ['subdomains/data/**', '.github/workflows/data-training.yml']
+  push:
+    branches: [erpl-public-data, codex/training-workspace]
+    paths: ['subdomains/data/**', '.github/workflows/data-training.yml']
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: subdomains/data
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: npm
+          cache-dependency-path: subdomains/data/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --include=dev
+      - run: npm test
+      - run: npm run build

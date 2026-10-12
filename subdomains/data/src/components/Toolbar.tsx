@@ -3,9 +3,13 @@ import { useTelemetry } from '../store'
 type Props = {
   onOpenFolder: () => void
   onOpenFiles: () => void
+  onOpenOnline: () => void
+  onOpenLive: () => void
+  onOpenLiveInfo: () => void
+  live: boolean
 }
 
-export function Toolbar({ onOpenFolder, onOpenFiles }: Props) {
+export function Toolbar({ onOpenFolder, onOpenFiles, onOpenOnline, onOpenLive, onOpenLiveInfo, live }: Props) {
   const { tool, timeMode, hasAbsolute, loading, fullSpan, dispatch } = useTelemetry()
 
   return (
@@ -32,6 +36,18 @@ export function Toolbar({ onOpenFolder, onOpenFiles }: Props) {
         <button type="button" className="btn" onClick={onOpenFiles}>
           Open files
         </button>
+        <button type="button" className="btn accent" disabled={Boolean(loading)} onClick={onOpenOnline}>
+          Open Online ERPL Data
+        </button>
+        <a className="btn" href="/library">Library</a>
+        <a className="btn" href="/training">Training</a>
+        <span className="live-toolbar">
+          <button type="button" className={`btn live-btn${live ? ' on' : ''}`} onClick={onOpenLive}>
+            <span className="live-dot" /> Live
+          </button>
+          <button type="button" className="btn info-btn" title="Live telemetry endpoint setup"
+            aria-label="Live telemetry endpoint setup" onClick={onOpenLiveInfo}>ⓘ</button>
+        </span>
       </div>
 
       <div className="tool-group segmented">
