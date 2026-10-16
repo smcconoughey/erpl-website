@@ -2,6 +2,11 @@
     "imageDuration": 4000,
     "slides": [
         {
+            "type": "image",
+            "src": "assets/projects/moe-composite-hotfire-stand.jpg",
+            "alt": "MOE composite chamber hot fire test under the ERPL tent with American flag"
+        },
+        {
             "type": "video",
             "src": "assets/projects/extratrim2.mp4"
         },

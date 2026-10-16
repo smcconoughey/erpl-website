@@ -61,5 +61,15 @@
     "archiveProject": true,
     "source": null,
     "sourceLabel": "ERPL TEST RECORD"
+  },
+  {
+    "date": "MOE / OCTOBER 2026",
+    "title": "MOE composite chamber achieves successful hot fire",
+    "summary": "After two hard starts on earlier attempts, the MOE composite chamber completed a 7.5-second burn, the full length planned for this test on Draco. The engine produced approximately 1,950 lbf of thrust. Next up: a full-duration static fire on the vehicle.",
+    "result": "SUCCESSFUL HOT FIRE",
+    "image": "assets/projects/moe-composite-hotfire-stand.jpg",
+    "projectId": "moe",
+    "source": null,
+    "sourceLabel": "ERPL TEST RECORD"
   }
 ]
