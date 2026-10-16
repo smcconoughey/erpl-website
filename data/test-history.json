@@ -61,5 +61,15 @@
     "archiveProject": true,
     "source": null,
     "sourceLabel": "ERPL TEST RECORD"
+  },
+  {
+    "date": "MOE / OCTOBER 2026",
+    "title": "MOE composite chamber achieves successful hot fire",
+    "summary": "After two hard starts on earlier attempts, the MOE composite chamber fired successfully, producing approximately 1,950 lbf of thrust. The test moves the engine one step closer on the critical path to flight.",
+    "result": "SUCCESSFUL HOT FIRE",
+    "image": "assets/projects/moe-composite-hotfire-stand.jpg",
+    "projectId": "moe",
+    "source": null,
+    "sourceLabel": "ERPL TEST RECORD"
   }
 ]
