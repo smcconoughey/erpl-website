@@ -635,48 +635,31 @@ async function loadSponsors() {
     const container = document.getElementById('sponsorsContainer');
     if (!container) return;
 
-    // Group sponsors by tier
-    const tiers = {
-        platinum: sponsors.filter(s => s.tier === 'platinum'),
-        gold: sponsors.filter(s => s.tier === 'gold'),
-        silver: sponsors.filter(s => s.tier === 'silver'),
-        bronze: sponsors.filter(s => s.tier === 'bronze')
-    };
+    let html = '<div class="sponsors-grid">';
 
-    let html = '';
+    sponsors.forEach(sponsor => {
+        const url = sponsor.url && sponsor.url !== '#' ? sponsor.url : null;
+        const linkOpen = url ? `<a href="${url}" target="_blank" rel="noopener" class="sponsor-link">` : '<div class="sponsor-link">';
+        const linkClose = url ? '</a>' : '</div>';
 
-    // Render each tier
-    for (const [tierName, tierSponsors] of Object.entries(tiers)) {
-        if (tierSponsors.length === 0) continue;
+        const wrapperClass = sponsor.theme === 'dark'
+            ? 'sponsor-logo-wrapper dark-bg'
+            : 'sponsor-logo-wrapper';
+        const logoClass = sponsor.logoTreatment === 'black'
+            ? 'sponsor-logo sponsor-logo-black'
+            : 'sponsor-logo';
 
-        html += `<div class="sponsors-tier sponsors-tier-${tierName}">`;
-        html += `<div class="sponsors-grid sponsors-grid-${tierName}">`;
+        html += `
+            ${linkOpen}
+                <div class="${wrapperClass}">
+                    <img src="${sponsor.logo}" alt="${sponsor.name}" class="${logoClass}"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'sponsor-name\\'>${sponsor.name}</span>'">
+                </div>
+            ${linkClose}
+        `;
+    });
 
-        tierSponsors.forEach(sponsor => {
-            const url = sponsor.url && sponsor.url !== '#' ? sponsor.url : null;
-            const linkOpen = url ? `<a href="${url}" target="_blank" rel="noopener" class="sponsor-link">` : '<div class="sponsor-link">';
-            const linkClose = url ? '</a>' : '</div>';
-
-            const wrapperClass = sponsor.theme === 'dark'
-                ? 'sponsor-logo-wrapper dark-bg'
-                : 'sponsor-logo-wrapper';
-            const logoClass = sponsor.logoTreatment === 'black'
-                ? 'sponsor-logo sponsor-logo-black'
-                : 'sponsor-logo';
-
-            html += `
-                ${linkOpen}
-                    <div class="${wrapperClass}">
-                        <img src="${sponsor.logo}" alt="${sponsor.name}" class="${logoClass}"
-                             onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\\'sponsor-name\\'>${sponsor.name}</span>'">
-                    </div>
-                ${linkClose}
-            `;
-        });
-
-        html += '</div></div>';
-    }
-
+    html += '</div>';
     container.innerHTML = html;
 }
 
