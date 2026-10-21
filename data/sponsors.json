@@ -83,5 +83,47 @@
     "logo": "assets/sponsors/metalcraft.png",
     "url": "#",
     "tier": "gold"
+  },
+  {
+    "name": "Technetics Group",
+    "logo": "assets/sponsors/technetics-logo.png",
+    "url": "https://www.technetics.com",
+    "tier": "gold"
+  },
+  {
+    "name": "SSP Fittings",
+    "logo": "assets/sponsors/ssp-logo.png",
+    "url": "https://www.myssp.com",
+    "tier": "bronze"
+  },
+  {
+    "name": "Mitutoyo America",
+    "logo": "assets/sponsors/mitutoyo-logo.png",
+    "url": "https://www.mitutoyo.com",
+    "tier": "bronze"
+  },
+  {
+    "name": "Scientific Cutting Tools",
+    "logo": "assets/sponsors/sct-logo.png",
+    "url": "https://sct-usa.com",
+    "tier": "bronze"
+  },
+  {
+    "name": "LabJack",
+    "logo": "assets/sponsors/labjack-logo.png",
+    "url": "https://www.labjack.com",
+    "tier": "bronze"
+  },
+  {
+    "name": "CHANNELLOCK",
+    "logo": "assets/sponsors/channellock-logo.png",
+    "url": "https://www.channellock.com",
+    "tier": "bronze"
+  },
+  {
+    "name": "Altech Corp",
+    "logo": "assets/sponsors/altech-logo.png",
+    "url": "https://www.altechcorp.com",
+    "tier": "bronze"
   }
 ]
